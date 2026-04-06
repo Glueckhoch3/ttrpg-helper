@@ -9,12 +9,22 @@ visibility: public
 **Purpose:** UX, accessibility, and component guidelines for the AI assistant.
 
 UX & accessibility
+
 - Prioritize semantic HTML and keyboard navigation.
 - Provide meaningful ARIA attributes when necessary.
 
 Vue conventions
+
 - Prefer Options API and single-file components in `frontend/src`.
 - Keep components focused and testable.
 
 Styling
+
 - Respect existing design tokens and CSS variable usage.
+
+Architectural decisions
+
+- Read `decisions/_index.md` before choosing a new UI pattern or library.
+- Common past decisions to check: routing strategy, form handling, auth flow, component library choices.
+- Write an ADR when adding a new dependency, introducing a new global pattern, or changing
+  how data flows through a major feature.
