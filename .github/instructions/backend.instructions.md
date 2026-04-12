@@ -12,11 +12,17 @@ Security & secrets
 
 - Never include secrets, keys, or tokens in code or in assistant responses.
 - Use `.env` or platform secret stores; commit only `.env.example`.
+- Use placeholder values in `.env.example` and make them obvious with CAPS.
 
 API contracts
 
 - Keep route handlers small and documented; update API docs when changing endpoints.
 - Return clear HTTP status codes and error payloads.
+- Document any API changes in the ttrpg-API.yaml file at `doc/ttrpg-API.yaml` and check when creating a PR if the API documentation matches the actual API. 
+
+Data storage
+
+- Document and reference the database model at `doc/ttrpg-database.json` to keep Data variable names and the data structure consistent over the whole application.
 
 Testing & logging
 

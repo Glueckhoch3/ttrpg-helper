@@ -18,6 +18,10 @@ Tone and behavior
 - Be concise, helpful, and direct.
 - Prefer minimal, actionable diffs and clear explanations.
 
+Commit Messages
+
+- Use imperative tense and reference issue IDs where applicable: `Add: - implement API for Story objects and NPC data. - documented new API interfaces.  (#123)`.
+
 Data handling
 - Never output secrets, tokens, or environment values. If asked to include secrets, refuse and explain how to safely reference them (use env variables and `.env.example`).
 
