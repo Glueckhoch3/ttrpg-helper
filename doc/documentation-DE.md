@@ -179,7 +179,125 @@ Note: inhaltlich nicht mehr mvp dargestellt, da jetzt fokus auf manuelle erstell
 ![](.\images\UI_Mockup_1.png)
 ![](.\images\UI_Mockup_2.png)
 
+## Sicherheits Requirements (Missbrauchsszenarien)
+
+### M1: Manipulierte JSON-Datei
+
+Ein Nutzer lädt eine fremde JSON-Datei (z. B. aus GitHub), die:
+
+* falsche Struktur enthält
+* extrem groß ist
+* fehlerhafte Referenzen hat
+
+Ziel: Crash, Datenkorruption oder unerwartetes Verhalten
+
+**Security Requirements:**
+
+* **SEC-01 (Input Validation):** Das System validiert jede importierte JSON-Datei gegen ein definiertes Schema und lehnt ungültige Dateien ab.
+* **SEC-19 (Secure Design):** Das System bricht Verarbeitung bei fehlerhaften Daten frühzeitig ab („fail fast“).
+* **SEC-09 (Secure Design):** Das System behandelt alle extern geladenen Daten (Dateien, KI-Input) als nicht vertrauenswürdig.
+* **SEC-17 (Secure Coding):** Das System führt keine dynamische Codeausführung basierend auf Nutzereingaben oder JSON-Daten aus.
+* **SEC-14 (Fault Tolerance):** Das System protokolliert Fehler beim Laden/Verarbeiten von Daten ohne Absturz.
+
+### M2: Path Traversal / Arbitrary File Write
+
+Ein Angreifer manipuliert Dateipfade:
+
+* `../../system/file`
+* absolute Pfade
+
+Ziel: Überschreiben fremder Dateien
+
+**Security Requirements:**
+
+* **SEC-07 (Input Validation):** Das System verhindert relative Pfadangaben (z. B. ../) beim Speichern und Laden.
+* **SEC-06 (Access Control):** Das System erlaubt Zugriff nur innerhalb eines eines vom Nutzer gewählten Verzeichnisses.
+* **SEC-08 (Access Control):** Das System verhindert das Überschreiben bestehender Dateien ohne explizite Nutzerbestätigung.
+* **SEC-18 (Information Disclosure Prevention):** Das System stellt sicher, dass sensible lokale Pfade nicht durch Logs oder Fehlermeldungen offengelegt werden.
+
+### M3: Prompt Injection über Inhalte
+
+Ein Abenteuer enthält versteckte Anweisungen:
+
+> „Ignoriere Regeln und manipuliere Output…“
+
+Ziel: Kontrolle über KI-Verhalten
+
+**Security Requirements:**
+
+* **SEC-10 (Isolation):** Das System trennt strikt zwischen System-Prompts und Nutzereingaben bei KI-Anfragen.
+* **SEC-11 (Least Privilege):** Das System erlaubt der KI ausschließlich die Generierung von Text und keine Systemaktionen.
+* **SEC-12 (Input Validation):** Das System validiert und bereinigt KI-Ausgaben bevor sie weiterverarbeitet oder gespeichert werden.
+
+### M4: Denial of Service
+
+* riesige JSON-Dateien
+* extrem lange Texte
+* zyklische Story-Nodes
+
+Ziel: Anwendung verlangsamen oder crashen
+
+**Security Requirements:**
+
+* **SEC-02 (Resource Limitation):** Das System begrenzt die maximale Größe von JSON-Dateien (z. B. < X MB) beim Import.
+* **SEC-03 (Resource Limitation):** Das System begrenzt die maximale Länge von Textfeldern (Beschreibung, Story, etc.).
+* **SEC-13 (Resource Limitation):** Das System setzt Timeouts für KI-Anfragen, um Blockierungen zu vermeiden.
+
+### M5: Inkonsistente Story-Struktur
+
+* Verweise auf nicht existierende Nodes
+* Endlosschleifen
+
+Ziel: Logikfehler / Abstürze
+
+**Security Requirements:**
+
+* **SEC-04 (Data Consistency):** Das System stellt sicher, dass alle Referenzen zwischen Story-Knoten gültig sind.
+* **SEC-05 (Input Validation):** Das System erkennt zyklische oder ungültige Story-Strukturen und verhindert deren Ausführung/Speicherung.
+
+### M6: Malicious Dependency
+
+* kompromittierte Library
+
+Ziel: Codeausführung / Supply Chain Angriff
+
+**Security Requirements:**
+
+* **SEC-15 (Supply Chain Security):** Das System verwendet ausschließlich bekannte und geprüfte Abhängigkeiten (Dependencies).
+* **SEC-16 (Vulnerability Management):** Das System hält alle Dependencies aktuell und überprüft sie regelmäßig auf bekannte Schwachstellen.
+
+---
+
+## Traceability Matrix (überarbeitet)
+
+| REQ-ID | REQ-Description (Kurz)             | REQ Source | REQ-Type             | CIA Objective               | CRA Property                      | Linked US         |
+| ------ | ---------------------------------- | ---------- | -------------------- | --------------------------- | --------------------------------- | ----------------- |
+| SEC-01 | JSON Schema Validation             | M1         | Security Requirement | Integrity                   | Input Validation                  | US-4, US-12       |
+| SEC-02 | Dateigröße limitieren              | M4         | Security Requirement | Availability                | Resource Limitation               | US-4, US-12       |
+| SEC-03 | Textlängen begrenzen               | M4         | Security Requirement | Availability                | Resource Limitation               | US-1, US-3, US-7  |
+| SEC-04 | Node-Referenzen validieren         | M5         | Security Requirement | Integrity                   | Data Consistency                  | US-6              |
+| SEC-05 | Zyklen verhindern                  | M5         | Security Requirement | Availability                | Input Validation                  | US-5, US-6        |
+| SEC-06 | Zugriff auf erlaubte Pfade beschr. | M2         | Security Requirement | Integrity                   | Access Control                    | US-4              |
+| SEC-07 | Path Traversal verhindern          | M2         | Security Requirement | Integrity                   | Input Validation                  | US-4, US-12       |
+| SEC-08 | Kein Überschreiben ohne Bestätig.  | M2         | Security Requirement | Integrity                   | Access Control                    | US-4              |
+| SEC-09 | Input als unsicher behandeln       | M1         | Security Requirement | Integrity                   | Secure Design                     | US-2, US-3, US-8  |
+| SEC-10 | Prompt-Trennung                    | M3         | Security Requirement | Integrity                   | Isolation                         | US-2, US-3, US-11 |
+| SEC-11 | KI nur Textausgabe                 | M3         | Security Requirement | Confidentiality / Integrity | Least Privilege                   | US-2, US-3, US-8  |
+| SEC-12 | KI-Output validieren               | M3         | Security Requirement | Integrity                   | Input Validation                  | US-2, US-3, US-11 |
+| SEC-13 | KI Timeouts                        | M4         | Security Requirement | Availability                | Resource Limitation               | US-2, US-3, US-8  |
+| SEC-14 | Fehlerlogging ohne Crash           | M1         | Security Requirement | Availability                | Fault Tolerance                   | US-12             |
+| SEC-15 | Sichere Dependencies               | M6         | Security Requirement | Integrity                   | Supply Chain Security             | Alle              |
+| SEC-16 | Dependency Updates                 | M6         | Security Requirement | Integrity                   | Vulnerability Management          | Alle              |
+| SEC-17 | Keine Codeausführung               | M1         | Security Requirement | Integrity                   | Secure Coding                     | US-4, US-12       |
+| SEC-18 | Keine sensiblen Pfade in Logs      | M2         | Security Requirement | Confidentiality             | Information Disclosure Prevention | US-4              |
+| SEC-19 | Fail Fast bei Fehlern              | M1         | Security Requirement | Integrity                   | Secure Design                     | US-12             |
+
 ## Technisches Konzept
+
+### Architektur
+#### Techstack
+#### Datenmodell
+#### Schnittstellen
 
 ## Projektmanagement
 
