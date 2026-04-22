@@ -176,8 +176,8 @@ Als Spielleiter möchte ich ein gespeichertes Abenteuer laden, damit ich daran w
 
 Note: inhaltlich nicht mehr mvp dargestellt, da jetzt fokus auf manuelle erstellung
 
-![](doc\UI_Mockup_1.png)
-![](doc\UI_Mockup_2.png)
+![](.\images\UI_Mockup_1.png)
+![](.\images\UI_Mockup_2.png)
 
 ## Technisches Konzept
 
