@@ -1,10 +1,12 @@
-import fs from 'fs/promises';
-import path from 'path';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 // Ensure test env vars before importing app/config
-process.env.UPLOAD_DIR = './backend_test_uploads';
+const UPLOAD_DIR = './uploads';
+process.env.UPLOAD_DIR = UPLOAD_DIR;
 process.env.ALLOW_OVERWRITE = 'true';
 process.env.BODY_LIMIT = '1mb';
+const EXAMPLE_FILENAME = 'example.json';
 
 import request from 'supertest';
 import app from '../app.js';
@@ -16,14 +18,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  // cleanup test upload dir
-  try {
-    const files = await fs.readdir(uploadDir);
-    await Promise.all(files.map(f => fs.unlink(path.join(uploadDir, f))));
-    await fs.rmdir(uploadDir);
-  } catch (e) {
-    // ignore
-  }
+  const examplePath = path.join(uploadDir, EXAMPLE_FILENAME);
+  await fs.unlink(examplePath).catch(() => {});
 });
 
 test('GET /health returns status ok', async () => {
@@ -34,9 +30,10 @@ test('GET /health returns status ok', async () => {
 
 test('POST /api/import accepts valid JSON and saves file', async () => {
   const payload = { name: 'test', items: [1, 2, 3] };
+  const filename = EXAMPLE_FILENAME;
   const res = await request(app)
     .post('/api/import')
-    .query({ filename: 'test1.json' })
+    .query({ filename })
     .send(payload)
     .set('Content-Type', 'application/json');
 

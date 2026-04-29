@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import importerRouter from './modules/importer/index.js';
+import exportRouter from './modules/export/index.js';
 import { BODY_LIMIT } from './config/index.js';
 import errorHandler from './middleware/errorHandler.js';
 
@@ -16,6 +17,9 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 // Importer: accept whole JSON files as application/json
 app.use('/api/import', importerRouter);
+
+// Export: serve saved JSON by filename via query `?filename=`
+app.use('/api/export', exportRouter);
 
 // 404
 app.use((req, res) => res.status(404).json({ error: 'Not Found' }));
