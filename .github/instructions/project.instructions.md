@@ -13,6 +13,7 @@ Key guidelines
 - Follow existing project coding styles; prefer small, reviewable diffs.
 - When proposing changes, include tests and update relevant docs.
 - Reference `copilot-instructions.md` for workspace-level policies.
+- Always look into the `doc/documentation-DE.md` for security requirements to implement. 
 
 PRs and reviews
 
