@@ -3,6 +3,10 @@ info:
   title: TTRPG Helper Backend API
   version: 1.0.0
   description: Minimal API for importing/exporting whole JSON files used by the frontend.
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
 paths:
   /health:
     get:
@@ -49,3 +53,23 @@ paths:
           description: Validation failed
         '413':
           description: Payload too large
+  /api/export:
+    get:
+      summary: Export a stored JSON document
+      description: Retrieves a previously stored JSON document by its `id` query parameter.
+      parameters:
+        - in: query
+          name: filename
+          schema:
+            type: string
+          required: true
+          description: The unique identifier of the JSON document to export.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Not found
