@@ -10,7 +10,7 @@ async function ensureDir(dir) {
 export async function saveJson(obj, filename) {
   await ensureDir(UPLOAD_DIR);
 
-  const name = filename && filename.trim().length > 0 ? filename : `upload-${Date.now()}.json`;
+  const name = filename && filename.trim().length > 0 ? filename : "";
   const safeName = sanitize(name);
   if (!safeName || safeName.length === 0) {
     throw Object.assign(new Error('Invalid filename after sanitization'), { status: 400 });

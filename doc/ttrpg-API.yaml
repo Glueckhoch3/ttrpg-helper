@@ -31,6 +31,9 @@ paths:
           schema:
             type: string
           description: Optional desired filename for storing the JSON (will be sanitized).
+          
+          # Validation: filename must end with .json. If it does not, the server
+          # responds with 400 and message: "the file ending has been tampered with; ensure a .json file".
       requestBody:
         required: true
         content:
@@ -63,7 +66,10 @@ paths:
           schema:
             type: string
           required: true
-          description: The unique identifier of the JSON document to export.
+          description: The unique identifier (filename) of the JSON document to export. Must end with `.json`.
+          
+          # Validation: filename must end with .json. If it does not, the server
+          # responds with 400 and message: "the file ending has been tampered with; ensure a .json file".
       responses:
         '200':
           description: OK
@@ -73,3 +79,5 @@ paths:
                 type: object
         '404':
           description: Not found
+        '400':
+          description: Bad request — filename missing or invalid (e.g., wrong file ending)
