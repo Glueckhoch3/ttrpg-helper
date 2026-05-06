@@ -15,7 +15,7 @@ UX & accessibility
 
 Vue conventions
 
-- Prefer Options API and single-file components in `frontend/src`.
+- You must use the Options API and single-file components in `frontend/src`.
 - Keep components focused and testable.
 
 Styling
