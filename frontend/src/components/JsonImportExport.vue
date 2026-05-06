@@ -14,6 +14,11 @@ export default {
     }
   },
   methods: {
+    ensureFilenameWithJson(name) {
+      if (!name) return ''
+      const trimmed = name.trim()
+      return trimmed.toLowerCase().endsWith('.json') ? trimmed : trimmed + '.json'
+    },
     handleSave() {
       this.error = ''
       this.result = null
@@ -25,7 +30,8 @@ export default {
         return
       }
       this.loading = true
-      saveFile(parsed, this.filenameSave)
+      const filename = this.ensureFilenameWithJson(this.filenameSave)
+      saveFile(parsed, filename)
         .then(res => { this.result = res })
         .catch(err => { this.error = err.message || JSON.stringify(err) })
         .finally(() => { this.loading = false })
@@ -33,12 +39,13 @@ export default {
     handleFetch() {
       this.error = ''
       this.result = null
-      if (!this.filenameFetch) {
+      const filename = this.ensureFilenameWithJson(this.filenameFetch)
+      if (!filename) {
         this.error = 'Please enter a filename to fetch.'
         return
       }
       this.loading = true
-      getFile(this.filenameFetch)
+      getFile(filename)
         .then(res => { this.result = res })
         .catch(err => { this.error = err.message || JSON.stringify(err) })
         .finally(() => { this.loading = false })
@@ -50,8 +57,8 @@ export default {
 <template>
   <div class="json-import-export">
     <section class="panel">
-      <h2>SAVE JSON</h2>
-      <label class="row">Filename (optional): <input v-model="filenameSave" placeholder="optional filename" /></label>
+      <h2>Save JSON</h2>
+      <label class="row">Filename: <input v-model="filenameSave" placeholder="filename" /></label>
       <textarea v-model="jsonText" rows="10" class="json-input"></textarea>
       <div class="actions">
         <button @click="handleSave" :disabled="loading">Save</button>
