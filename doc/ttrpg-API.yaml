@@ -90,7 +90,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Adventure name mapped to `<adventureName>.json` in uploads.
+          description: Adventure title from `metadata.title` inside stored adventure JSON files.
       responses:
         '200':
           description: Metadata for the adventure
@@ -116,6 +116,7 @@ paths:
           required: true
           schema:
             type: string
+          description: Adventure title from `metadata.title`.
       responses:
         '200':
           description: Chapter count and chapter preview list
@@ -151,6 +152,7 @@ paths:
           required: true
           schema:
             type: string
+          description: Adventure title from `metadata.title`.
         - in: path
           name: chapterId
           required: true
@@ -181,6 +183,7 @@ paths:
           required: true
           schema:
             type: string
+          description: Adventure title from `metadata.title`.
       responses:
         '200':
           description: NPC count and NPC preview list
@@ -216,6 +219,7 @@ paths:
           required: true
           schema:
             type: string
+          description: Adventure title from `metadata.title`.
         - in: path
           name: npcId
           required: true

@@ -1,31 +1,46 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import sanitize from 'sanitize-filename';
 import { UPLOAD_DIR } from '../../config/index.js';
 
 function normalizeAdventureName(adventureName) {
 	if (!adventureName || String(adventureName).trim().length === 0) {
 		throw Object.assign(new Error('adventureName is required'), { status: 400 });
 	}
-
-	const raw = String(adventureName).trim();
-	const withoutExtension = raw.toLowerCase().endsWith('.json') ? raw.slice(0, -5) : raw;
-	const safeBaseName = sanitize(path.basename(withoutExtension));
-
-	if (!safeBaseName || safeBaseName.length === 0) {
-		throw Object.assign(new Error('Invalid adventureName after sanitization'), { status: 400 });
-	}
-
-	return `${safeBaseName}.json`;
+	return String(adventureName).trim();
 }
 
 export async function readAdventureJson(adventureName) {
-	const filename = normalizeAdventureName(adventureName);
-	const destPath = path.resolve(UPLOAD_DIR, path.basename(filename));
+	const wantedTitle = normalizeAdventureName(adventureName);
 
-	let data;
 	try {
-		data = await fs.readFile(destPath, 'utf8');
+		const entries = await fs.readdir(UPLOAD_DIR, { withFileTypes: true });
+		const jsonFiles = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'));
+
+		for (const entry of jsonFiles) {
+			const filePath = path.resolve(UPLOAD_DIR, path.basename(entry.name));
+			let data;
+			try {
+				data = await fs.readFile(filePath, 'utf8');
+			} catch {
+				continue;
+			}
+
+			let parsed;
+			try {
+				parsed = JSON.parse(data);
+			} catch {
+				continue;
+			}
+
+			if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+				continue;
+			}
+
+			const title = parsed?.metadata?.title;
+			if (typeof title === 'string' && title.trim() === wantedTitle) {
+				return parsed;
+			}
+		}
 	} catch (e) {
 		if (e?.code === 'ENOENT') {
 			const err = new Error('Adventure not found');
@@ -35,20 +50,7 @@ export async function readAdventureJson(adventureName) {
 		throw e;
 	}
 
-	let parsed;
-	try {
-		parsed = JSON.parse(data);
-	} catch (e) {
-		const err = new Error('Stored adventure JSON is invalid');
-		err.status = 422;
-		throw err;
-	}
-
-	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-		const err = new Error('Adventure root must be an object');
-		err.status = 422;
-		throw err;
-	}
-
-	return parsed;
+	const err = new Error('Adventure not found');
+	err.status = 404;
+	throw err;
 }

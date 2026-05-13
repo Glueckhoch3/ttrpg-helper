@@ -38,7 +38,7 @@ beforeAll(async () => {
 	);
 	await fs.writeFile(
 		path.join(uploadDir, MALFORMED_FILENAME),
-		JSON.stringify({ metadata: { id: 'bad' }, npcs: [] }, null, 2),
+		JSON.stringify({ metadata: { id: 'bad', title: 'Malformed Adventure' }, npcs: [] }, null, 2),
 		'utf8'
 	);
 });
@@ -49,13 +49,13 @@ afterAll(async () => {
 });
 
 test('GET /api/adventures/:adventureName/metadata returns metadata', async () => {
-	const res = await request(app).get('/api/adventures/adventure-alpha/metadata');
+	const res = await request(app).get('/api/adventures/Adventure%20Alpha/metadata');
 	expect(res.status).toBe(200);
 	expect(res.body).toEqual({ metadata: ADVENTURE_PAYLOAD.metadata });
 });
 
 test('GET /api/adventures/:adventureName/chapters returns count and chapter preview list', async () => {
-	const res = await request(app).get('/api/adventures/adventure-alpha/chapters');
+	const res = await request(app).get('/api/adventures/Adventure%20Alpha/chapters');
 	expect(res.status).toBe(200);
 	expect(res.body).toEqual({
 		count: 2,
@@ -67,13 +67,13 @@ test('GET /api/adventures/:adventureName/chapters returns count and chapter prev
 });
 
 test('GET /api/adventures/:adventureName/chapters/:chapterId returns single chapter', async () => {
-	const res = await request(app).get('/api/adventures/adventure-alpha/chapters/ch-002');
+	const res = await request(app).get('/api/adventures/Adventure%20Alpha/chapters/ch-002');
 	expect(res.status).toBe(200);
 	expect(res.body).toEqual({ chapter: ADVENTURE_PAYLOAD.chapters[1] });
 });
 
 test('GET /api/adventures/:adventureName/npcs returns count and npc preview list', async () => {
-	const res = await request(app).get('/api/adventures/adventure-alpha/npcs');
+	const res = await request(app).get('/api/adventures/Adventure%20Alpha/npcs');
 	expect(res.status).toBe(200);
 	expect(res.body).toEqual({
 		count: 2,
@@ -85,7 +85,7 @@ test('GET /api/adventures/:adventureName/npcs returns count and npc preview list
 });
 
 test('GET /api/adventures/:adventureName/npcs/:npcId returns single npc', async () => {
-	const res = await request(app).get('/api/adventures/adventure-alpha/npcs/npc-001');
+	const res = await request(app).get('/api/adventures/Adventure%20Alpha/npcs/npc-001');
 	expect(res.status).toBe(200);
 	expect(res.body).toEqual({ npc: ADVENTURE_PAYLOAD.npcs[0] });
 });
@@ -97,19 +97,19 @@ test('GET /api/adventures/:adventureName/metadata returns 404 for unknown advent
 });
 
 test('GET /api/adventures/:adventureName/chapters/:chapterId returns 404 for unknown chapter', async () => {
-	const res = await request(app).get('/api/adventures/adventure-alpha/chapters/no-such-id');
+	const res = await request(app).get('/api/adventures/Adventure%20Alpha/chapters/no-such-id');
 	expect(res.status).toBe(404);
 	expect(res.body).toHaveProperty('error', 'Chapter not found');
 });
 
 test('GET /api/adventures/:adventureName/npcs/:npcId returns 404 for unknown npc', async () => {
-	const res = await request(app).get('/api/adventures/adventure-alpha/npcs/no-such-id');
+	const res = await request(app).get('/api/adventures/Adventure%20Alpha/npcs/no-such-id');
 	expect(res.status).toBe(404);
 	expect(res.body).toHaveProperty('error', 'NPC not found');
 });
 
 test('GET /api/adventures/:adventureName/chapters returns 422 for malformed chapters section', async () => {
-	const res = await request(app).get('/api/adventures/adventure-malformed/chapters');
+	const res = await request(app).get('/api/adventures/Malformed%20Adventure/chapters');
 	expect(res.status).toBe(422);
 	expect(res.body).toHaveProperty('error');
 });
