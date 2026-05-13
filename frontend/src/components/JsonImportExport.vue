@@ -1,56 +1,51 @@
-<script>
+<script setup>
+import { ref } from 'vue'
 import { saveFile, getFile } from '../utils/api.js'
 
-export default {
-  name: 'JsonImportExport',
-  data() {
-    return {
-      jsonText: '{\n  "example": "value"\n}',
-      filenameSave: '',
-      filenameFetch: '',
-      result: null,
-      error: '',
-      loading: false,
-    }
-  },
-  methods: {
-    ensureFilenameWithJson(name) {
-      if (!name) return ''
-      const trimmed = name.trim()
-      return trimmed.toLowerCase().endsWith('.json') ? trimmed : trimmed + '.json'
-    },
-    handleSave() {
-      this.error = ''
-      this.result = null
-      let parsed
-      try {
-        parsed = JSON.parse(this.jsonText)
-      } catch (e) {
-        this.error = 'Invalid JSON: ' + e.message
-        return
-      }
-      this.loading = true
-      const filename = this.ensureFilenameWithJson(this.filenameSave)
-      saveFile(parsed, filename)
-        .then(res => { this.result = res })
-        .catch(err => { this.error = err.message || JSON.stringify(err) })
-        .finally(() => { this.loading = false })
-    },
-    handleFetch() {
-      this.error = ''
-      this.result = null
-      const filename = this.ensureFilenameWithJson(this.filenameFetch)
-      if (!filename) {
-        this.error = 'Please enter a filename to fetch.'
-        return
-      }
-      this.loading = true
-      getFile(filename)
-        .then(res => { this.result = res })
-        .catch(err => { this.error = err.message || JSON.stringify(err) })
-        .finally(() => { this.loading = false })
-    }
+const jsonText = ref('{\n  "example": "value"\n}')
+const filenameSave = ref('')
+const filenameFetch = ref('')
+const result = ref(null)
+const error = ref('')
+const loading = ref(false)
+
+function ensureFilenameWithJson(name) {
+  if (!name) return ''
+  const trimmed = name.trim()
+  return trimmed.toLowerCase().endsWith('.json') ? trimmed : trimmed + '.json'
+}
+
+function handleSave() {
+  error.value = ''
+  result.value = null
+  let parsed
+  try {
+    parsed = JSON.parse(jsonText.value)
+  } catch (e) {
+    error.value = 'Invalid JSON: ' + e.message
+    return
   }
+  loading.value = true
+  const filename = ensureFilenameWithJson(filenameSave.value)
+  saveFile(parsed, filename)
+    .then(res => { result.value = res })
+    .catch(err => { error.value = err.message || JSON.stringify(err) })
+    .finally(() => { loading.value = false })
+}
+
+function handleFetch() {
+  error.value = ''
+  result.value = null
+  const filename = ensureFilenameWithJson(filenameFetch.value)
+  if (!filename) {
+    error.value = 'Please enter a filename to fetch.'
+    return
+  }
+  loading.value = true
+  getFile(filename)
+    .then(res => { result.value = res })
+    .catch(err => { error.value = err.message || JSON.stringify(err) })
+    .finally(() => { loading.value = false })
 }
 </script>
 
