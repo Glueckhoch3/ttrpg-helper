@@ -2,7 +2,7 @@
 name: ADR-002
 title: "Add read-only adventure slice API using metadata.title routing"
 date: 2026-05-13
-status: proposed
+status: accepted
 domain: backend
 agent: GitHub Copilot
 decisionBy: team
