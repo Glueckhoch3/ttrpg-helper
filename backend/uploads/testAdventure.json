@@ -69,12 +69,7 @@
       "id": "ch-001",
       "title": "Triefen",
       "summary": "The adventurers arrive at the decaying village of Triefenhain. The streets are muddy and half the buildings stand empty. Elder Aldric Moorfen greets them with desperate eyes and begs for help. Strange black moss creeps up the walls of buildings closest to the swamp. At the inn, Vesper Dankhollow is suspiciously eager to point the party toward the swamp and away from the cave. Investigation checks around the village reveal scorched arcane symbols beneath the inn's floorboards.",
-      "locations": [
-        "The Soggy Antler Inn",
-        "Aldric's Elder Hall",
-        "Mira's Herbalist Hut",
-        "The Rotting Market Square"
-      ],
+      "story": "Triefenhain breathes like a tired old beast: shutters hang loose, and whispers cling to every alley. As the party walks the muddy lanes they begin to feel the village's exhaustion, and small acts of kindness from frightened villagers reveal the fragile hope still holding this place together. Rumors passed in hushed tones point toward the cave, and the inn's hearth seems to hold more secrets than warmth.",
       "encounters": [
         {
           "id": "enc-001-01",
@@ -92,11 +87,7 @@
       "id": "ch-002",
       "title": "Swampdwellers",
       "summary": "Venturing into the murky marshes near Triefenhain, the party encounters Gorrak's tribe of lizardfolk — the Swampdwellers. Initially hostile, they can be calmed through diplomacy or by showing Mira's journal. Gorrak reveals that a shadowy entity drove his people from the Triefencave three moons ago. He offers a guide and a Bogstone Amulet (advantage on saves vs. poison) in exchange for clearing the cave.",
-      "locations": [
-        "The Gurgling Fen",
-        "Gorrak's Reed Encampment",
-        "The Sunken Idol of Ssareth"
-      ],
+      "story": "The marsh has its own language of chirps and creaks, and at first the Swampdwellers' silhouettes seem like tricks of steam. As conversations unfold, the tribe's sorrow and fierce pride become clear; they are not merely monsters but exiles guarding memories of the cave. Mira's journal acts as a bridge, and the party learns that old grievances and ancient pacts bind the swamp's fate to the village.",
       "encounters": [
         {
           "id": "enc-002-01",
@@ -119,11 +110,7 @@
       "id": "ch-003",
       "title": "Triefencave",
       "summary": "The cave north of the village reeks of dark magic. Twisted fungi light the walls with sickly green glow. Three chambers await: the Entry Grotto filled with corrupted bats and slimes, the Ley-Node Chamber where Vesper's ritual circle still crackles with unstable energy, and the final Hollow — the lair of the Blightshade, a shadow elemental born from the botched ritual. Destroying the ritual circle weakens the Blightshade significantly. After the boss is defeated, the cave begins to stabilize and the black moss in the village starts to wither.",
-      "locations": [
-        "Entry Grotto",
-        "The Ley-Node Chamber",
-        "The Hollow (Boss Room)"
-      ],
+      "story": "Cold air breathes out from the cave like regret, and every step deeper feels like turning a page in a forbidden book. The party finds signs of failed experiments and small tokens of those who tried before them, and the ritual's residue hums with desperate intent. In the final hollow the Blightshade waits, a wound made manifest, and the choices made in the Ley-Node Chamber will decide whether the darkness is cleansed or merely transformed.",
       "encounters": [
         {
           "id": "enc-003-01",
@@ -140,11 +127,6 @@
           "type": "combat",
           "description": "The Blightshade (custom CR 7 shadow elemental). If the ritual circle was dismantled, it enters combat at 60 HP instead of 90 HP."
         }
-      ],
-      "loot": [
-        "Vesper's Ritual Notes (evidence of his guilt)",
-        "Bogstone Geode (worth 120 gp to the right collector)",
-        "Amulet of the Deep Dark (resistance to necrotic damage)"
       ]
     }
   ]
