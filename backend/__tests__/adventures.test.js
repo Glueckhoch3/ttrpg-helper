@@ -11,7 +11,8 @@ import app from '../app.js';
 
 const uploadDir = path.resolve(process.cwd(), process.env.UPLOAD_DIR);
 const ADVENTURE_FILENAME = 'adventure-alpha.json';
-const MALFORMED_FILENAME = 'adventure-malformed.json';
+const MALFORMED_CHAPTERS_FILENAME = 'adventure-malformed-chapters.json';
+const MALFORMED_NPCS_FILENAME = 'adventure-malformed-npcs.json';
 
 const ADVENTURE_PAYLOAD = {
 	metadata: {
@@ -37,15 +38,21 @@ beforeAll(async () => {
 		'utf8'
 	);
 	await fs.writeFile(
-		path.join(uploadDir, MALFORMED_FILENAME),
+		path.join(uploadDir, MALFORMED_CHAPTERS_FILENAME),
 		JSON.stringify({ metadata: { id: 'bad', title: 'Malformed Adventure' }, npcs: [] }, null, 2),
+		'utf8'
+	);
+	await fs.writeFile(
+		path.join(uploadDir, MALFORMED_NPCS_FILENAME),
+		JSON.stringify({ metadata: { title: 'Malformed Npcs' }, chapters: [], npcs: {} }, null, 2),
 		'utf8'
 	);
 });
 
 afterAll(async () => {
 	await fs.rm(path.join(uploadDir, ADVENTURE_FILENAME), { force: true });
-	await fs.rm(path.join(uploadDir, MALFORMED_FILENAME), { force: true });
+	await fs.rm(path.join(uploadDir, MALFORMED_CHAPTERS_FILENAME), { force: true });
+	await fs.rm(path.join(uploadDir, MALFORMED_NPCS_FILENAME), { force: true });
 });
 
 test('GET /api/adventures/:adventureName/metadata returns metadata', async () => {
@@ -111,5 +118,29 @@ test('GET /api/adventures/:adventureName/npcs/:npcId returns 404 for unknown npc
 test('GET /api/adventures/:adventureName/chapters returns 422 for malformed chapters section', async () => {
 	const res = await request(app).get('/api/adventures/Malformed%20Adventure/chapters');
 	expect(res.status).toBe(422);
+	expect(res.body).toHaveProperty('error');
+});
+
+test('GET /api/adventures/:adventureName/npcs returns 422 for malformed npcs section', async () => {
+	const res = await request(app).get('/api/adventures/Malformed%20Npcs/npcs');
+	expect(res.status).toBe(422);
+	expect(res.body).toHaveProperty('error');
+});
+
+test('GET /api/adventures/:adventureName/metadata returns 400 for whitespace-only adventureName', async () => {
+	const res = await request(app).get('/api/adventures/%20/metadata');
+	expect(res.status).toBe(400);
+	expect(res.body).toHaveProperty('error');
+});
+
+test('GET /api/adventures/:adventureName/chapters/:chapterId returns 400 for whitespace-only chapterId', async () => {
+	const res = await request(app).get('/api/adventures/Adventure%20Alpha/chapters/%20');
+	expect(res.status).toBe(400);
+	expect(res.body).toHaveProperty('error');
+});
+
+test('GET /api/adventures/:adventureName/npcs/:npcId returns 400 for whitespace-only npcId', async () => {
+	const res = await request(app).get('/api/adventures/Adventure%20Alpha/npcs/%20');
+	expect(res.status).toBe(400);
 	expect(res.body).toHaveProperty('error');
 });
