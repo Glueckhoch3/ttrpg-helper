@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
   title: TTRPG Helper Backend API
-  version: 1.0.0
-  description: Minimal API for importing/exporting whole JSON files used by the frontend.
+  version: 1.1.0
+  description: API for importing/exporting adventure JSON and reading adventure slices (metadata, chapters, NPCs).
 servers:
   - url: http://localhost:3000
     description: Local development server
@@ -81,3 +81,163 @@ paths:
           description: Not found
         '400':
           description: Bad request — filename missing or invalid (e.g., wrong file ending)
+  /api/adventures/{adventureName}/metadata:
+    get:
+      summary: Get adventure metadata
+      parameters:
+        - in: path
+          name: adventureName
+          required: true
+          schema:
+            type: string
+          description: Adventure title from `metadata.title` inside stored adventure JSON files.
+      responses:
+        '200':
+          description: Metadata for the adventure
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+        '404':
+          description: Adventure not found
+        '400':
+          description: Invalid adventure name
+        '422':
+          description: Adventure data malformed
+  /api/adventures/{adventureName}/chapters:
+    get:
+      summary: Get chapter overview list for an adventure
+      parameters:
+        - in: path
+          name: adventureName
+          required: true
+          schema:
+            type: string
+          description: Adventure title from `metadata.title`.
+      responses:
+        '200':
+          description: Chapter count and chapter preview list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    minimum: 0
+                  chapters:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          nullable: true
+                        title:
+                          type: string
+                          nullable: true
+        '404':
+          description: Adventure not found
+        '422':
+          description: Adventure chapters malformed
+  /api/adventures/{adventureName}/chapters/{chapterId}:
+    get:
+      summary: Get a single chapter by chapterId
+      parameters:
+        - in: path
+          name: adventureName
+          required: true
+          schema:
+            type: string
+          description: Adventure title from `metadata.title`.
+        - in: path
+          name: chapterId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Full chapter payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chapter:
+                    type: object
+        '404':
+          description: Adventure or chapter not found
+        '400':
+          description: Invalid chapterId or adventureName
+        '422':
+          description: Adventure chapters malformed
+  /api/adventures/{adventureName}/npcs:
+    get:
+      summary: Get NPC overview list for an adventure
+      parameters:
+        - in: path
+          name: adventureName
+          required: true
+          schema:
+            type: string
+          description: Adventure title from `metadata.title`.
+      responses:
+        '200':
+          description: NPC count and NPC preview list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    minimum: 0
+                  npcs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          nullable: true
+                        name:
+                          type: string
+                          nullable: true
+        '404':
+          description: Adventure not found
+        '422':
+          description: Adventure NPC section malformed
+  /api/adventures/{adventureName}/npcs/{npcId}:
+    get:
+      summary: Get a single NPC by npcId
+      parameters:
+        - in: path
+          name: adventureName
+          required: true
+          schema:
+            type: string
+          description: Adventure title from `metadata.title`.
+        - in: path
+          name: npcId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Full NPC payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  npc:
+                    type: object
+        '404':
+          description: Adventure or NPC not found
+        '400':
+          description: Invalid npcId or adventureName
+        '422':
+          description: Adventure NPC section malformed

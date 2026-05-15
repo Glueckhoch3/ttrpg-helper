@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import importerRouter from './modules/importer/index.js';
 import exportRouter from './modules/export/index.js';
+import adventuresRouter from './modules/adventures/index.js';
 import { BODY_LIMIT } from './config/index.js';
 import errorHandler from './middleware/errorHandler.js';
 
@@ -20,6 +21,9 @@ app.use('/api/import', importerRouter);
 
 // Export: serve saved JSON by filename via query `?filename=`
 app.use('/api/export', exportRouter);
+
+// Adventures: read adventure slices by adventureName
+app.use('/api/adventures', adventuresRouter);
 
 // 404
 app.use((req, res) => res.status(404).json({ error: 'Not Found' }));
