@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+	getAdventuresOverview,
 	getMetadata,
 	getChapters,
 	getChapterById,
@@ -9,10 +10,11 @@ import {
 
 const router = express.Router();
 
-router.get('/:adventureName/metadata', getMetadata);
-router.get('/:adventureName/chapters', getChapters);
-router.get('/:adventureName/chapters/:chapterId', getChapterById);
-router.get('/:adventureName/npcs', getNpcs);
-router.get('/:adventureName/npcs/:npcId', getNpcById);
+router.get('/', getAdventuresOverview);
+router.get('/:adventureFile/metadata', getMetadata);
+router.get('/:adventureFile/chapters', getChapters);
+router.get('/:adventureFile/chapters/:chapterId', getChapterById);
+router.get('/:adventureFile/npcs', getNpcs);
+router.get('/:adventureFile/npcs/:npcId', getNpcById);
 
 export default router;

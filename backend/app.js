@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import importerRouter from './modules/importer/index.js';
-import exportRouter from './modules/export/index.js';
+import saveRouter from './modules/savejson/index.js';
+import loadRouter from './modules/loadjson/index.js';
 import adventuresRouter from './modules/adventures/index.js';
 import { BODY_LIMIT } from './config/index.js';
 import errorHandler from './middleware/errorHandler.js';
@@ -17,12 +17,12 @@ app.use(express.json({ limit: BODY_LIMIT }));
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 // Importer: accept whole JSON files as application/json
-app.use('/api/import', importerRouter);
+app.use('/api/save', saveRouter);
 
 // Export: serve saved JSON by filename via query `?filename=`
-app.use('/api/export', exportRouter);
+app.use('/api/load', loadRouter);
 
-// Adventures: read adventure slices by adventureName
+// Adventures: read adventure slices and overview by filename stem
 app.use('/api/adventures', adventuresRouter);
 
 // 404

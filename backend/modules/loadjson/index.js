@@ -3,7 +3,7 @@ import { download } from './controller.js';
 
 const router = express.Router();
 
-// GET /api/export?filename=...
+// GET /api/load?filename=...
 router.get('/', download);
 
 export default router;
