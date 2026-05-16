@@ -28,8 +28,9 @@ onMounted(async () => {
         <Splitter class="adventure-layout-splitter">
             <!-- Left Pane: Meta + Chapters -->
             <SplitterPanel class="left-pane flex flex-col" :size="25" :minSize="15">
-                <AdventureMeta></AdventureMeta>
-                <ChapterOverview></ChapterOverview>
+                <AdventureMeta :metadata="adventureData?.metadata"></AdventureMeta>
+                <div class="spacer"></div>
+                <ChapterOverview :chapters="adventureData?.chapters"></ChapterOverview>
             </SplitterPanel>
             
             <!-- Right side containing Middle and Right Panes -->

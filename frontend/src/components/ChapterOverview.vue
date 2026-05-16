@@ -1,26 +1,43 @@
 <!-- Holder for an Accordeon of all the Chapters in the Adventure -->
 
 <script setup>
+import { defineProps } from 'vue';
 import ChapterContent from './ChapterContent.vue';
+import Accordion from 'primevue/accordion';
+import AccordionPanel from 'primevue/accordionpanel';
+import AccordionHeader from 'primevue/accordionheader';
+import AccordionContent from 'primevue/accordioncontent';
 
+const props = defineProps({
+    chapters: {
+        type: Array,
+        default: () => []
+    }
+});
 </script>
 
 <template>
-    <div>
-        <p>Chapter Overview (Akkordeon)</p>
-        <ChapterContent></ChapterContent>
-        <ChapterContent></ChapterContent>
-        <ChapterContent></ChapterContent>
+    <div class="chapter-overview">
+        <h3>Chapters</h3>
+        <Accordion multiple class="w-full">
+            <AccordionPanel v-for="chapter in props.chapters" :key="chapter.id || chapter.title" :value="chapter.id || chapter.title">
+                <AccordionHeader>
+                    {{ chapter.title }}
+                </AccordionHeader>
+                <AccordionContent>
+                    <ChapterContent :story="chapter.story"></ChapterContent>
+                </AccordionContent>
+            </AccordionPanel>
+        </Accordion>
     </div>
-    
-    
-    
 </template>
 
-<!-- <style scoped >
-div {
+<style scoped>
+.chapter-overview {
   margin: 1em;
-  border-style: solid;
-  border-color: white;
 }
-</style> -->
+h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+</style>
