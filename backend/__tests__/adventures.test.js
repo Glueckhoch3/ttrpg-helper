@@ -1,13 +1,13 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-const UPLOAD_DIR = './uploads';
+const UPLOAD_DIR = './uploads-adventures-test';
 process.env.UPLOAD_DIR = UPLOAD_DIR;
 process.env.ALLOW_OVERWRITE = 'true';
 process.env.BODY_LIMIT = '1mb';
 
 import request from 'supertest';
-import app from '../app.js';
+const { default: app } = await import('../app.js');
 
 const uploadDir = path.resolve(process.cwd(), process.env.UPLOAD_DIR);
 const ADVENTURE_FILENAME = 'adventure-alpha.json';
@@ -69,11 +69,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-	await fs.rm(path.join(uploadDir, ADVENTURE_FILENAME), { force: true });
-	await fs.rm(path.join(uploadDir, ADVENTURE_TWO_FILENAME), { force: true });
-	await fs.rm(path.join(uploadDir, MALFORMED_CHAPTERS_FILENAME), { force: true });
-	await fs.rm(path.join(uploadDir, MALFORMED_NPCS_FILENAME), { force: true });
-	await fs.rm(path.join(uploadDir, MALFORMED_JSON_FILENAME), { force: true });
+	await fs.rm(uploadDir, { recursive: true, force: true });
 });
 
 test('GET /api/adventures returns count and metadata list and skips malformed JSON files', async () => {
