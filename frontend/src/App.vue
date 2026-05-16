@@ -13,10 +13,10 @@ import NavigationBar from './components/NavigationBar.vue';
 </template>
 
 <style>
-div {
+/* div {
   padding-left: 1em;
   margin: 1em;
   border-style: solid;
   border-color: white;
-}
+} */
 </style>

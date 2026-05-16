@@ -27,3 +27,16 @@ export async function getFile(filename) {
   }
   return data
 }
+
+export async function getAdventureMetadata(adventureName) {
+  const url = `/api/adventures/${encodeURIComponent(adventureName)}/metadata`
+  const resp = await fetch(url)
+  let data = null
+  try { data = await resp.json() } catch (e) { /* ignore */ }
+  if (!resp.ok) {
+    const err = new Error((data && (data.error || data.message)) || `Fetch failed (${resp.status})`)
+    err.details = data
+    throw err
+  }
+  return data
+}

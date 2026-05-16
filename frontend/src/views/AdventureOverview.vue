@@ -8,7 +8,6 @@ import AdventureSummary from '@/components/AdventureSummary.vue';
 <template>
     <p>Adventure Overview</p>
     <AdventureSummary></AdventureSummary>
-    <AdventureSummary></AdventureSummary>
 </template>
 
 <!-- <style scoped >
