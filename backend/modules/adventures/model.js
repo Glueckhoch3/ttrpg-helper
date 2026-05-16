@@ -38,7 +38,7 @@ function normalizeMetadata(parsed) {
 
 export async function readAdventureJson(adventureFile) {
 	const stem = normalizeAdventureFilenameStem(adventureFile);
-	const filePath = path.resolve(UPLOAD_DIR, `${path.basename(stem)}.json`);
+	const filePath = path.resolve(UPLOAD_DIR, `${stem}.json`);
 	try {
 		const data = await fs.readFile(filePath, 'utf8');
 		return JSON.parse(data);
