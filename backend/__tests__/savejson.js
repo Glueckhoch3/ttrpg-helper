@@ -28,11 +28,11 @@ test('GET /health returns status ok', async () => {
   expect(res.body).toHaveProperty('status', 'ok');
 });
 
-test('POST /api/import accepts valid JSON and saves file', async () => {
+test('POST /api/save accepts valid JSON and saves file', async () => {
   const payload = { name: 'test', items: [1, 2, 3] };
   const filename = EXAMPLE_FILENAME;
   const res = await request(app)
-    .post('/api/import')
+    .post('/api/save')
     .query({ filename })
     .send(payload)
     .set('Content-Type', 'application/json');
@@ -44,10 +44,10 @@ test('POST /api/import accepts valid JSON and saves file', async () => {
   expect(parsed).toEqual(payload);
 });
 
-test('POST /api/import rejects invalid payload (non-object root)', async () => {
+test('POST /api/save rejects invalid payload (non-object root)', async () => {
   const payload = 'this is a string';
   const res = await request(app)
-    .post('/api/import')
+    .post('/api/save')
     .send(payload)
     .set('Content-Type', 'application/json');
 

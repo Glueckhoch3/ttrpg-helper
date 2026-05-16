@@ -1,11 +1,11 @@
 // Ensure test env vars before importing service/config
 import fs from 'node:fs/promises';
 import path from 'node:path';
-const UPLOAD_DIR = './uploads';
+const UPLOAD_DIR = './uploads-adventures-test';
 process.env.UPLOAD_DIR = UPLOAD_DIR;
 process.env.ALLOW_OVERWRITE = 'true';
 const EXAMPLE_FILENAME = 'example.json';
-import { processImport } from '../modules/importer/service.js';
+import { processImport } from '../modules/savejson/service.js';
 
 const uploadDir = path.resolve(process.cwd(), process.env.UPLOAD_DIR);
 

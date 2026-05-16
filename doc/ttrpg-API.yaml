@@ -21,9 +21,9 @@ paths:
                 properties:
                   status:
                     type: string
-  /api/import:
+  /api/save:
     post:
-      summary: Import a whole JSON document
+      summary: Save a whole JSON document
       description: Accepts `application/json` body and optional `filename` query parameter. The payload is validated against the server schema and stored server-side.
       parameters:
         - in: query
@@ -56,9 +56,9 @@ paths:
           description: Validation failed
         '413':
           description: Payload too large
-  /api/export:
+  /api/load:
     get:
-      summary: Export a stored JSON document
+      summary: Load a stored JSON document
       description: Retrieves a previously stored JSON document by its `id` query parameter.
       parameters:
         - in: query
