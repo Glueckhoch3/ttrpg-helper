@@ -1,31 +1,21 @@
 <!-- Used for displaying the Metadata of an Adventure on the AdventureOverview View -->
 
 <script setup>
-import { ref, onMounted } from 'vue'
 import Card from 'primevue/card'
-import { getAdventureMetadata } from '@/utils/api'
 import Button from 'primevue/button'
+import { defineProps } from 'vue'
 
-const loading = ref(true)
-const error = ref(null)
-const meta = ref(null)
-
-onMounted(async () => {
-  try {
-    //TODO change backend to require filename?
-    const result = await getAdventureMetadata('Triefenhain')
-    meta.value = result?.metadata ?? result
-  } catch (e) {
-    error.value = e.message || String(e)
-  } finally {
-    loading.value = false
+const props = defineProps({
+  meta: {
+    type: Object,
+    required: true
   }
 })
 </script>
 
 <template>
   <div>
-    <Card v-if="!loading && meta" style="width:25rem; height: 15rem; overflow:hidden">
+    <Card v-if="meta" style="width:25rem; height: 15rem; overflow:hidden">
       <template #title>
         {{ meta.title }}
       </template>
@@ -41,8 +31,7 @@ onMounted(async () => {
       </template>
     </Card>
 
-    <p v-else-if="loading">Loading adventure metadata…</p>
-    <p v-else class="error">Error: {{ error }}</p>
+    <p v-else>No metadata provided…</p>
   </div>
 </template>
 
