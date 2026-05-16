@@ -29,7 +29,15 @@ test('GET /health returns status ok', async () => {
 });
 
 test('POST /api/save accepts valid JSON and saves file', async () => {
-  const payload = { name: 'test', items: [1, 2, 3] };
+  const payload = { "metadata": {
+    "id": "adv-triefenhain-001",
+    "title": "Triefenhain",
+    "version": "1.0",
+    "author": "Leonhardit07 with Claude Sonnet 4.6",
+    "summary": "A dark adventure set in and around the cursed village of Triefenhain. Ancient evils stir beneath the murky swamps, and the villagers live in fear of what lurks in the cave beyond the treeline."
+  }, 
+  "npcs": [],
+  "chapters":[]};
   const filename = EXAMPLE_FILENAME;
   const res = await request(app)
     .post('/api/save')

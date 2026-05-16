@@ -23,7 +23,15 @@ afterAll(async () => {
 });
 
 test('GET /api/load returns stored JSON previously uploaded', async () => {
-  const payload = { hello: 'world', list: [ 'a', 'b', 'c' ] };
+  const payload = { "metadata": {
+    "id": "adv-triefenhain-001",
+    "title": "Triefenhain",
+    "version": "1.0",
+    "author": "Leonhardit07 with Claude Sonnet 4.6",
+    "summary": "A dark adventure set in and around the cursed village of Triefenhain. Ancient evils stir beneath the murky swamps, and the villagers live in fear of what lurks in the cave beyond the treeline."
+  }, 
+  "npcs": [],
+  "chapters":[]};
 
   // create via import endpoint
   const filename = EXAMPLE_FILENAME;

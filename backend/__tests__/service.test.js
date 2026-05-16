@@ -23,7 +23,15 @@ afterAll(async () => {
 });
 
 test('processImport validates and returns metadata for valid object', async () => {
-  const payload = { foo: 'bar' };
+  const payload = { "metadata": {
+    "id": "adv-001",
+    "title": "Triefenhain",
+    "version": "1.0",
+    "author": "Leonhardit07 with Claude Sonnet 4.6",
+    "summary": "A dark adventure set in and around the cursed village of Triefenhain. Ancient evils stir beneath the murky swamps, and the villagers live in fear of what lurks in the cave beyond the treeline."
+  }, 
+  "npcs": [],
+  "chapters":[]};
   const meta = await processImport(payload, EXAMPLE_FILENAME);
   expect(meta).toHaveProperty('id');
   expect(meta).toHaveProperty('path');
