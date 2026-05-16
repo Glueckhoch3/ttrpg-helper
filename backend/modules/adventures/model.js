@@ -13,6 +13,7 @@ function normalizeAdventureFilenameStem(adventureFile) {
 		throw Object.assign(new Error('adventure filename must not include .json'), { status: 400 });
 	}
 
+	// sanitize-filename removes unsafe filesystem characters before path resolution.
 	const sanitizedStem = sanitize(stem);
 	if (!sanitizedStem || sanitizedStem.length === 0) {
 		throw Object.assign(new Error('adventure filename is invalid'), { status: 400 });
