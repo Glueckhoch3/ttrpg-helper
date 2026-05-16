@@ -2,12 +2,12 @@
 name: ADR-002
 title: "Add read-only adventure slice API using metadata.title routing"
 date: 2026-05-13
-status: accepted
+status: superseded
 domain: backend
 agent: GitHub Copilot
 decisionBy: team
 supersedes: —
-supersededBy: —
+supersededBy: ADR-003
 ---
 
 ### Context

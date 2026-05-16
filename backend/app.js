@@ -22,7 +22,7 @@ app.use('/api/save', saveRouter);
 // Export: serve saved JSON by filename via query `?filename=`
 app.use('/api/load', loadRouter);
 
-// Adventures: read adventure slices by adventureName
+// Adventures: read adventure slices and overview by filename stem
 app.use('/api/adventures', adventuresRouter);
 
 // 404
