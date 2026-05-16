@@ -1,4 +1,4 @@
-import { readAdventureJson } from './model.js';
+import { listAdventureMetadata, readAdventureJson } from './model.js';
 
 function requireString(value, fieldName) {
 	if (!value || String(value).trim().length === 0) {
@@ -29,14 +29,14 @@ function ensureArrayField(obj, fieldName) {
 	return value;
 }
 
-export async function getMetadata(adventureName) {
-	const adventure = await readAdventureJson(adventureName);
+export async function getMetadata(adventureFile) {
+	const adventure = await readAdventureJson(adventureFile);
 	const metadata = ensureObjectField(adventure, 'metadata');
 	return { metadata };
 }
 
-export async function getChapters(adventureName) {
-	const adventure = await readAdventureJson(adventureName);
+export async function getChapters(adventureFile) {
+	const adventure = await readAdventureJson(adventureFile);
 	const chapters = ensureArrayField(adventure, 'chapters');
 
 	const chapterList = chapters.map((chapter) => ({
@@ -47,9 +47,9 @@ export async function getChapters(adventureName) {
 	return { count: chapterList.length, chapters: chapterList };
 }
 
-export async function getChapterById(adventureName, chapterId) {
+export async function getChapterById(adventureFile, chapterId) {
 	const normalizedChapterId = requireString(chapterId, 'chapterId');
-	const adventure = await readAdventureJson(adventureName);
+	const adventure = await readAdventureJson(adventureFile);
 	const chapters = ensureArrayField(adventure, 'chapters');
 
 	const chapter = chapters.find((item) => item && String(item.id) === normalizedChapterId);
@@ -62,8 +62,8 @@ export async function getChapterById(adventureName, chapterId) {
 	return { chapter };
 }
 
-export async function getNpcs(adventureName) {
-	const adventure = await readAdventureJson(adventureName);
+export async function getNpcs(adventureFile) {
+	const adventure = await readAdventureJson(adventureFile);
 	const npcs = ensureArrayField(adventure, 'npcs');
 
 	const npcList = npcs.map((npc) => ({
@@ -74,9 +74,9 @@ export async function getNpcs(adventureName) {
 	return { count: npcList.length, npcs: npcList };
 }
 
-export async function getNpcById(adventureName, npcId) {
+export async function getNpcById(adventureFile, npcId) {
 	const normalizedNpcId = requireString(npcId, 'npcId');
-	const adventure = await readAdventureJson(adventureName);
+	const adventure = await readAdventureJson(adventureFile);
 	const npcs = ensureArrayField(adventure, 'npcs');
 
 	const npc = npcs.find((item) => item && String(item.id) === normalizedNpcId);
@@ -87,4 +87,9 @@ export async function getNpcById(adventureName, npcId) {
 	}
 
 	return { npc };
+}
+
+export async function getAdventuresOverview() {
+	const metadata = await listAdventureMetadata();
+	return { count: metadata.length, metadata };
 }

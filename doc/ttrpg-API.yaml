@@ -81,16 +81,35 @@ paths:
           description: Not found
         '400':
           description: Bad request — filename missing or invalid (e.g., wrong file ending)
-  /api/adventures/{adventureName}/metadata:
+  /api/adventures:
+    get:
+      summary: Get global adventure metadata overview
+      description: Returns a count of valid adventure JSON files and their metadata objects from the upload directory. Malformed JSON files are skipped.
+      responses:
+        '200':
+          description: Adventure count and metadata list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    minimum: 0
+                  metadata:
+                    type: array
+                    items:
+                      type: object
+  /api/adventures/{adventureFile}/metadata:
     get:
       summary: Get adventure metadata
       parameters:
         - in: path
-          name: adventureName
+          name: adventureFile
           required: true
           schema:
             type: string
-          description: Adventure title from `metadata.title` inside stored adventure JSON files.
+          description: Adventure filename stem without `.json` extension.
       responses:
         '200':
           description: Metadata for the adventure
@@ -104,19 +123,19 @@ paths:
         '404':
           description: Adventure not found
         '400':
-          description: Invalid adventure name
+          description: Invalid adventure filename
         '422':
           description: Adventure data malformed
-  /api/adventures/{adventureName}/chapters:
+  /api/adventures/{adventureFile}/chapters:
     get:
       summary: Get chapter overview list for an adventure
       parameters:
         - in: path
-          name: adventureName
+          name: adventureFile
           required: true
           schema:
             type: string
-          description: Adventure title from `metadata.title`.
+          description: Adventure filename stem without `.json` extension.
       responses:
         '200':
           description: Chapter count and chapter preview list
@@ -143,16 +162,16 @@ paths:
           description: Adventure not found
         '422':
           description: Adventure chapters malformed
-  /api/adventures/{adventureName}/chapters/{chapterId}:
+  /api/adventures/{adventureFile}/chapters/{chapterId}:
     get:
       summary: Get a single chapter by chapterId
       parameters:
         - in: path
-          name: adventureName
+          name: adventureFile
           required: true
           schema:
             type: string
-          description: Adventure title from `metadata.title`.
+          description: Adventure filename stem without `.json` extension.
         - in: path
           name: chapterId
           required: true
@@ -171,19 +190,19 @@ paths:
         '404':
           description: Adventure or chapter not found
         '400':
-          description: Invalid chapterId or adventureName
+          description: Invalid chapterId or adventure filename
         '422':
           description: Adventure chapters malformed
-  /api/adventures/{adventureName}/npcs:
+  /api/adventures/{adventureFile}/npcs:
     get:
       summary: Get NPC overview list for an adventure
       parameters:
         - in: path
-          name: adventureName
+          name: adventureFile
           required: true
           schema:
             type: string
-          description: Adventure title from `metadata.title`.
+          description: Adventure filename stem without `.json` extension.
       responses:
         '200':
           description: NPC count and NPC preview list
@@ -210,16 +229,16 @@ paths:
           description: Adventure not found
         '422':
           description: Adventure NPC section malformed
-  /api/adventures/{adventureName}/npcs/{npcId}:
+  /api/adventures/{adventureFile}/npcs/{npcId}:
     get:
       summary: Get a single NPC by npcId
       parameters:
         - in: path
-          name: adventureName
+          name: adventureFile
           required: true
           schema:
             type: string
-          description: Adventure title from `metadata.title`.
+          description: Adventure filename stem without `.json` extension.
         - in: path
           name: npcId
           required: true
@@ -238,6 +257,6 @@ paths:
         '404':
           description: Adventure or NPC not found
         '400':
-          description: Invalid npcId or adventureName
+          description: Invalid npcId or adventure filename
         '422':
           description: Adventure NPC section malformed
