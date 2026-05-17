@@ -13,6 +13,9 @@
     "format": "prettier --write --experimental-cli --cache-location ./node_modules/.cache/prettier/cache.json src/"
   },
   "dependencies": {
+    "@primeuix/themes": "^2.0.3",
+    "primevue": "^4.5.5",
+    "quill": "^2.0.3",
     "vue": "^3.5.31",
     "vue-router": "^5.0.4"
   },
@@ -28,7 +31,7 @@
     "oxlint": "~1.57.0",
     "prettier": "3.8.1",
     "vite": "^8.0.3",
-    "vite-plugin-vue-devtools": "^8.1.1"
+    "vite-plugin-vue-devtools": "^8.1.2"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

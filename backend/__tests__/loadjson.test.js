@@ -22,13 +22,21 @@ afterAll(async () => {
   await fs.rm(examplePath, { force: true });
 });
 
-test('GET /api/export returns stored JSON previously uploaded', async () => {
-  const payload = { hello: 'world', list: [ 'a', 'b', 'c' ] };
+test('GET /api/load returns stored JSON previously uploaded', async () => {
+  const payload = { "metadata": {
+    "id": "adv-triefenhain-001",
+    "title": "Triefenhain",
+    "version": "1.0",
+    "author": "Leonhardit07 with Claude Sonnet 4.6",
+    "summary": "A dark adventure set in and around the cursed village of Triefenhain. Ancient evils stir beneath the murky swamps, and the villagers live in fear of what lurks in the cave beyond the treeline."
+  }, 
+  "npcs": [],
+  "chapters":[]};
 
   // create via import endpoint
   const filename = EXAMPLE_FILENAME;
   const post = await request(app)
-    .post('/api/import')
+    .post('/api/load')
     .query({ filename })
     .send(payload)
     .set('Content-Type', 'application/json');
@@ -38,12 +46,12 @@ test('GET /api/export returns stored JSON previously uploaded', async () => {
 
   const id = post.body.id;
 
-  const get = await request(app).get('/api/export').query({ filename: id });
+  const get = await request(app).get('/api/load').query({ filename: id });
   expect(get.status).toBe(200);
   expect(get.body).toEqual(payload);
 });
 
-test('GET /api/export returns 404 for missing file', async () => {
-  const res = await request(app).get('/api/export').query({ filename: 'no-such-file.json' });
+test('GET /api/load returns 404 for missing file', async () => {
+  const res = await request(app).get('/api/load').query({ filename: 'no-such-file.json' });
   expect(res.status).toBe(404);
 });
