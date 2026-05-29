@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import sanitize from 'sanitize-filename';
-import { UPLOAD_DIR, ALLOW_OVERWRITE } from '../../config/index.js';
+import { UPLOAD_DIR } from '../../config/index.js';
 
 async function ensureDir(dir) {
   await fs.mkdir(dir, { recursive: true });
@@ -18,14 +18,6 @@ export async function saveJson(obj, filename) {
 
   // Prevent path traversal by using basename and sanitize
   const destPath = path.resolve(UPLOAD_DIR, path.basename(safeName));
-
-  // Check overwrite
-  const stat = await fs.stat(destPath).catch(() => null);
-  if (stat && !ALLOW_OVERWRITE) {
-    const err = new Error('File exists and overwrite is disabled');
-    err.status = 409;
-    throw err;
-  }
 
   const data = JSON.stringify(obj, null, 2);
   // debug: log paths to help test diagnostics
