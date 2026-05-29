@@ -9,6 +9,10 @@ const props = defineProps({
         type: Array,
         default: () => []
     },
+    chapterIndex: {
+        type: Number,
+        required: true
+    },
     onSaveEncounter: {
         type: Function,
         required: true
@@ -47,6 +51,7 @@ async function saveEncounter(encounter, index) {
     state.error = '';
     try {
         await props.onSaveEncounter({
+            chapterIndex: props.chapterIndex,
             encounterIndex: index,
             description: state.draft
         });
@@ -77,7 +82,6 @@ async function saveEncounter(encounter, index) {
                 <Editor
                     v-if="ensureEncounterState(encounter, encounterIndex).isEditing"
                     v-model="ensureEncounterState(encounter, encounterIndex).draft"
-                    :readonly="!ensureEncounterState(encounter, encounterIndex).isEditing"
                     editorStyle="height: 180px"
                 />
                 <p v-else class="encounter-description">{{ encounter.description }}</p>

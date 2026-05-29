@@ -45,6 +45,7 @@ const props = defineProps({
                         <div class="chapter-half">
                             <EncounterContent
                                 :encounters="chapter.encounters"
+                                :chapterIndex="chapterIndex"
                                 :onSaveEncounter="({ encounterIndex, description }) => props.onSaveEncounter({ chapterIndex, encounterIndex, description })"
                             ></EncounterContent>
                         </div>

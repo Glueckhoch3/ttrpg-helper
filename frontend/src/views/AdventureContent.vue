@@ -19,7 +19,6 @@ const props = defineProps({
 const adventureData = ref(null);
 const loading = ref(false);
 const error = ref(null);
-const saveError = ref(null);
 
 provide('adventureChapters', computed(() => adventureData.value?.chapters));
 provide('adventureNPCs', computed(() => adventureData.value?.npcs));
@@ -49,7 +48,6 @@ watch(
 );
 
 async function persistAdventure() {
-    saveError.value = null;
     await saveFile(adventureData.value, props.filename);
 }
 
@@ -66,7 +64,6 @@ async function saveChapterStory({ chapterIndex, story }) {
         await persistAdventure();
     } catch (e) {
         chapter.story = previousStory;
-        saveError.value = e?.message || String(e);
         throw e;
     }
 }
@@ -84,7 +81,6 @@ async function saveEncounterDescription({ chapterIndex, encounterIndex, descript
         await persistAdventure();
     } catch (e) {
         encounter.description = previousDescription;
-        saveError.value = e?.message || String(e);
         throw e;
     }
 }
@@ -94,7 +90,6 @@ async function saveEncounterDescription({ chapterIndex, encounterIndex, descript
     <div class="adventure-content-wrapper">
         <div v-if="loading" class="status-message">Loading adventure...</div>
         <div v-else-if="error" class="status-message error">Error: {{ error }}</div>
-        <div v-else-if="saveError" class="status-message error">Save failed: {{ saveError }}</div>
         <Splitter class="adventure-layout-splitter">
             <!-- Left Pane: Meta + Chapters -->
             <SplitterPanel class="left-pane flex flex-col" :size="75" :minSize="30">

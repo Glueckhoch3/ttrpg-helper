@@ -63,7 +63,6 @@ async function handleSave() {
         <Editor
             v-if="isEditing"
             v-model="draftStory"
-            :readonly="!isEditing"
             editorStyle="height: 220px"
         />
 
