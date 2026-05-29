@@ -3,6 +3,7 @@
 <script setup>
 import { reactive } from 'vue';
 import Editor from 'primevue/editor';
+import { richTextToDisplayText } from '@/utils/richText.js';
 
 const props = defineProps({
     encounters: {
@@ -62,6 +63,10 @@ async function saveEncounter(encounter, index) {
         state.isSaving = false;
     }
 }
+
+function displayDescription(value) {
+    return richTextToDisplayText(value);
+}
 </script>
 
 <template>
@@ -84,7 +89,7 @@ async function saveEncounter(encounter, index) {
                     v-model="ensureEncounterState(encounter, encounterIndex).draft"
                     editorStyle="height: 180px"
                 />
-                <p v-else class="encounter-description">{{ encounter.description }}</p>
+                <p v-else class="encounter-description">{{ displayDescription(encounter.description) }}</p>
                 <p v-if="ensureEncounterState(encounter, encounterIndex).error" class="error-text">
                     {{ ensureEncounterState(encounter, encounterIndex).error }}
                 </p>

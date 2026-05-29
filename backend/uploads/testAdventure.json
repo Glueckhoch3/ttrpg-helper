@@ -69,7 +69,7 @@
       "id": "ch-001",
       "title": "Triefen",
       "summary": "The adventurers arrive at the decaying village of Triefenhain. The streets are muddy and half the buildings stand empty. Elder Aldric Moorfen greets them with desperate eyes and begs for help. Strange black moss creeps up the walls of buildings closest to the swamp. At the inn, Vesper Dankhollow is suspiciously eager to point the party toward the swamp and away from the cave. Investigation checks around the village reveal scorched arcane symbols beneath the inn's floorboards.",
-      "story": "Triefenhain breathes like a tired old beast: shutters hang loose, and whispers cling to every alley. As the party walks the muddy lanes they begin to feel the village's exhaustion, and small acts of kindness from frightened villagers reveal the fragile hope still holding this place together. Rumors passed in hushed tones point toward the cave, and the inn's hearth seems to hold more secrets than warmth.",
+      "story": "<p>Triefenhain&nbsp;breathes&nbsp;like&nbsp;a&nbsp;tired&nbsp;old&nbsp;beast:&nbsp;shutters&nbsp;hang&nbsp;loose,&nbsp;and&nbsp;whispers&nbsp;cling&nbsp;to&nbsp;every&nbsp;alley.&nbsp;As&nbsp;the&nbsp;party&nbsp;walks&nbsp;the&nbsp;muddy&nbsp;lanes&nbsp;they&nbsp;begin&nbsp;to&nbsp;feel&nbsp;the&nbsp;village&#39;s&nbsp;exhaustion,&nbsp;and&nbsp;small&nbsp;acts&nbsp;of&nbsp;kindness&nbsp;from&nbsp;frightened&nbsp;villagers&nbsp;reveal&nbsp;the&nbsp;fragile&nbsp;hope&nbsp;still&nbsp;holding&nbsp;this&nbsp;place&nbsp;together.&nbsp;Rumors&nbsp;passed&nbsp;in&nbsp;hushed&nbsp;tones&nbsp;point&nbsp;toward&nbsp;the&nbsp;cave,&nbsp;and&nbsp;the&nbsp;inn&#39;s&nbsp;hearth&nbsp;seems&nbsp;to&nbsp;hold&nbsp;more&nbsp;secrets&nbsp;than&nbsp;warmth.</p>",
       "encounters": [
         {
           "id": "enc-001-01",
@@ -79,7 +79,7 @@
         {
           "id": "enc-001-02",
           "type": "exploration",
-          "description": "Searching the inn uncovers arcane symbols. DC 14 Arcana check reveals a ley-line siphoning ritual gone wrong."
+          "description": "<p>Searching&nbsp;the&nbsp;inn&nbsp;uncovers&nbsp;arcane&nbsp;symbols.&nbsp;DC&nbsp;14&nbsp;Arcana&nbsp;check&nbsp;reveals&nbsp;a&nbsp;ley-line&nbsp;siphoning&nbsp;ritual&nbsp;gone&nbsp;wrong.</p>"
         }
       ]
     },

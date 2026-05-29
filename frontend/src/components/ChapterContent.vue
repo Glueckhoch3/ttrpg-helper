@@ -1,8 +1,9 @@
 <!-- displays contents of a Chapter -->
 
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Editor from 'primevue/editor';
+import { richTextToDisplayText } from '@/utils/richText.js';
 
 const props = defineProps({
     story: {
@@ -18,6 +19,7 @@ const isEditing = ref(false);
 const isSaving = ref(false);
 const draftStory = ref(props.story);
 const localError = ref('');
+const displayStory = computed(() => richTextToDisplayText(props.story));
 
 watch(
     () => props.story,
@@ -66,7 +68,7 @@ async function handleSave() {
             editorStyle="height: 220px"
         />
 
-        <p v-else-if="props.story" class="story-text">{{ props.story }}</p>
+        <p v-else-if="displayStory" class="story-text">{{ displayStory }}</p>
         <p v-else class="empty-text">No story content available.</p>
         <p v-if="localError" class="error-text">{{ localError }}</p>
     </div>
