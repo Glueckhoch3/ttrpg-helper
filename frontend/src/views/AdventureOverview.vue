@@ -30,7 +30,8 @@ onMounted(async () => {
       <AdventureSummary 
         v-for="adv in adventures" 
         :key="adv.filename" 
-        :meta="adv.metadata" 
+        :meta="adv.metadata"
+        :filename="adv.filename"
       />
     </div>
   </div>
