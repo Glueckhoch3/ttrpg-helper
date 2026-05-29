@@ -12,7 +12,7 @@ const error = ref(null)
 onMounted(async () => {
   try {
     const result = await getAllAdventures()
-    adventures.value = result?.metadata || []
+    adventures.value = result?.adventures || []
   } catch (e) {
     error.value = e.message || String(e)
   } finally {
@@ -29,8 +29,8 @@ onMounted(async () => {
     <div v-else style="display: flex; gap: 1rem; flex-wrap: wrap;">
       <AdventureSummary 
         v-for="adv in adventures" 
-        :key="adv.id" 
-        :meta="adv" 
+        :key="adv.filename" 
+        :meta="adv.metadata" 
       />
     </div>
   </div>

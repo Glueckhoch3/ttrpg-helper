@@ -84,22 +84,29 @@ paths:
   /api/adventures:
     get:
       summary: Get global adventure metadata overview
-      description: Returns a count of valid adventure JSON files and their metadata objects from the upload directory. Malformed JSON files are skipped.
+      description: Returns filename and metadata pairs for all valid adventure JSON files from the upload directory. Malformed JSON files are skipped.
       responses:
         '200':
-          description: Adventure count and metadata list
+          description: Adventure filename and metadata list
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  count:
-                    type: integer
-                    minimum: 0
-                  metadata:
+                  adventures:
                     type: array
                     items:
                       type: object
+                      required:
+                        - filename
+                        - metadata
+                      properties:
+                        filename:
+                          type: string
+                        metadata:
+                          type: object
+                required:
+                  - adventures
   /api/adventures/{adventureFile}/metadata:
     get:
       summary: Get adventure metadata
