@@ -8,6 +8,12 @@ import NPCOverview from '@/components/NPCOverview.vue';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import { getFile, saveFile } from '@/utils/api.js';
+import {
+    cloneValue,
+    createChapterTemplate,
+    createEncounterTemplate,
+    createNpcTemplate
+} from '@/utils/adventureTemplates.js';
 
 const props = defineProps({
     filename: {
@@ -19,13 +25,15 @@ const props = defineProps({
 const adventureData = ref(null);
 const loading = ref(false);
 const error = ref(null);
+const actionError = ref(null);
 
-provide('adventureChapters', computed(() => adventureData.value?.chapters));
-provide('adventureNPCs', computed(() => adventureData.value?.npcs));
+provide('adventureChapters', computed(() => adventureData.value?.chapters || []));
+provide('adventureNPCs', computed(() => adventureData.value?.npcs || []));
 
 async function loadAdventure(filename) {
     loading.value = true;
     error.value = null;
+    actionError.value = null;
     try {
         const data = await getFile(filename);
         adventureData.value = data;
@@ -51,38 +59,119 @@ async function persistAdventure() {
     await saveFile(adventureData.value, props.filename);
 }
 
-async function saveChapterStory({ chapterIndex, story }) {
-    if (!adventureData.value?.chapters?.[chapterIndex]) {
-        throw new Error('Chapter not found');
+async function mutateAdventure(mutator) {
+    if (!adventureData.value) {
+        throw new Error('Adventure not loaded');
     }
 
-    const chapter = adventureData.value.chapters[chapterIndex];
-    const previousStory = chapter.story;
-    chapter.story = story;
+    const previousAdventure = cloneValue(adventureData.value);
+    mutator(adventureData.value);
 
     try {
         await persistAdventure();
+        actionError.value = null;
     } catch (e) {
-        chapter.story = previousStory;
+        adventureData.value = previousAdventure;
+        actionError.value = e?.message || 'Failed to save adventure.';
         throw e;
     }
 }
 
-async function saveEncounterDescription({ chapterIndex, encounterIndex, description }) {
-    const encounter = adventureData.value?.chapters?.[chapterIndex]?.encounters?.[encounterIndex];
-    if (!encounter) {
-        throw new Error('Encounter not found');
-    }
+async function saveMetadata(metadataDraft) {
+    await mutateAdventure((adventure) => {
+        adventure.metadata = {
+            ...adventure.metadata,
+            ...metadataDraft
+        };
+    });
+}
 
-    const previousDescription = encounter.description;
-    encounter.description = description;
+async function addChapter() {
+    await mutateAdventure((adventure) => {
+        adventure.chapters = Array.isArray(adventure.chapters) ? adventure.chapters : [];
+        adventure.chapters.push(createChapterTemplate(adventure.chapters));
+    });
+}
 
-    try {
-        await persistAdventure();
-    } catch (e) {
-        encounter.description = previousDescription;
-        throw e;
-    }
+async function saveChapter({ chapterIndex, chapter }) {
+    await mutateAdventure((adventure) => {
+        if (!Array.isArray(adventure.chapters) || !adventure.chapters[chapterIndex]) {
+            throw new Error('Chapter not found');
+        }
+
+        adventure.chapters[chapterIndex] = chapter;
+    });
+}
+
+async function deleteChapter(chapterIndex) {
+    await mutateAdventure((adventure) => {
+        if (!Array.isArray(adventure.chapters) || !adventure.chapters[chapterIndex]) {
+            throw new Error('Chapter not found');
+        }
+
+        adventure.chapters.splice(chapterIndex, 1);
+    });
+}
+
+async function addEncounter({ chapterIndex }) {
+    await mutateAdventure((adventure) => {
+        const chapter = adventure.chapters?.[chapterIndex];
+        if (!chapter) {
+            throw new Error('Chapter not found');
+        }
+
+        chapter.encounters = Array.isArray(chapter.encounters) ? chapter.encounters : [];
+        chapter.encounters.push(createEncounterTemplate(chapter.encounters));
+    });
+}
+
+async function saveEncounter({ chapterIndex, encounterIndex, encounter }) {
+    await mutateAdventure((adventure) => {
+        const chapter = adventure.chapters?.[chapterIndex];
+        if (!chapter || !chapter.encounters?.[encounterIndex]) {
+            throw new Error('Encounter not found');
+        }
+
+        chapter.encounters[encounterIndex] = encounter;
+    });
+}
+
+async function deleteEncounter({ chapterIndex, encounterIndex }) {
+    await mutateAdventure((adventure) => {
+        const chapter = adventure.chapters?.[chapterIndex];
+        if (!chapter || !chapter.encounters?.[encounterIndex]) {
+            throw new Error('Encounter not found');
+        }
+
+        chapter.encounters.splice(encounterIndex, 1);
+    });
+}
+
+async function addNpc() {
+    await mutateAdventure((adventure) => {
+        adventure.npcs = Array.isArray(adventure.npcs) ? adventure.npcs : [];
+        adventure.npcs.push(createNpcTemplate(adventure.npcs));
+    });
+}
+
+async function saveNpc({ npcIndex, npc }) {
+    await mutateAdventure((adventure) => {
+        if (!Array.isArray(adventure.npcs) || !adventure.npcs[npcIndex]) {
+            throw new Error('NPC not found');
+        }
+
+        adventure.npcs[npcIndex] = npc;
+    });
+}
+
+async function deleteNpc(npcIndex) {
+    await mutateAdventure((adventure) => {
+        if (!Array.isArray(adventure.npcs) || !adventure.npcs[npcIndex]) {
+            throw new Error('NPC not found');
+        }
+
+        adventure.npcs.splice(npcIndex, 1);
+    });
 }
 </script>
 
@@ -90,20 +179,32 @@ async function saveEncounterDescription({ chapterIndex, encounterIndex, descript
     <div class="adventure-content-wrapper">
         <div v-if="loading" class="status-message">Loading adventure...</div>
         <div v-else-if="error" class="status-message error">Error: {{ error }}</div>
+        <div v-else-if="actionError" class="status-message error">Error: {{ actionError }}</div>
         <Splitter class="adventure-layout-splitter">
             <!-- Left Pane: Meta + Chapters -->
             <SplitterPanel class="left-pane flex flex-col" :size="75" :minSize="30">
-                <AdventureMeta :metadata="adventureData?.metadata"></AdventureMeta>
+                <AdventureMeta
+                    :metadata="adventureData?.metadata"
+                    :onSaveMetadata="saveMetadata"
+                ></AdventureMeta>
                 <div class="spacer"></div>
                 <ChapterOverview
-                    :onSaveStory="saveChapterStory"
-                    :onSaveEncounter="saveEncounterDescription"
+                    :onAddChapter="addChapter"
+                    :onDeleteChapter="deleteChapter"
+                    :onSaveChapter="saveChapter"
+                    :onAddEncounter="addEncounter"
+                    :onSaveEncounter="saveEncounter"
+                    :onDeleteEncounter="deleteEncounter"
                 ></ChapterOverview>
             </SplitterPanel>
             
             <!-- Right side containing Middle and Right Panes -->
             <SplitterPanel class="right-pane" :size="25" :minSize="25">
-                <NPCOverview></NPCOverview>
+                <NPCOverview
+                    :onAddNpc="addNpc"
+                    :onSaveNpc="saveNpc"
+                    :onDeleteNpc="deleteNpc"
+                ></NPCOverview>
             </SplitterPanel>
         </Splitter>
     </div>

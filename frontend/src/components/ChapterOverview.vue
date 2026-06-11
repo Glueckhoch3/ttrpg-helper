@@ -8,14 +8,31 @@ import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
 import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
+import Button from 'primevue/button';
 
 const adventureChapters = inject('adventureChapters');
 const props = defineProps({
-    onSaveStory: {
+    onAddChapter: {
+        type: Function,
+        required: true
+    },
+    onDeleteChapter: {
+        type: Function,
+        required: true
+    },
+    onSaveChapter: {
+        type: Function,
+        required: true
+    },
+    onAddEncounter: {
         type: Function,
         required: true
     },
     onSaveEncounter: {
+        type: Function,
+        required: true
+    },
+    onDeleteEncounter: {
         type: Function,
         required: true
     }
@@ -24,7 +41,10 @@ const props = defineProps({
 
 <template>
     <div class="chapter-overview">
-        <h3>Chapters</h3>
+        <div class="overview-header">
+            <h3>Chapters</h3>
+            <Button label="Add" icon="pi pi-plus" @click="props.onAddChapter()" />
+        </div>
         <Accordion multiple class="w-full">
             <AccordionPanel
                 v-for="(chapter, chapterIndex) in adventureChapters"
@@ -38,15 +58,18 @@ const props = defineProps({
                     <div class="chapter-details">
                         <div class="chapter-half">
                             <ChapterContent
-                                :story="chapter.story"
-                                :onSaveStory="(story) => props.onSaveStory({ chapterIndex, story })"
+                                :chapter="chapter"
+                                :onSaveChapter="(chapterDraft) => props.onSaveChapter({ chapterIndex, chapter: chapterDraft })"
+                                :onDeleteChapter="() => props.onDeleteChapter(chapterIndex)"
                             ></ChapterContent>
                         </div>
                         <div class="chapter-half">
                             <EncounterContent
                                 :encounters="chapter.encounters"
                                 :chapterIndex="chapterIndex"
-                                :onSaveEncounter="({ encounterIndex, description }) => props.onSaveEncounter({ chapterIndex, encounterIndex, description })"
+                                :onAddEncounter="() => props.onAddEncounter({ chapterIndex })"
+                                :onSaveEncounter="({ encounterIndex, encounter }) => props.onSaveEncounter({ chapterIndex, encounterIndex, encounter })"
+                                :onDeleteEncounter="({ encounterIndex }) => props.onDeleteEncounter({ chapterIndex, encounterIndex })"
                             ></EncounterContent>
                         </div>
                     </div>
@@ -60,6 +83,14 @@ const props = defineProps({
 .chapter-overview {
   margin: 1em;
 }
+
+.overview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+}
+
 h3 {
     margin-top: 0;
     margin-bottom: 1rem;
