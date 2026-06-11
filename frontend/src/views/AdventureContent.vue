@@ -7,7 +7,7 @@ import ChapterOverview from '@/components/ChapterOverview.vue';
 import NPCOverview from '@/components/NPCOverview.vue';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
-import { getFile } from '@/utils/api.js';
+import { getFile, saveFile } from '@/utils/api.js';
 
 const props = defineProps({
     filename: {
@@ -46,6 +46,44 @@ watch(
     },
     { immediate: true }
 );
+
+async function persistAdventure() {
+    await saveFile(adventureData.value, props.filename);
+}
+
+async function saveChapterStory({ chapterIndex, story }) {
+    if (!adventureData.value?.chapters?.[chapterIndex]) {
+        throw new Error('Chapter not found');
+    }
+
+    const chapter = adventureData.value.chapters[chapterIndex];
+    const previousStory = chapter.story;
+    chapter.story = story;
+
+    try {
+        await persistAdventure();
+    } catch (e) {
+        chapter.story = previousStory;
+        throw e;
+    }
+}
+
+async function saveEncounterDescription({ chapterIndex, encounterIndex, description }) {
+    const encounter = adventureData.value?.chapters?.[chapterIndex]?.encounters?.[encounterIndex];
+    if (!encounter) {
+        throw new Error('Encounter not found');
+    }
+
+    const previousDescription = encounter.description;
+    encounter.description = description;
+
+    try {
+        await persistAdventure();
+    } catch (e) {
+        encounter.description = previousDescription;
+        throw e;
+    }
+}
 </script>
 
 <template>
@@ -57,7 +95,10 @@ watch(
             <SplitterPanel class="left-pane flex flex-col" :size="75" :minSize="30">
                 <AdventureMeta :metadata="adventureData?.metadata"></AdventureMeta>
                 <div class="spacer"></div>
-                <ChapterOverview></ChapterOverview>
+                <ChapterOverview
+                    :onSaveStory="saveChapterStory"
+                    :onSaveEncounter="saveEncounterDescription"
+                ></ChapterOverview>
             </SplitterPanel>
             
             <!-- Right side containing Middle and Right Panes -->
