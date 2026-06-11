@@ -1,7 +1,23 @@
 import { toRaw } from "vue";
 
+function toPlainValue(value) {
+  const rawValue = toRaw(value);
+
+  if (Array.isArray(rawValue)) {
+    return rawValue.map((item) => toPlainValue(item));
+  }
+
+  if (rawValue && typeof rawValue === 'object') {
+    return Object.fromEntries(
+      Object.entries(rawValue).map(([key, nestedValue]) => [key, toPlainValue(nestedValue)])
+    );
+  }
+
+  return rawValue;
+}
+
 export function cloneValue(value) {
-  return structuredClone(toRaw(value));
+  return structuredClone(toPlainValue(value));
 }
 
 function nextSequentialId(prefix, items = []) {

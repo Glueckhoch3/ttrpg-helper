@@ -1,7 +1,7 @@
 <!-- Holder for an Accordeon of all the Chapters in the Adventure -->
 
 <script setup>
-import { inject } from 'vue';
+import { computed, inject, unref } from 'vue';
 import ChapterContent from './ChapterContent.vue';
 import EncounterContent from './EncounterContent.vue';
 import Accordion from 'primevue/accordion';
@@ -10,7 +10,11 @@ import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
 import Button from 'primevue/button';
 
-const adventureChapters = inject('adventureChapters');
+const injectedAdventureChapters = inject('adventureChapters', []);
+const adventureChapters = computed(() => {
+    const chapters = unref(injectedAdventureChapters);
+    return Array.isArray(chapters) ? chapters : [];
+});
 const props = defineProps({
     onAddChapter: {
         type: Function,

@@ -1,11 +1,15 @@
 <!-- Holder for displaying NPCSummary Cards -->
 
 <script setup>
-import { inject } from 'vue';
+import { computed, inject, unref } from 'vue';
 import NPCSummary from './NPCSummary.vue';
 import Button from 'primevue/button';
 
-const adventureNPCs = inject('adventureNPCs');
+const injectedAdventureNPCs = inject('adventureNPCs', []);
+const adventureNPCs = computed(() => {
+  const npcs = unref(injectedAdventureNPCs);
+  return Array.isArray(npcs) ? npcs : [];
+});
 const props = defineProps({
   onAddNpc: {
     type: Function,

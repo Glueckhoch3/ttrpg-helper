@@ -7,6 +7,8 @@ import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 import Panel from 'primevue/panel';
 
+// TODO: enable editing stats with editor/ picker primevue component
+
 const props = defineProps({
     npc: {
         type: Object,

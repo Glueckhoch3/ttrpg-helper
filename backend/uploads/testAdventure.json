@@ -62,34 +62,6 @@
         "wisdom": 9,
         "charisma": 14
       }
-    },
-    {
-      "id": "npc-5",
-      "name": "template",
-      "backstory": "",
-      "motivation": "",
-      "stats": {
-        "health": 1,
-        "strength": 1,
-        "dexterity": 1,
-        "intelligence": 1,
-        "wisdom": 1,
-        "charisma": 1
-      }
-    },
-    {
-      "id": "npc-6",
-      "name": "template",
-      "backstory": "",
-      "motivation": "",
-      "stats": {
-        "health": 1,
-        "strength": 1,
-        "dexterity": 1,
-        "intelligence": 1,
-        "wisdom": 1,
-        "charisma": 1
-      }
     }
   ],
   "chapters": [
@@ -225,13 +197,6 @@
           "description": "The Sunken Idol holds a carving depicting the cave's layout, giving the party a rough map of Triefencave."
         }
       ]
-    },
-    {
-      "id": "ch-7",
-      "title": "template",
-      "summary": "",
-      "story": "",
-      "encounters": []
     }
   ]
 }

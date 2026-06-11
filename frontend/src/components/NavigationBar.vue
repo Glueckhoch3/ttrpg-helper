@@ -1,5 +1,7 @@
 <!-- Navigation Bar for going back to the AdventureOverview View, Logo, and Button to toggle the NPCOverview Sidebar -->
 
+<!-- TODO: fill interactions; pin to top so it doesnt get "scrolled away" -->
+
 <script setup></script>
 
 <template>
