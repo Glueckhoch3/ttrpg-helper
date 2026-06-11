@@ -128,6 +128,75 @@
           "description": "The Blightshade (custom CR 7 shadow elemental). If the ritual circle was dismantled, it enters combat at 60 HP instead of 90 HP."
         }
       ]
+    },
+    {
+      "id": "ch-004",
+      "title": "Swampdwellers",
+      "summary": "Venturing into the murky marshes near Triefenhain, the party encounters Gorrak's tribe of lizardfolk — the Swampdwellers. Initially hostile, they can be calmed through diplomacy or by showing Mira's journal. Gorrak reveals that a shadowy entity drove his people from the Triefencave three moons ago. He offers a guide and a Bogstone Amulet (advantage on saves vs. poison) in exchange for clearing the cave.",
+      "story": "The marsh has its own language of chirps and creaks, and at first the Swampdwellers' silhouettes seem like tricks of steam. As conversations unfold, the tribe's sorrow and fierce pride become clear; they are not merely monsters but exiles guarding memories of the cave. Mira's journal acts as a bridge, and the party learns that old grievances and ancient pacts bind the swamp's fate to the village.",
+      "encounters": [
+        {
+          "id": "enc-002-01",
+          "type": "combat",
+          "description": "Ambush by 4 lizardfolk scouts (CR 1/2 each). Fighting back escalates tension; non-lethal resolution or diplomacy unlocks Gorrak's alliance."
+        },
+        {
+          "id": "enc-002-02",
+          "type": "social",
+          "description": "Parley with Gorrak — DC 12 Persuasion or showing Mira's journal automatically succeeds."
+        },
+        {
+          "id": "enc-002-03",
+          "type": "exploration",
+          "description": "The Sunken Idol holds a carving depicting the cave's layout, giving the party a rough map of Triefencave."
+        }
+      ]
+    },
+    {
+      "id": "ch-005",
+      "title": "Swampdwellers",
+      "summary": "Venturing into the murky marshes near Triefenhain, the party encounters Gorrak's tribe of lizardfolk — the Swampdwellers. Initially hostile, they can be calmed through diplomacy or by showing Mira's journal. Gorrak reveals that a shadowy entity drove his people from the Triefencave three moons ago. He offers a guide and a Bogstone Amulet (advantage on saves vs. poison) in exchange for clearing the cave.",
+      "story": "The marsh has its own language of chirps and creaks, and at first the Swampdwellers' silhouettes seem like tricks of steam. As conversations unfold, the tribe's sorrow and fierce pride become clear; they are not merely monsters but exiles guarding memories of the cave. Mira's journal acts as a bridge, and the party learns that old grievances and ancient pacts bind the swamp's fate to the village.",
+      "encounters": [
+        {
+          "id": "enc-002-01",
+          "type": "combat",
+          "description": "Ambush by 4 lizardfolk scouts (CR 1/2 each). Fighting back escalates tension; non-lethal resolution or diplomacy unlocks Gorrak's alliance."
+        },
+        {
+          "id": "enc-002-02",
+          "type": "social",
+          "description": "Parley with Gorrak — DC 12 Persuasion or showing Mira's journal automatically succeeds."
+        },
+        {
+          "id": "enc-002-03",
+          "type": "exploration",
+          "description": "The Sunken Idol holds a carving depicting the cave's layout, giving the party a rough map of Triefencave."
+        }
+      ]
+    },
+    {
+      "id": "ch-006",
+      "title": "Swampdwellers",
+      "summary": "Venturing into the murky marshes near Triefenhain, the party encounters Gorrak's tribe of lizardfolk — the Swampdwellers. Initially hostile, they can be calmed through diplomacy or by showing Mira's journal. Gorrak reveals that a shadowy entity drove his people from the Triefencave three moons ago. He offers a guide and a Bogstone Amulet (advantage on saves vs. poison) in exchange for clearing the cave.",
+      "story": "The marsh has its own language of chirps and creaks, and at first the Swampdwellers' silhouettes seem like tricks of steam. As conversations unfold, the tribe's sorrow and fierce pride become clear; they are not merely monsters but exiles guarding memories of the cave. Mira's journal acts as a bridge, and the party learns that old grievances and ancient pacts bind the swamp's fate to the village.",
+      "encounters": [
+        {
+          "id": "enc-002-01",
+          "type": "combat",
+          "description": "Ambush by 4 lizardfolk scouts (CR 1/2 each). Fighting back escalates tension; non-lethal resolution or diplomacy unlocks Gorrak's alliance."
+        },
+        {
+          "id": "enc-002-02",
+          "type": "social",
+          "description": "Parley with Gorrak — DC 12 Persuasion or showing Mira's journal automatically succeeds."
+        },
+        {
+          "id": "enc-002-03",
+          "type": "exploration",
+          "description": "The Sunken Idol holds a carving depicting the cave's layout, giving the party a rough map of Triefencave."
+        }
+      ]
     }
   ]
 }

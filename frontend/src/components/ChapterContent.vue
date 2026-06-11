@@ -2,37 +2,56 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
+import Button from 'primevue/button';
 import Editor from 'primevue/editor';
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
+import { cloneValue } from '@/utils/adventureTemplates.js';
 import { richTextToDisplayText } from '@/utils/richText.js';
 
 const props = defineProps({
-    story: {
-        type: String,
-        default: ''
+    chapter: {
+        type: Object,
+        default: () => ({})
     },
-    onSaveStory: {
+    onSaveChapter: {
+        type: Function,
+        required: true
+    },
+    onDeleteChapter: {
         type: Function,
         required: true
     }
 });
 const isEditing = ref(false);
 const isSaving = ref(false);
-const draftStory = ref(props.story);
+const draftChapter = ref({});
 const localError = ref('');
-const displayStory = computed(() => richTextToDisplayText(props.story));
+const displayStory = computed(() => richTextToDisplayText(props.chapter?.story));
+
+function createDraftChapter() {
+    return cloneValue({
+        id: props.chapter?.id || '',
+        title: props.chapter?.title || '',
+        summary: props.chapter?.summary || '',
+        story: props.chapter?.story || '',
+        encounters: Array.isArray(props.chapter?.encounters) ? props.chapter.encounters : []
+    });
+}
 
 watch(
-    () => props.story,
-    (newStory) => {
+    () => props.chapter,
+    () => {
         if (!isEditing.value) {
-            draftStory.value = newStory || '';
+            draftChapter.value = createDraftChapter();
         }
-    }
+    },
+    { immediate: true }
 );
 
 function handleEdit() {
     localError.value = '';
-    draftStory.value = props.story || '';
+    draftChapter.value = createDraftChapter();
     isEditing.value = true;
 }
 
@@ -40,12 +59,25 @@ async function handleSave() {
     isSaving.value = true;
     localError.value = '';
     try {
-        await props.onSaveStory(draftStory.value);
+        await props.onSaveChapter({ ...draftChapter.value });
         isEditing.value = false;
     } catch (e) {
-        localError.value = e?.message || 'Failed to save chapter story.';
+        localError.value = e?.message || 'Failed to save chapter.';
     } finally {
         isSaving.value = false;
+    }
+}
+
+async function handleDelete() {
+    if (!globalThis.confirm(`Delete chapter ${props.chapter?.id || ''}?`)) {
+        return;
+    }
+
+    localError.value = '';
+    try {
+        await props.onDeleteChapter();
+    } catch (e) {
+        localError.value = e?.message || 'Failed to delete chapter.';
     }
 }
 </script>
@@ -53,23 +85,50 @@ async function handleSave() {
 <template>
     <div class="chapter-content">
         <div class="actions">
-            <button
-                type="button"
+            <Button
+                :label="isEditing ? 'Save' : 'Edit'"
+                icon="pi pi-pencil"
+                :loading="isSaving"
                 @click="isEditing ? handleSave() : handleEdit()"
-                :disabled="isSaving"
-            >
-                {{ isEditing ? 'Save' : 'Edit' }}
-            </button>
+            />
+            <Button
+                label="Delete"
+                icon="pi pi-trash"
+                severity="danger"
+                outlined
+                @click="handleDelete()"
+            />
         </div>
 
-        <Editor
-            v-if="isEditing"
-            v-model="draftStory"
-            editorStyle="height: 220px"
-        />
+        <div v-if="isEditing" class="editor-grid">
+            <div class="field">
+                <span class="field-label">Id</span>
+                <InputText v-model="draftChapter.id" />
+            </div>
+            <div class="field">
+                <span class="field-label">Title</span>
+                <InputText v-model="draftChapter.title" />
+            </div>
+            <div class="field field-full">
+                <span class="field-label">Summary</span>
+                <Textarea v-model="draftChapter.summary" rows="3" autoResize />
+            </div>
+            <div class="field field-full">
+                <span class="field-label">Story</span>
+                <Editor
+                    v-model="draftChapter.story"
+                    editorStyle="height: 220px"
+                />
+            </div>
+        </div>
 
-        <p v-else-if="displayStory" class="story-text">{{ displayStory }}</p>
-        <p v-else class="empty-text">No story content available.</p>
+        <div v-else>
+            <p class="chapter-id">{{ props.chapter?.id }}</p>
+            <p v-if="props.chapter?.title" class="chapter-title">{{ props.chapter.title }}</p>
+            <p v-if="props.chapter?.summary" class="summary-text">{{ props.chapter.summary }}</p>
+            <p v-if="displayStory" class="story-text">{{ displayStory }}</p>
+            <p v-else class="empty-text">No story content available.</p>
+        </div>
         <p v-if="localError" class="error-text">{{ localError }}</p>
     </div>
 </template>
@@ -79,7 +138,45 @@ async function handleSave() {
   padding: 0.5rem 0;
 }
 .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     margin-bottom: 0.75rem;
+}
+
+.editor-grid {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.field-label {
+    font-weight: 600;
+}
+
+.field-full {
+    grid-column: 1 / -1;
+}
+
+.chapter-id {
+    margin: 0 0 0.35rem;
+    font-size: 0.85rem;
+    color: var(--p-text-color-secondary, #6c757d);
+}
+
+.chapter-title {
+    margin: 0 0 0.5rem;
+    font-weight: 700;
+}
+
+.summary-text {
+    margin: 0 0 0.75rem;
+    font-style: italic;
 }
 .story-text {
     line-height: 1.6;
