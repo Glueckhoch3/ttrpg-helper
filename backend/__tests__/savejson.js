@@ -52,6 +52,29 @@ test('POST /api/save accepts valid JSON and saves file', async () => {
   expect(parsed).toEqual(payload);
 });
 
+test('POST /api/save overwrites existing file content', async () => {
+  const filename = EXAMPLE_FILENAME;
+  const initialPayload = { metadata: { id: 'adv-initial' }, npcs: [], chapters: [] };
+  const updatedPayload = { metadata: { id: 'adv-updated' }, npcs: [{ id: 'npc-1' }], chapters: [] };
+
+  const firstSave = await request(app)
+    .post('/api/save')
+    .query({ filename })
+    .send(initialPayload)
+    .set('Content-Type', 'application/json');
+  expect(firstSave.status).toBe(201);
+
+  const secondSave = await request(app)
+    .post('/api/save')
+    .query({ filename })
+    .send(updatedPayload)
+    .set('Content-Type', 'application/json');
+  expect(secondSave.status).toBe(201);
+
+  const saved = await fs.readFile(path.join(uploadDir, filename), 'utf8');
+  expect(JSON.parse(saved)).toEqual(updatedPayload);
+});
+
 test('POST /api/save rejects invalid payload (non-object root)', async () => {
   const payload = 'this is a string';
   const res = await request(app)

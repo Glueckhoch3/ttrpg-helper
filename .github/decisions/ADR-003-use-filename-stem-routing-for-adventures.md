@@ -2,12 +2,12 @@
 name: ADR-003
 title: "Use filename-stem routing for adventure read endpoints and add global metadata overview"
 date: 2026-05-16
-status: accepted
+status: superseded
 domain: backend
 agent: GitHub Copilot
 decisionBy: team
 supersedes: ADR-002
-supersededBy: —
+supersededBy: ADR-004
 ---
 
 ### Context

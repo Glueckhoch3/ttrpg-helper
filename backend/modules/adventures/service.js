@@ -90,6 +90,6 @@ export async function getNpcById(adventureFile, npcId) {
 }
 
 export async function getAdventuresOverview() {
-	const metadata = await listAdventureMetadata();
-	return { count: metadata.length, metadata };
+	const adventures = await listAdventureMetadata();
+	return { adventures };
 }

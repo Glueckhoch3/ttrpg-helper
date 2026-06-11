@@ -72,18 +72,28 @@ afterAll(async () => {
 	await fs.rm(uploadDir, { recursive: true, force: true });
 });
 
-test('GET /api/adventures returns count and metadata list and skips malformed JSON files', async () => {
+test('GET /api/adventures returns filename and metadata list and skips malformed JSON files', async () => {
 	const res = await request(app).get('/api/adventures');
 	expect(res.status).toBe(200);
 	expect(res.body).toEqual({
-		count: 4,
-		metadata: [
-			{ id: 'adv-alpha-001', title: 'Adventure Alpha', version: '1.0.0' },
-			{ id: 'adv-beta-001', title: 'Adventure Beta', version: '1.1.0' },
-			{ id: 'bad', title: 'Malformed Adventure' },
-			{ title: 'Malformed Npcs' }
+		adventures: [
+			{ filename: ADVENTURE_FILENAME, metadata: { id: 'adv-alpha-001', title: 'Adventure Alpha', version: '1.0.0' } },
+			{ filename: ADVENTURE_TWO_FILENAME, metadata: { id: 'adv-beta-001', title: 'Adventure Beta', version: '1.1.0' } },
+			{ filename: MALFORMED_CHAPTERS_FILENAME, metadata: { id: 'bad', title: 'Malformed Adventure' } },
+			{ filename: MALFORMED_NPCS_FILENAME, metadata: { title: 'Malformed Npcs' } }
 		]
 	});
+});
+
+test('GET /api/adventures returns every discovered adventure filename', async () => {
+	const res = await request(app).get('/api/adventures');
+	expect(res.status).toBe(200);
+	expect(res.body.adventures.map((item) => item.filename)).toEqual([
+		ADVENTURE_FILENAME,
+		ADVENTURE_TWO_FILENAME,
+		MALFORMED_CHAPTERS_FILENAME,
+		MALFORMED_NPCS_FILENAME
+	]);
 });
 
 test('GET /api/adventures/:adventureFile/metadata returns metadata', async () => {

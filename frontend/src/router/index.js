@@ -7,7 +7,14 @@ const router = createRouter({
   routes: [
     {path: '/', redirect: '/overview'},
     {path: '/overview', component: AdventureOverview},
-    {path: '/content', component: AdventureContent}
+    {
+      path: '/content/:filename?',
+      name: 'adventure-content',
+      component: AdventureContent,
+      props: route => ({
+        filename: route.params.filename || 'testAdventure.json'
+      })
+    }
   ],
 })
 

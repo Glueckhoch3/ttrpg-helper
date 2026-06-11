@@ -36,6 +36,18 @@ function normalizeMetadata(parsed) {
 	return parsed.metadata;
 }
 
+function normalizeAdventureEntry(fileName, parsed) {
+	const metadata = normalizeMetadata(parsed);
+	if (!metadata) {
+		return null;
+	}
+
+	return {
+		filename: fileName,
+		metadata
+	};
+}
+
 export async function readAdventureJson(adventureFile) {
 	const stem = normalizeAdventureFilenameStem(adventureFile);
 	const filePath = path.resolve(UPLOAD_DIR, `${stem}.json`);
@@ -65,7 +77,7 @@ export async function listAdventureMetadata() {
 			.map((entry) => entry.name)
 			.sort((a, b) => a.localeCompare(b));
 
-		const metadataList = [];
+		const adventureList = [];
 
 		for (const fileName of jsonFiles) {
 			const filePath = path.resolve(UPLOAD_DIR, path.basename(fileName));
@@ -83,15 +95,15 @@ export async function listAdventureMetadata() {
 				continue;
 			}
 
-			const metadata = normalizeMetadata(parsed);
-			if (!metadata) {
+			const adventureEntry = normalizeAdventureEntry(fileName, parsed);
+			if (!adventureEntry) {
 				continue;
 			}
 
-			metadataList.push(metadata);
+			adventureList.push(adventureEntry);
 		}
 
-		return metadataList;
+		return adventureList;
 	} catch (e) {
 		if (e?.code === 'ENOENT') {
 			return [];
