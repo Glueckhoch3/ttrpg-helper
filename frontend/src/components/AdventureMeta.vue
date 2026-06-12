@@ -99,7 +99,6 @@ async function saveMetadata() {
         </div>
 
         <div v-else class="metadata-preview">
-            <p v-if="props.metadata?.id"><strong>Id:</strong> {{ props.metadata.id }}</p>
             <p v-if="props.metadata?.author"><strong>By:</strong> {{ props.metadata.author }}</p>
             <p v-if="props.metadata?.version"><strong>Version:</strong> {{ props.metadata.version }}</p>
             <p v-if="props.metadata?.summary" class="summary">{{ props.metadata.summary }}</p>

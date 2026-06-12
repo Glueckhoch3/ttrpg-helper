@@ -123,7 +123,6 @@ function displayDescription(value) {
             <li v-for="row in encounterRows" :key="row.encounter.id || row.index">
                 <div class="encounter-header">
                     <div class="encounter-headline">
-                        <span class="encounter-id">{{ row.encounter.id }}</span>
                         <span class="encounter-type">{{ row.encounter.type }}</span>
                     </div>
                     <div class="encounter-actions">
@@ -160,7 +159,6 @@ function displayDescription(value) {
                     </div>
                 </div>
                 <div v-else>
-                    <p class="encounter-id-line">{{ row.encounter.id }}</p>
                     <p class="encounter-description">{{ displayDescription(row.encounter.description) }}</p>
                 </div>
                 <p v-if="row.state.error" class="error-text">{{ row.state.error }}</p>
@@ -196,16 +194,6 @@ function displayDescription(value) {
     flex-wrap: wrap;
     gap: 0.5rem;
     align-items: center;
-}
-
-.encounter-id,
-.encounter-id-line {
-    font-size: 0.85rem;
-    color: var(--p-text-color-secondary, #6c757d);
-}
-
-.encounter-id-line {
-    margin: 0 0 0.35rem;
 }
 
 .empty-text {

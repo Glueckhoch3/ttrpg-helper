@@ -167,7 +167,6 @@ async function deleteNpc() {
                 </div>
             </div>
             <div v-else>
-                <p><strong>Id:</strong> {{ props.npc.id }}</p>
                 <p><strong>Motivation:</strong> {{ props.npc.motivation }}</p>
                 <p><strong>Backstory:</strong> {{ props.npc.backstory }}</p>
                 <pre class="stats-pre"><strong>Stats:</strong> {{ statText }}</pre>

@@ -123,7 +123,6 @@ async function handleDelete() {
         </div>
 
         <div v-else>
-            <p class="chapter-id">{{ props.chapter?.id }}</p>
             <p v-if="props.chapter?.title" class="chapter-title">{{ props.chapter.title }}</p>
             <p v-if="props.chapter?.summary" class="summary-text">{{ props.chapter.summary }}</p>
             <p v-if="displayStory" class="story-text">{{ displayStory }}</p>
@@ -161,12 +160,6 @@ async function handleDelete() {
 
 .field-full {
     grid-column: 1 / -1;
-}
-
-.chapter-id {
-    margin: 0 0 0.35rem;
-    font-size: 0.85rem;
-    color: var(--p-text-color-secondary, #6c757d);
 }
 
 .chapter-title {
