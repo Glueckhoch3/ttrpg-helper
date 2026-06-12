@@ -1,13 +1,12 @@
 <!-- Component to show short Summary of an NPC in the NPCOverview Sidebar -->
 
 <script setup>
-import { computed, ref, watch, defineProps } from 'vue';
+import { ref, watch, defineProps } from 'vue';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 import Textarea from 'primevue/textarea';
 import Panel from 'primevue/panel';
-
-// TODO: enable editing stats with editor/ picker primevue component
 
 const props = defineProps({
     npc: {
@@ -33,15 +32,13 @@ const isSaving = ref(false);
 const localError = ref('');
 const draftNpc = ref({});
 
-const statText = computed(() => JSON.stringify(props.npc?.stats || {}, null, 2));
-
 function createDraftNpc() {
     return {
         id: props.npc?.id || '',
         name: props.npc?.name || '',
         backstory: props.npc?.backstory || '',
         motivation: props.npc?.motivation || '',
-        stats: JSON.stringify(props.npc?.stats || {}, null, 2)
+        stats: { ...props.npc?.stats }
     };
 }
 
@@ -61,8 +58,9 @@ function startEdit() {
     isEditing.value = true;
 }
 
-function clearStats() {
-    draftNpc.value.stats = '{}';
+// Derive a short display label from a stat key (e.g. "strength" → "STR")
+function statLabel(key) {
+    return key.slice(0, 3).toUpperCase();
 }
 
 async function saveNpc() {
@@ -70,7 +68,6 @@ async function saveNpc() {
     localError.value = '';
 
     try {
-        const statsValue = draftNpc.value.stats?.trim() ? JSON.parse(draftNpc.value.stats) : {};
         await props.onSaveNpc({
             npcIndex: props.npcIndex,
             npc: {
@@ -78,7 +75,7 @@ async function saveNpc() {
                 name: draftNpc.value.name,
                 backstory: draftNpc.value.backstory,
                 motivation: draftNpc.value.motivation,
-                stats: statsValue
+                stats: { ...draftNpc.value.stats }
             }
         });
         isEditing.value = false;
@@ -126,19 +123,21 @@ async function deleteNpc() {
                         />
                     </div>
                 </div>
-                
-                <!-- Stats Row -->
-                <div class="stats-row flex flex-wrap gap-2 text-xs" style="color: var(--p-text-color-secondary, #6c757d);">
-                    <span title="Health" class="stat">HP: {{ props.npc.stats?.health }}</span>
-                    <span title="Strength" class="stat">STR: {{ props.npc.stats?.strength }}</span>
-                    <span title="Dexterity" class="stat">DEX: {{ props.npc.stats?.dexterity }}</span>
-                    <span title="Intelligence" class="stat">INT: {{ props.npc.stats?.intelligence }}</span>
-                    <span title="Wisdom" class="stat">WIS: {{ props.npc.stats?.wisdom }}</span>
-                    <span title="Charisma" class="stat">CHA: {{ props.npc.stats?.charisma }}</span>
+
+                <!-- Stats Row: shown directly under the name while just displaying -->
+                <div v-if="!isEditing" class="stats-row text-xs">
+                    <span
+                        v-for="[key, value] in Object.entries(props.npc.stats || {})"
+                        :key="key"
+                        :title="key"
+                        class="stat"
+                    >
+                        {{ statLabel(key) }}: {{ value }}
+                    </span>
                 </div>
             </div>
         </template>
-        
+
         <!-- Expandable Content Slot -->
         <div class="npc-details text-sm">
             <div v-if="isEditing" class="npc-editor">
@@ -151,11 +150,26 @@ async function deleteNpc() {
                     <InputText v-model="draftNpc.name" />
                 </div>
                 <div class="field">
-                    <div class="field-header">
-                        <span class="field-label">Stats</span>
-                        <Button label="Clear Stats" severity="secondary" text @click="clearStats" />
+                    <span class="field-label">Stats</span>
+                    <div class="stats-editor-grid">
+                        <div
+                            v-for="[key] in Object.entries(draftNpc.stats || {})"
+                            :key="key"
+                            class="stat-input-field"
+                        >
+                            <label :for="`stat-${key}`" class="stat-input-label">{{ key }}</label>
+                            <InputNumber
+                                :inputId="`stat-${key}`"
+                                v-model="draftNpc.stats[key]"
+                                :min="0"
+                                :max="99"
+                                showButtons
+                                buttonLayout="horizontal"
+                                incrementButtonIcon="pi pi-plus"
+                                decrementButtonIcon="pi pi-minus"
+                            />
+                        </div>
                     </div>
-                    <Textarea v-model="draftNpc.stats" rows="6" autoResize />
                 </div>
                 <div class="field">
                     <span class="field-label">Motivation</span>
@@ -166,10 +180,9 @@ async function deleteNpc() {
                     <Textarea v-model="draftNpc.backstory" rows="4" autoResize />
                 </div>
             </div>
-            <div v-else>
+            <div v-else class="npc-view">
                 <p><strong>Motivation:</strong> {{ props.npc.motivation }}</p>
                 <p><strong>Backstory:</strong> {{ props.npc.backstory }}</p>
-                <pre class="stats-pre"><strong>Stats:</strong> {{ statText }}</pre>
             </div>
             <p v-if="localError" class="error-text">{{ localError }}</p>
         </div>
@@ -180,8 +193,10 @@ async function deleteNpc() {
 .npc-card {
     margin-bottom: 1rem;
 }
+
 .npc-header {
-    margin-right: 1rem; /* Space between header content and toggle button */
+    margin-right: 1rem;
+    gap: 0.5rem;
 }
 
 .npc-title-row {
@@ -199,50 +214,74 @@ async function deleteNpc() {
 }
 
 .npc-name {
-    margin-bottom: 0.5rem;
     display: inline-block;
 }
+
 .stats-row {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    color: var(--p-text-color-secondary, #6c757d);
 }
+
 .stat {
     background-color: var(--p-surface-200, #e9ecef);
     padding: 0.2rem 0.4rem;
     border-radius: 4px;
     white-space: nowrap;
 }
-.npc-details p {
-    margin: 0.5rem 0;
-    line-height: 1.5;
-}
 
+/* Editor layout */
 .npc-editor {
     display: grid;
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
 .field {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
-}
-
-.field-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .field-label {
     font-weight: 600;
 }
 
-.stats-pre {
-    white-space: pre-wrap;
-    margin: 0.5rem 0 0;
+.stats-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.stat-input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.stat-input-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--p-text-color-secondary, #6c757d);
+    text-transform: capitalize;
+}
+
+/* Keep the InputNumber (with +/- buttons) inside its grid cell */
+.stat-input-field :deep(.p-inputnumber) {
+    width: 100%;
+}
+
+.stat-input-field :deep(.p-inputnumber-input) {
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+}
+
+/* Read-only view */
+.npc-view p {
+    margin: 0.5rem 0;
+    line-height: 1.5;
 }
 
 .error-text {
