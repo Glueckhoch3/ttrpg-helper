@@ -117,7 +117,7 @@ function displayDescription(value) {
     <div class="encounter-content">
         <div class="encounter-header-row" v-if="props.encounters && props.encounters.length > 0">
             <h4>Encounters</h4>
-            <Button label="Add" icon="pi pi-plus" @click="props.onAddEncounter()" />
+            <Button icon="pi pi-plus" aria-label="Add encounter" @click="props.onAddEncounter()" />
         </div>
         <ul v-if="props.encounters && props.encounters.length > 0">
             <li v-for="row in encounterRows" :key="row.encounter.id || row.index">
@@ -127,14 +127,14 @@ function displayDescription(value) {
                     </div>
                     <div class="encounter-actions">
                         <Button
-                            :label="row.state.isEditing ? 'Save' : 'Edit'"
-                            icon="pi pi-pencil"
+                            :icon="row.state.isEditing ? 'pi pi-check' : 'pi pi-pencil'"
+                            :aria-label="row.state.isEditing ? 'Save encounter' : 'Edit encounter'"
                             :loading="row.state.isSaving"
                             @click="row.state.isEditing ? saveEncounter(row.encounter, row.index) : startEdit(row.encounter, row.index)"
                         />
                         <Button
-                            label="Delete"
                             icon="pi pi-trash"
+                            aria-label="Delete encounter"
                             severity="danger"
                             outlined
                             @click="deleteEncounter(row.encounter, row.index)"
@@ -166,7 +166,7 @@ function displayDescription(value) {
         </ul>
         <div v-else class="empty-state">
             <p class="empty-text">No encounters available.</p>
-            <Button label="Add Encounter" icon="pi pi-plus" @click="props.onAddEncounter()" />
+            <Button icon="pi pi-plus" aria-label="Add encounter" @click="props.onAddEncounter()" />
         </div>
     </div>
 </template>

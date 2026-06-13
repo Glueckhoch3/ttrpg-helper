@@ -68,8 +68,8 @@ async function saveMetadata() {
         <div class="header-row">
             <h2>{{ props.metadata?.title || 'Unknown Adventure' }}</h2>
             <Button
-                :label="isEditing ? 'Save' : 'Edit Metadata'"
-                icon="pi pi-pencil"
+                :icon="isEditing ? 'pi pi-check' : 'pi pi-pencil'"
+                :aria-label="isEditing ? 'Save metadata' : 'Edit metadata'"
                 :loading="isSaving"
                 @click="isEditing ? saveMetadata() : startEdit()"
             />

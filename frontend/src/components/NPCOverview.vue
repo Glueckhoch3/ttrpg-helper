@@ -29,7 +29,7 @@ const props = defineProps({
 <template>
   <div class="npc-overview-header">
     <p>NPC Overview</p>
-    <Button label="Add" icon="pi pi-plus" @click="props.onAddNpc()" />
+    <Button icon="pi pi-plus" aria-label="Add NPC" @click="props.onAddNpc()" />
   </div>
   <div v-if="adventureNPCs && adventureNPCs.length > 0">
     <NPCSummary
@@ -43,7 +43,7 @@ const props = defineProps({
   </div>
   <div v-else class="empty-state">
     <p>No NPCs available.</p>
-    <Button label="Add NPC" icon="pi pi-plus" @click="props.onAddNpc()" />
+    <Button icon="pi pi-plus" aria-label="Add NPC" @click="props.onAddNpc()" />
   </div>
 </template>
 

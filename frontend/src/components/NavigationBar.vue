@@ -1,14 +1,31 @@
-<script setup></script>
+<script setup>
+import Button from 'primevue/button'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+function goToOverview() {
+  router.push('/overview')
+}
+</script>
 
 <template>
   <nav class="navigation-bar" aria-label="Primary">
+    <div class="navigation-bar__left">
+      <Button
+        label="Go to Overview"
+        icon="pi pi-home"
+        outlined
+        severity="secondary"
+        @click="goToOverview"
+      />
+    </div>
+
     <div class="navigation-bar__brand">
       <span class="navigation-bar__title">TTRPG Helper</span>
     </div>
 
-    <router-link class="navigation-bar__button" to="/overview">
-      Go to Overview
-    </router-link>
+    <div class="navigation-bar__right" aria-hidden="true"></div>
   </nav>
 </template>
 
@@ -20,9 +37,9 @@
   right: 0;
   width: 100%;
   z-index: 1000;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
   padding: 0.875rem 1.25rem;
   background: var(--color-background, #111827);
@@ -30,29 +47,22 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+.navigation-bar__left {
+  justify-self: start;
+}
+
+.navigation-bar__brand {
+  justify-self: center;
+}
+
+.navigation-bar__right {
+  justify-self: end;
+  min-height: 2.5rem;
+}
+
 .navigation-bar__title {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.03em;
-}
-
-.navigation-bar__button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
-  background: var(--color-accent, #f8fafc);
-  color: var(--color-background, #111827);
-  text-decoration: none;
-  font-weight: 600;
-  transition: transform 0.15s ease, background-color 0.15s ease;
-}
-
-.navigation-bar__button:hover,
-.navigation-bar__button:focus-visible {
-  background: var(--color-accent-hover, #e5e7eb);
-  transform: translateY(-1px);
 }
 </style>

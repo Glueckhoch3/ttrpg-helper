@@ -47,7 +47,7 @@ const props = defineProps({
     <div class="chapter-overview">
         <div class="overview-header">
             <h3>Chapters</h3>
-            <Button label="Add" icon="pi pi-plus" @click="props.onAddChapter()" />
+            <Button icon="pi pi-plus" aria-label="Add chapter" @click="props.onAddChapter()" />
         </div>
         <Accordion multiple class="w-full">
             <AccordionPanel

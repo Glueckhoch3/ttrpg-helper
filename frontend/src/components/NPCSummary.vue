@@ -29,6 +29,7 @@ const props = defineProps({
 
 const isEditing = ref(false);
 const isSaving = ref(false);
+const isPanelCollapsed = ref(true);
 const localError = ref('');
 const draftNpc = ref({});
 
@@ -55,6 +56,7 @@ watch(
 function startEdit() {
     localError.value = '';
     draftNpc.value = createDraftNpc();
+    isPanelCollapsed.value = false;
     isEditing.value = true;
 }
 
@@ -101,7 +103,7 @@ async function deleteNpc() {
 </script>
 
 <template>
-    <Panel toggleable :collapsed="true" class="npc-card mb-4" v-if="props.npc">
+    <Panel v-model:collapsed="isPanelCollapsed" toggleable class="npc-card mb-4" v-if="props.npc">
         <!-- Custom Header Slot -->
         <template #header>
             <div class="npc-header flex flex-col w-full">

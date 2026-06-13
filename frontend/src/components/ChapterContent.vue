@@ -86,14 +86,14 @@ async function handleDelete() {
     <div class="chapter-content">
         <div class="actions">
             <Button
-                :label="isEditing ? 'Save' : 'Edit'"
-                icon="pi pi-pencil"
+                :icon="isEditing ? 'pi pi-check' : 'pi pi-pencil'"
+                :aria-label="isEditing ? 'Save chapter' : 'Edit chapter'"
                 :loading="isSaving"
                 @click="isEditing ? handleSave() : handleEdit()"
             />
             <Button
-                label="Delete"
                 icon="pi pi-trash"
+                aria-label="Delete chapter"
                 severity="danger"
                 outlined
                 @click="handleDelete()"
