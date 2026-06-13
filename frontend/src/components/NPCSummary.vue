@@ -109,14 +109,14 @@ async function deleteNpc() {
                     <span class="font-bold text-lg npc-name">{{ props.npc.name }}</span>
                     <div class="npc-actions">
                         <Button
-                            :label="isEditing ? 'Save' : 'Edit'"
-                            icon="pi pi-pencil"
+                            :icon="isEditing ? 'pi pi-check' : 'pi pi-pencil'"
+                            :aria-label="isEditing ? 'Save NPC' : 'Edit NPC'"
                             :loading="isSaving"
                             @click.stop="isEditing ? saveNpc() : startEdit()"
                         />
                         <Button
-                            label="Delete"
                             icon="pi pi-trash"
+                            aria-label="Delete NPC"
                             severity="danger"
                             outlined
                             @click.stop="deleteNpc()"
@@ -194,9 +194,19 @@ async function deleteNpc() {
     margin-bottom: 1rem;
 }
 
+.npc-card :deep(.p-panel-header) {
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.npc-card :deep(.p-panel-header > :first-child) {
+    flex: 1;
+    min-width: 0;
+}
+
 .npc-header {
-    margin-right: 1rem;
-    gap: 0.5rem;
+    width: 100%;
+    gap: 0.75rem;
 }
 
 .npc-title-row {
@@ -205,12 +215,14 @@ async function deleteNpc() {
     justify-content: space-between;
     gap: 0.75rem;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .npc-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    margin-left: 0.5rem;
 }
 
 .npc-name {
@@ -218,17 +230,25 @@ async function deleteNpc() {
 }
 
 .stats-row {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
     gap: 0.5rem;
+    margin-top: 0.25rem;
+    width: 100%;
     color: var(--p-text-color-secondary, #6c757d);
 }
 
 .stat {
     background-color: var(--p-surface-200, #e9ecef);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2rem;
     padding: 0.2rem 0.4rem;
     border-radius: 4px;
     white-space: nowrap;
+    text-align: center;
 }
 
 /* Editor layout */
