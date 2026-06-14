@@ -13,7 +13,12 @@ export async function upload(req, res, next) {
     }
 
     const result = await service.processImport(payload, filename);
-    res.status(201).json({ message: 'Imported', id: result.id, path: result.path });
+    res.status(201).json({
+      message: 'Imported',
+      id: result.id,
+      path: result.path,
+      metadataId: result.metadataId
+    });
   } catch (err) {
     next(err);
   }

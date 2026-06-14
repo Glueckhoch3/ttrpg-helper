@@ -95,11 +95,15 @@ async function addChapter() {
 
 async function saveChapter({ chapterIndex, chapter }) {
     await mutateAdventure((adventure) => {
-        if (!Array.isArray(adventure.chapters) || !adventure.chapters[chapterIndex]) {
+        const currentChapter = adventure.chapters?.[chapterIndex];
+        if (!Array.isArray(adventure.chapters) || !currentChapter) {
             throw new Error('Chapter not found');
         }
 
-        adventure.chapters[chapterIndex] = chapter;
+        adventure.chapters[chapterIndex] = {
+            ...chapter,
+            id: currentChapter.id
+        };
     });
 }
 
@@ -121,18 +125,22 @@ async function addEncounter({ chapterIndex }) {
         }
 
         chapter.encounters = Array.isArray(chapter.encounters) ? chapter.encounters : [];
-        chapter.encounters.push(createEncounterTemplate(chapter.encounters));
+        chapter.encounters.push(createEncounterTemplate(chapter.id, chapter.encounters));
     });
 }
 
 async function saveEncounter({ chapterIndex, encounterIndex, encounter }) {
     await mutateAdventure((adventure) => {
         const chapter = adventure.chapters?.[chapterIndex];
-        if (!chapter || !chapter.encounters?.[encounterIndex]) {
+        const currentEncounter = chapter?.encounters?.[encounterIndex];
+        if (!chapter || !currentEncounter) {
             throw new Error('Encounter not found');
         }
 
-        chapter.encounters[encounterIndex] = encounter;
+        chapter.encounters[encounterIndex] = {
+            ...encounter,
+            id: currentEncounter.id
+        };
     });
 }
 
@@ -156,11 +164,15 @@ async function addNpc() {
 
 async function saveNpc({ npcIndex, npc }) {
     await mutateAdventure((adventure) => {
-        if (!Array.isArray(adventure.npcs) || !adventure.npcs[npcIndex]) {
+        const currentNpc = adventure.npcs?.[npcIndex];
+        if (!Array.isArray(adventure.npcs) || !currentNpc) {
             throw new Error('NPC not found');
         }
 
-        adventure.npcs[npcIndex] = npc;
+        adventure.npcs[npcIndex] = {
+            ...npc,
+            id: currentNpc.id
+        };
     });
 }
 

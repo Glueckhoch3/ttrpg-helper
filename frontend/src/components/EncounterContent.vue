@@ -50,7 +50,6 @@ function ensureEncounterState(encounter, index) {
             isEditing: false,
             isSaving: false,
             draft: {
-                id: encounter?.id || '',
                 type: encounter?.type || '',
                 description: encounter?.description || ''
             },
@@ -64,7 +63,6 @@ function startEdit(encounter, index) {
     const state = ensureEncounterState(encounter, index);
     state.error = '';
     state.draft = {
-        id: encounter?.id || '',
         type: encounter?.type || '',
         description: encounter?.description || ''
     };
@@ -80,6 +78,7 @@ async function saveEncounter(encounter, index) {
             chapterIndex: props.chapterIndex,
             encounterIndex: index,
             encounter: {
+                id: encounter?.id || '',
                 ...state.draft
             }
         });
@@ -144,7 +143,7 @@ function displayDescription(value) {
                 <div v-if="row.state.isEditing" class="encounter-editor">
                     <div class="field">
                         <span class="field-label">Id</span>
-                        <InputText v-model="row.state.draft.id" />
+                        <InputText :modelValue="row.encounter?.id || ''" readonly disabled />
                     </div>
                     <div class="field">
                         <span class="field-label">Type</span>

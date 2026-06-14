@@ -24,7 +24,6 @@ const draftMetadata = ref({});
 
 function cloneMetadata() {
     return {
-        id: props.metadata?.id || '',
         title: props.metadata?.title || '',
         version: props.metadata?.version || '',
         author: props.metadata?.author || '',
@@ -78,7 +77,7 @@ async function saveMetadata() {
         <div v-if="isEditing" class="editor-grid">
             <div class="field">
                 <span class="field-label">Id</span>
-                <InputText v-model="draftMetadata.id" />
+                <InputText :modelValue="props.metadata?.id || ''" readonly disabled />
             </div>
             <div class="field">
                 <span class="field-label">Title</span>
@@ -99,6 +98,7 @@ async function saveMetadata() {
         </div>
 
         <div v-else class="metadata-preview">
+            <p v-if="props.metadata?.id"><strong>ID:</strong> {{ props.metadata.id }}</p>
             <p v-if="props.metadata?.author"><strong>By:</strong> {{ props.metadata.author }}</p>
             <p v-if="props.metadata?.version"><strong>Version:</strong> {{ props.metadata.version }}</p>
             <p v-if="props.metadata?.summary" class="summary">{{ props.metadata.summary }}</p>

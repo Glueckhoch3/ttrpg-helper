@@ -35,7 +35,6 @@ const draftNpc = ref({});
 
 function createDraftNpc() {
     return {
-        id: props.npc?.id || '',
         name: props.npc?.name || '',
         backstory: props.npc?.backstory || '',
         motivation: props.npc?.motivation || '',
@@ -73,7 +72,7 @@ async function saveNpc() {
         await props.onSaveNpc({
             npcIndex: props.npcIndex,
             npc: {
-                id: draftNpc.value.id,
+                id: props.npc?.id || '',
                 name: draftNpc.value.name,
                 backstory: draftNpc.value.backstory,
                 motivation: draftNpc.value.motivation,
@@ -145,7 +144,7 @@ async function deleteNpc() {
             <div v-if="isEditing" class="npc-editor">
                 <div class="field">
                     <span class="field-label">Id</span>
-                    <InputText v-model="draftNpc.id" />
+                    <InputText :modelValue="props.npc?.id || ''" readonly disabled />
                 </div>
                 <div class="field">
                     <span class="field-label">Name</span>

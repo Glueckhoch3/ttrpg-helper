@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 import AdventureSummary from '@/components/AdventureSummary.vue'
 import Card from 'primevue/card'
 import { getAllAdventures, saveFile } from '@/utils/api'
-import { createAdventureFilename, createAdventureTemplate } from '@/utils/adventureTemplates.js'
+import { createAdventureFilename, createAdventureTemplate, nextAdventureId } from '@/utils/adventureTemplates.js'
 
 const adventures = ref([])
 const loading = ref(true)
@@ -34,11 +34,16 @@ async function handleCreateAdventure() {
   creating.value = true
   createError.value = null
 
-  const template = createAdventureTemplate()
+  const template = createAdventureTemplate(nextAdventureId(adventures.value))
   const filename = createAdventureFilename(template.metadata.title)
 
   try {
-    await saveFile(template, filename)
+    const result = await saveFile(template, filename)
+    const resolvedMetadataId = result?.metadataId
+    if (typeof resolvedMetadataId === 'string' && resolvedMetadataId.trim().length > 0) {
+      template.metadata.id = resolvedMetadataId
+    }
+
     adventures.value = [
       {
         filename,

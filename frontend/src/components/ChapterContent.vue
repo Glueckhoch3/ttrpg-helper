@@ -31,7 +31,6 @@ const displayStory = computed(() => richTextToDisplayText(props.chapter?.story))
 
 function createDraftChapter() {
     return cloneValue({
-        id: props.chapter?.id || '',
         title: props.chapter?.title || '',
         summary: props.chapter?.summary || '',
         story: props.chapter?.story || '',
@@ -103,7 +102,7 @@ async function handleDelete() {
         <div v-if="isEditing" class="editor-grid">
             <div class="field">
                 <span class="field-label">Id</span>
-                <InputText v-model="draftChapter.id" />
+                <InputText :modelValue="props.chapter?.id || ''" readonly disabled />
             </div>
             <div class="field">
                 <span class="field-label">Title</span>
