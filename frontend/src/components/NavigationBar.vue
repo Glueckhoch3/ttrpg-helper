@@ -61,7 +61,7 @@ function goToOverview() {
 }
 
 .navigation-bar__title {
-  font-size: 1rem;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.03em;
 }

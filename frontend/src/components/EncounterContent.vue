@@ -5,7 +5,6 @@ import { computed, reactive } from 'vue';
 import Button from 'primevue/button';
 import Editor from 'primevue/editor';
 import InputText from 'primevue/inputtext';
-import { richTextToDisplayText } from '@/utils/richText.js';
 
 const props = defineProps({
     encounters: {
@@ -107,8 +106,8 @@ async function deleteEncounter(encounter, index) {
     }
 }
 
-function displayDescription(value) {
-    return richTextToDisplayText(value);
+function renderDescription(value) {
+    return (value || '').replace(/&nbsp;/g, ' ').replace(/\u00a0/g, ' ');
 }
 </script>
 
@@ -158,7 +157,12 @@ function displayDescription(value) {
                     </div>
                 </div>
                 <div v-else>
-                    <p class="encounter-description">{{ displayDescription(row.encounter.description) }}</p>
+                    <div
+                        v-if="row.encounter.description"
+                        class="encounter-description"
+                        v-html="renderDescription(row.encounter.description)"
+                    ></div>
+                    <p v-else class="encounter-description empty-text">No encounter description available.</p>
                 </div>
                 <p v-if="row.state.error" class="error-text">{{ row.state.error }}</p>
             </li>
@@ -236,6 +240,16 @@ li {
 }
 .encounter-description {
     margin: 0;
+    line-height: 1.6;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.encounter-description :deep(p) {
+    margin: 0 0 0.75rem;
+}
+.encounter-description :deep(p:last-child) {
+    margin-bottom: 0;
 }
 .error-text {
     color: var(--p-red-600, #dc3545);

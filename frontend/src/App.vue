@@ -10,6 +10,10 @@ import NavigationBar from './components/NavigationBar.vue';
 </template>
 
 <style>
+* {
+  font-family: 'Roboto', sans-serif;
+}
+
 .app-content {
   padding-top: 3.5rem;
 }

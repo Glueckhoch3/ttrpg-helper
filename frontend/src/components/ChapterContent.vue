@@ -7,7 +7,6 @@ import Editor from 'primevue/editor';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 import { cloneValue } from '@/utils/adventureTemplates.js';
-import { richTextToDisplayText } from '@/utils/richText.js';
 
 const props = defineProps({
     chapter: {
@@ -27,8 +26,9 @@ const isEditing = ref(false);
 const isSaving = ref(false);
 const draftChapter = ref({});
 const localError = ref('');
-const displayStory = computed(() => richTextToDisplayText(props.chapter?.story));
-
+const renderedStory = computed(() =>
+    (props.chapter?.story || '').replace(/&nbsp;/g, ' ').replace(/\u00a0/g, ' ')
+);
 function createDraftChapter() {
     return cloneValue({
         title: props.chapter?.title || '',
@@ -124,7 +124,7 @@ async function handleDelete() {
         <div v-else>
             <p v-if="props.chapter?.title" class="chapter-title">{{ props.chapter.title }}</p>
             <p v-if="props.chapter?.summary" class="summary-text">{{ props.chapter.summary }}</p>
-            <p v-if="displayStory" class="story-text">{{ displayStory }}</p>
+            <div v-if="props.chapter?.story" class="story-text" v-html="renderedStory"></div>
             <p v-else class="empty-text">No story content available.</p>
         </div>
         <p v-if="localError" class="error-text">{{ localError }}</p>
@@ -173,6 +173,15 @@ async function handleDelete() {
 .story-text {
     line-height: 1.6;
     margin: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.story-text :deep(p) {
+    margin: 0 0 0.75rem;
+}
+.story-text :deep(p:last-child) {
+    margin-bottom: 0;
 }
 .empty-text {
     font-style: italic;

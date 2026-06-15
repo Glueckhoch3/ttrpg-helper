@@ -237,11 +237,11 @@ async function deleteNpc() {
     gap: 0.5rem;
     margin-top: 0.25rem;
     width: 100%;
-    color: var(--p-text-color-secondary, #6c757d);
+    /* color: var(--p-text-color-secondary, #6c757d); */
 }
 
 .stat {
-    background-color: var(--p-surface-200, #e9ecef);
+    background-color: var(--p-surface-800, #e9ecef);
     display: flex;
     align-items: center;
     justify-content: center;
