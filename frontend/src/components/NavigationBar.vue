@@ -1,11 +1,19 @@
 <script setup>
+import { computed, inject } from 'vue'
 import Button from 'primevue/button'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const npcPaneUi = inject('npcPaneUi', null)
+const isAdventureContentRoute = computed(() => Boolean(npcPaneUi?.isAdventureContentRoute?.value))
+const isNpcPaneVisible = computed(() => Boolean(npcPaneUi?.isNpcPaneVisible?.value))
 
 function goToOverview() {
   router.push('/overview')
+}
+
+function toggleNpcPane() {
+  npcPaneUi?.toggleNpcPane?.()
 }
 </script>
 
@@ -25,7 +33,18 @@ function goToOverview() {
       <span class="navigation-bar__title">TTRPG Helper</span>
     </div>
 
-    <div class="navigation-bar__right" aria-hidden="true"></div>
+    <div class="navigation-bar__right">
+      <Button
+        v-if="isAdventureContentRoute"
+        :label="isNpcPaneVisible ? 'Hide NPCs' : 'Show NPCs'"
+        :icon="isNpcPaneVisible ? 'pi pi-eye-slash' : 'pi pi-users'"
+        outlined
+        severity="secondary"
+        :aria-label="isNpcPaneVisible ? 'Hide NPC pane' : 'Show NPC pane'"
+        :aria-pressed="isNpcPaneVisible"
+        @click="toggleNpcPane"
+      />
+    </div>
   </nav>
 </template>
 
