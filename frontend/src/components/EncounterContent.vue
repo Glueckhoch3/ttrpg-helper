@@ -192,10 +192,6 @@ watch(
                 </div>
                 <div v-if="row.state.isEditing" class="encounter-editor">
                     <div class="field">
-                        <span class="field-label">Id</span>
-                        <InputText :modelValue="row.encounter?.id || ''" readonly disabled />
-                    </div>
-                    <div class="field">
                         <span class="field-label">Type</span>
                         <InputText v-model="row.state.draft.type" />
                     </div>
@@ -204,7 +200,22 @@ watch(
                         <Editor
                             v-model="row.state.draft.description"
                             editorStyle="height: 180px"
-                        />
+                        >
+                            <template #toolbar>
+                                <span class="ql-formats">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <select class="ql-color"></select>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-list" value="ordered"></button>
+                                    <button class="ql-list" value="bullet"></button>
+                                </span>
+                            </template>
+                        </Editor>
                     </div>
                 </div>
                 <div v-else>
@@ -291,6 +302,7 @@ li {
 }
 .encounter-description {
     margin: 0;
+    font-size: 1rem;
     line-height: 1.6;
     white-space: normal;
     overflow-wrap: anywhere;
@@ -302,6 +314,36 @@ li {
 .encounter-description :deep(p:last-child) {
     margin-bottom: 0;
 }
+
+:deep(.p-editor-content .ql-editor) {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+:deep(.p-editor-content .ql-editor p) {
+    margin: 0 0 0.75rem;
+}
+
+:deep(.p-editor-content .ql-editor p:last-child) {
+    margin-bottom: 0;
+}
+
+:deep(.p-editor-content .ql-editor ol li[data-list='ordered']) {
+    list-style-type: decimal;
+}
+
+:deep(.p-editor-content .ql-editor ol li[data-list='bullet']) {
+    list-style-type: disc;
+}
+
+:deep(.p-editor-content .ql-editor li .ql-ui) {
+    display: none;
+}
+
+:deep(.p-editor-content .ql-editor li::before) {
+    content: none;
+}
+
 .error-text {
     color: var(--p-red-600, #dc3545);
     margin-top: 0.5rem;

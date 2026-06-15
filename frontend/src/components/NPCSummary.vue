@@ -178,10 +178,6 @@ async function deleteNpc() {
         <div class="npc-details text-sm">
             <div v-if="isEditing" class="npc-editor">
                 <div class="field">
-                    <span class="field-label">Id</span>
-                    <InputText :modelValue="props.npc?.id || ''" readonly disabled />
-                </div>
-                <div class="field">
                     <span class="field-label">Name</span>
                     <InputText v-model="draftNpc.name" />
                 </div>

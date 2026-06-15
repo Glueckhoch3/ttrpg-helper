@@ -114,10 +114,6 @@ async function handleDelete() {
 
         <div v-if="isEditing" class="editor-grid">
             <div class="field">
-                <span class="field-label">Id</span>
-                <InputText :modelValue="props.chapter?.id || ''" readonly disabled />
-            </div>
-            <div class="field">
                 <span class="field-label">Title</span>
                 <InputText v-model="draftChapter.title" />
             </div>
@@ -130,7 +126,22 @@ async function handleDelete() {
                 <Editor
                     v-model="draftChapter.story"
                     editorStyle="height: 220px"
-                />
+                >
+                    <template #toolbar>
+                        <span class="ql-formats">
+                            <button class="ql-bold"></button>
+                            <button class="ql-italic"></button>
+                            <button class="ql-underline"></button>
+                        </span>
+                        <span class="ql-formats">
+                            <select class="ql-color"></select>
+                        </span>
+                        <span class="ql-formats">
+                            <button class="ql-list" value="ordered"></button>
+                            <button class="ql-list" value="bullet"></button>
+                        </span>
+                    </template>
+                </Editor>
             </div>
         </div>
 
@@ -184,6 +195,7 @@ async function handleDelete() {
     font-style: italic;
 }
 .story-text {
+    font-size: 1rem;
     line-height: 1.6;
     margin: 0;
     white-space: normal;
@@ -196,6 +208,36 @@ async function handleDelete() {
 .story-text :deep(p:last-child) {
     margin-bottom: 0;
 }
+
+:deep(.p-editor-content .ql-editor) {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+:deep(.p-editor-content .ql-editor p) {
+    margin: 0 0 0.75rem;
+}
+
+:deep(.p-editor-content .ql-editor p:last-child) {
+    margin-bottom: 0;
+}
+
+:deep(.p-editor-content .ql-editor ol li[data-list='ordered']) {
+    list-style-type: decimal;
+}
+
+:deep(.p-editor-content .ql-editor ol li[data-list='bullet']) {
+    list-style-type: disc;
+}
+
+:deep(.p-editor-content .ql-editor li .ql-ui) {
+    display: none;
+}
+
+:deep(.p-editor-content .ql-editor li::before) {
+    content: none;
+}
+
 .empty-text {
     font-style: italic;
     color: var(--p-text-color-secondary, #6c757d);
