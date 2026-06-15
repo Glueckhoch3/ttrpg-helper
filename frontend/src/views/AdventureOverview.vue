@@ -133,6 +133,11 @@ async function handleCreateAdventure() {
 .add-adventure-card {
   cursor: pointer;
   border: 1px dashed var(--p-primary-color, #14b8a6);
+  transition: background-color 0.2s ease;
+}
+
+.add-adventure-card:hover {
+  background-color: var(--p-content-hover-background, var(--p-surface-800, #e9ecef));
 }
 
 .add-adventure-card:focus-visible {
