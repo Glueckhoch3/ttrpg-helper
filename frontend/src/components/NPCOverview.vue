@@ -1,7 +1,7 @@
 <!-- Holder for displaying NPCSummary Cards -->
 
 <script setup>
-import { computed, inject, ref, unref } from 'vue';
+import { computed, inject, nextTick, ref, unref, watch } from 'vue';
 import NPCSummary from './NPCSummary.vue';
 import Button from 'primevue/button';
 
@@ -27,8 +27,14 @@ const props = defineProps({
   newNpcSignal: {
     type: Object,
     default: null
+  },
+  focusedNpcSignal: {
+    type: Object,
+    default: null
   }
 });
+const npcOverviewRoot = ref(null);
+const npcFocusSignal = ref({ token: 0, npcId: '' });
 
 function npcAutoEditToken(npc) {
   if (!props.newNpcSignal?.token || !npc?.id) {
@@ -51,10 +57,37 @@ function collapseAllNpcs() {
     action: 'collapse'
   };
 }
+
+watch(
+  () => props.focusedNpcSignal?.token,
+  async (token) => {
+    if (!token || !props.focusedNpcSignal?.npcId) {
+      return;
+    }
+
+    const targetNpcId = String(props.focusedNpcSignal.npcId);
+    const targetNpcExists = adventureNPCs.value.some((npc) => npc?.id === targetNpcId);
+    if (!targetNpcExists) {
+      return;
+    }
+
+    npcFocusSignal.value = {
+      token: npcFocusSignal.value.token + 1,
+      npcId: targetNpcId
+    };
+
+    await nextTick();
+    const npcElements = npcOverviewRoot.value?.querySelectorAll('[data-npc-id]') || [];
+    const targetElement = Array.from(npcElements).find(
+      (element) => element?.getAttribute('data-npc-id') === targetNpcId
+    );
+    targetElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+);
 </script>
 
 <template>
-  <div class="npc-overview">
+  <div ref="npcOverviewRoot" class="npc-overview">
     <div class="npc-overview-header">
       <p>NPC Overview</p>
       <div class="npc-overview-actions">
@@ -75,6 +108,7 @@ function collapseAllNpcs() {
           :npcIndex="npcIndex"
           :autoStartEditToken="npcAutoEditToken(npc)"
           :panelControlSignal="npcPanelControlSignal"
+          :focusSignal="npcFocusSignal"
           :onSaveNpc="props.onSaveNpc"
           :onDeleteNpc="props.onDeleteNpc"
         ></NPCSummary>

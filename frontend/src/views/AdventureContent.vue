@@ -29,9 +29,23 @@ const actionError = ref(null);
 const newChapterSignal = ref({ token: 0, chapterId: '' });
 const newEncounterSignal = ref({ token: 0, chapterId: '', encounterId: '' });
 const newNpcSignal = ref({ token: 0, npcId: '' });
+const focusedNpcSignal = ref({ token: 0, npcId: '' });
 
 provide('adventureChapters', computed(() => adventureData.value?.chapters || []));
 provide('adventureNPCs', computed(() => adventureData.value?.npcs || []));
+provide('requestNpcFocus', requestNpcFocus);
+
+function requestNpcFocus(npcId) {
+    const normalizedNpcId = String(npcId ?? '').trim();
+    if (!normalizedNpcId) {
+        return;
+    }
+
+    focusedNpcSignal.value = {
+        token: focusedNpcSignal.value.token + 1,
+        npcId: normalizedNpcId
+    };
+}
 
 async function loadAdventure(filename) {
     loading.value = true;
@@ -252,6 +266,7 @@ async function deleteNpc(npcIndex) {
             <SplitterPanel class="right-pane" :size="25" :minSize="25">
                 <NPCOverview
                     :newNpcSignal="newNpcSignal"
+                    :focusedNpcSignal="focusedNpcSignal"
                     :onAddNpc="addNpc"
                     :onSaveNpc="saveNpc"
                     :onDeleteNpc="deleteNpc"

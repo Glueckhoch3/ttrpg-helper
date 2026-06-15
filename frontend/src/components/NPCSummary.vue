@@ -32,6 +32,10 @@ const props = defineProps({
     panelControlSignal: {
         type: Object,
         default: null
+    },
+    focusSignal: {
+        type: Object,
+        default: null
     }
 });
 
@@ -83,6 +87,19 @@ watch(
 
         if (props.panelControlSignal.action === 'collapse') {
             isPanelCollapsed.value = true;
+        }
+    }
+);
+
+watch(
+    () => props.focusSignal?.token,
+    (token) => {
+        if (!token || !props.focusSignal?.npcId) {
+            return;
+        }
+
+        if (String(props.focusSignal.npcId) === String(props.npc?.id || '')) {
+            isPanelCollapsed.value = false;
         }
     }
 );
