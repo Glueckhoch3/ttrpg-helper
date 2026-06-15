@@ -1,7 +1,7 @@
 <!-- Component to display the Content of an Encounter -->
 
 <script setup>
-import { computed, reactive } from 'vue';
+import { computed, nextTick, reactive, ref, watch } from 'vue';
 import Button from 'primevue/button';
 import Editor from 'primevue/editor';
 import InputText from 'primevue/inputtext';
@@ -14,6 +14,14 @@ const props = defineProps({
     chapterIndex: {
         type: Number,
         required: true
+    },
+    chapterId: {
+        type: String,
+        default: ''
+    },
+    newEncounterSignal: {
+        type: Object,
+        default: null
     },
     onAddEncounter: {
         type: Function,
@@ -30,6 +38,7 @@ const props = defineProps({
 });
 
 const editState = reactive({});
+const encounterItemRefs = ref({});
 const encounterRows = computed(() =>
     (props.encounters || []).map((encounter, index) => ({
         encounter,
@@ -40,6 +49,14 @@ const encounterRows = computed(() =>
 
 function getEncounterKey(encounter, index) {
     return encounter?.id || `encounter-${index}`;
+}
+
+function setEncounterItemRef(key, element) {
+    if (!element) {
+        return;
+    }
+
+    encounterItemRefs.value[String(key)] = element;
 }
 
 function ensureEncounterState(encounter, index) {
@@ -109,6 +126,36 @@ async function deleteEncounter(encounter, index) {
 function renderDescription(value) {
     return (value || '').replace(/&nbsp;/g, ' ').replace(/\u00a0/g, ' ');
 }
+
+watch(
+    () => props.newEncounterSignal?.token,
+    async (token) => {
+        if (!token || !props.newEncounterSignal) {
+            return;
+        }
+
+        if (props.newEncounterSignal.chapterId !== props.chapterId) {
+            return;
+        }
+
+        await nextTick();
+
+        const encounterIndex = (props.encounters || []).findIndex(
+            (encounter) => encounter?.id === props.newEncounterSignal.encounterId
+        );
+
+        if (encounterIndex < 0) {
+            return;
+        }
+
+        const encounter = props.encounters[encounterIndex];
+        startEdit(encounter, encounterIndex);
+
+        await nextTick();
+        const key = getEncounterKey(encounter, encounterIndex);
+        encounterItemRefs.value[String(key)]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+);
 </script>
 
 <template>
@@ -118,7 +165,11 @@ function renderDescription(value) {
             <Button icon="pi pi-plus" aria-label="Add encounter" @click="props.onAddEncounter()" />
         </div>
         <ul v-if="props.encounters && props.encounters.length > 0">
-            <li v-for="row in encounterRows" :key="row.encounter.id || row.index">
+            <li
+                v-for="row in encounterRows"
+                :key="row.encounter.id || row.index"
+                :ref="(element) => setEncounterItemRef(getEncounterKey(row.encounter, row.index), element)"
+            >
                 <div class="encounter-header">
                     <div class="encounter-headline">
                         <span class="encounter-type">{{ row.encounter.type }}</span>

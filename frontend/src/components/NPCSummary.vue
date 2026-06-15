@@ -24,6 +24,10 @@ const props = defineProps({
     onDeleteNpc: {
         type: Function,
         required: true
+    },
+    autoStartEditToken: {
+        type: Number,
+        default: 0
     }
 });
 
@@ -50,6 +54,15 @@ watch(
         }
     },
     { immediate: true }
+);
+
+watch(
+    () => props.autoStartEditToken,
+    (token) => {
+        if (token > 0 && !isEditing.value) {
+            startEdit();
+        }
+    }
 );
 
 function startEdit() {

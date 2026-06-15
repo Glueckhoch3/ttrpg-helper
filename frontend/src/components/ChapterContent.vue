@@ -20,6 +20,10 @@ const props = defineProps({
     onDeleteChapter: {
         type: Function,
         required: true
+    },
+    autoStartEditToken: {
+        type: Number,
+        default: 0
     }
 });
 const isEditing = ref(false);
@@ -46,6 +50,15 @@ watch(
         }
     },
     { immediate: true }
+);
+
+watch(
+    () => props.autoStartEditToken,
+    (token) => {
+        if (token > 0 && !isEditing.value) {
+            handleEdit();
+        }
+    }
 );
 
 function handleEdit() {

@@ -26,6 +26,9 @@ const adventureData = ref(null);
 const loading = ref(false);
 const error = ref(null);
 const actionError = ref(null);
+const newChapterSignal = ref({ token: 0, chapterId: '' });
+const newEncounterSignal = ref({ token: 0, chapterId: '', encounterId: '' });
+const newNpcSignal = ref({ token: 0, npcId: '' });
 
 provide('adventureChapters', computed(() => adventureData.value?.chapters || []));
 provide('adventureNPCs', computed(() => adventureData.value?.npcs || []));
@@ -87,10 +90,20 @@ async function saveMetadata(metadataDraft) {
 }
 
 async function addChapter() {
+    let createdChapter = null;
+
     await mutateAdventure((adventure) => {
         adventure.chapters = Array.isArray(adventure.chapters) ? adventure.chapters : [];
-        adventure.chapters.push(createChapterTemplate(adventure.chapters));
+        createdChapter = createChapterTemplate(adventure.chapters);
+        adventure.chapters.push(createdChapter);
     });
+
+    if (createdChapter?.id) {
+        newChapterSignal.value = {
+            token: newChapterSignal.value.token + 1,
+            chapterId: createdChapter.id
+        };
+    }
 }
 
 async function saveChapter({ chapterIndex, chapter }) {
@@ -118,6 +131,9 @@ async function deleteChapter(chapterIndex) {
 }
 
 async function addEncounter({ chapterIndex }) {
+    let createdEncounter = null;
+    let chapterId = '';
+
     await mutateAdventure((adventure) => {
         const chapter = adventure.chapters?.[chapterIndex];
         if (!chapter) {
@@ -125,8 +141,18 @@ async function addEncounter({ chapterIndex }) {
         }
 
         chapter.encounters = Array.isArray(chapter.encounters) ? chapter.encounters : [];
-        chapter.encounters.push(createEncounterTemplate(chapter.id, chapter.encounters));
+        chapterId = chapter.id || '';
+        createdEncounter = createEncounterTemplate(chapter.id, chapter.encounters);
+        chapter.encounters.push(createdEncounter);
     });
+
+    if (createdEncounter?.id && chapterId) {
+        newEncounterSignal.value = {
+            token: newEncounterSignal.value.token + 1,
+            chapterId,
+            encounterId: createdEncounter.id
+        };
+    }
 }
 
 async function saveEncounter({ chapterIndex, encounterIndex, encounter }) {
@@ -156,10 +182,20 @@ async function deleteEncounter({ chapterIndex, encounterIndex }) {
 }
 
 async function addNpc() {
+    let createdNpc = null;
+
     await mutateAdventure((adventure) => {
         adventure.npcs = Array.isArray(adventure.npcs) ? adventure.npcs : [];
-        adventure.npcs.push(createNpcTemplate(adventure.npcs));
+        createdNpc = createNpcTemplate(adventure.npcs);
+        adventure.npcs.push(createdNpc);
     });
+
+    if (createdNpc?.id) {
+        newNpcSignal.value = {
+            token: newNpcSignal.value.token + 1,
+            npcId: createdNpc.id
+        };
+    }
 }
 
 async function saveNpc({ npcIndex, npc }) {
@@ -201,6 +237,8 @@ async function deleteNpc(npcIndex) {
                 ></AdventureMeta>
                 <div class="spacer"></div>
                 <ChapterOverview
+                    :newChapterSignal="newChapterSignal"
+                    :newEncounterSignal="newEncounterSignal"
                     :onAddChapter="addChapter"
                     :onDeleteChapter="deleteChapter"
                     :onSaveChapter="saveChapter"
@@ -213,6 +251,7 @@ async function deleteNpc(npcIndex) {
             <!-- Right side containing Middle and Right Panes -->
             <SplitterPanel class="right-pane" :size="25" :minSize="25">
                 <NPCOverview
+                    :newNpcSignal="newNpcSignal"
                     :onAddNpc="addNpc"
                     :onSaveNpc="saveNpc"
                     :onDeleteNpc="deleteNpc"
