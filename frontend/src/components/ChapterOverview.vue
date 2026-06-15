@@ -64,6 +64,20 @@ function chapterAutoEditToken(chapter) {
     return props.newChapterSignal.chapterId === chapter.id ? props.newChapterSignal.token : 0;
 }
 
+const allChapterValues = computed(() =>
+    adventureChapters.value
+        .map((chapter) => chapterValue(chapter))
+        .filter((value) => value !== undefined && value !== null && value !== '')
+);
+
+function expandAllChapters() {
+    activeChapters.value = [...allChapterValues.value];
+}
+
+function collapseAllChapters() {
+    activeChapters.value = [];
+}
+
 watch(
     () => props.newChapterSignal?.token,
     async (token) => {
@@ -92,7 +106,11 @@ watch(
     <div class="chapter-overview">
         <div class="overview-header">
             <h3>Chapters</h3>
-            <Button icon="pi pi-plus" aria-label="Add chapter" @click="props.onAddChapter()" />
+            <div class="overview-actions">
+                <Button icon="pi pi-angle-double-down" aria-label="Expand all chapters" outlined @click="expandAllChapters" />
+                <Button icon="pi pi-angle-double-up" aria-label="Collapse all chapters" outlined @click="collapseAllChapters" />
+                <Button icon="pi pi-plus" aria-label="Add chapter" @click="props.onAddChapter()" />
+            </div>
         </div>
         <Accordion v-model:value="activeChapters" multiple class="w-full">
             <AccordionPanel
@@ -142,11 +160,25 @@ watch(
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 0.5rem 0;
+    background: var(--p-content-background, var(--p-surface-50, #f8fafc));
+    border-bottom: 1px solid var(--p-surface-200, #e5e7eb);
 }
 
-h3 {
-    margin-top: 0;
-    margin-bottom: 1rem;
+.overview-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.overview-header h3 {
+    margin: 0;
+    font-size: 1.17em;
+    font-weight: 700;
+    line-height: 1.2;
 }
 
 .chapter-details {

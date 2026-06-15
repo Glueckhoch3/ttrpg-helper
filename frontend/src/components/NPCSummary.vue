@@ -28,6 +28,10 @@ const props = defineProps({
     autoStartEditToken: {
         type: Number,
         default: 0
+    },
+    panelControlSignal: {
+        type: Object,
+        default: null
     }
 });
 
@@ -61,6 +65,24 @@ watch(
     (token) => {
         if (token > 0 && !isEditing.value) {
             startEdit();
+        }
+    }
+);
+
+watch(
+    () => props.panelControlSignal?.token,
+    (token) => {
+        if (!token || !props.panelControlSignal?.action) {
+            return;
+        }
+
+        if (props.panelControlSignal.action === 'expand') {
+            isPanelCollapsed.value = false;
+            return;
+        }
+
+        if (props.panelControlSignal.action === 'collapse') {
+            isPanelCollapsed.value = true;
         }
     }
 );
