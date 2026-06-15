@@ -45,7 +45,7 @@ Examples:
 
 ## Workflow
 
-1. Read `decisions/_index.md` — check if an existing decision already covers your situation.
+1. Read `.github/decisions/_index.md` — check if an existing decision already covers your situation.
 2. If writing a new ADR, create the new ADR file and an index row in the same commit.
 3. Use the template below for ADR files.
 4. If this supersedes an existing ADR, update that file's `supersededBy` field and mark the new ADR accordingly.

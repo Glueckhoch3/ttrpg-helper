@@ -12,7 +12,7 @@ paths:
     get:
       summary: Health check
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -31,7 +31,7 @@ paths:
           schema:
             type: string
           description: Optional desired filename for storing the JSON (will be sanitized).
-          
+
           # Validation: filename must end with .json. If it does not, the server
           # responds with 400 and message: "the file ending has been tampered with; ensure a .json file".
       requestBody:
@@ -41,20 +41,25 @@ paths:
             schema:
               type: object
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  message:
+                    type: string
                   id:
                     type: string
                   path:
                     type: string
-        '400':
+                  metadataId:
+                    type: string
+                    description: Final persisted adventure metadata id after server-side normalization/reconciliation.
+        "400":
           description: Validation failed
-        '413':
+        "413":
           description: Payload too large
   /api/load:
     get:
@@ -67,26 +72,26 @@ paths:
             type: string
           required: true
           description: The unique identifier (filename) of the JSON document to export. Must end with `.json`.
-          
+
           # Validation: filename must end with .json. If it does not, the server
           # responds with 400 and message: "the file ending has been tampered with; ensure a .json file".
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: object
-        '404':
+        "404":
           description: Not found
-        '400':
+        "400":
           description: Bad request — filename missing or invalid (e.g., wrong file ending)
   /api/adventures:
     get:
       summary: Get global adventure metadata overview
       description: Returns filename and metadata pairs for all valid adventure JSON files from the upload directory. Malformed JSON files are skipped.
       responses:
-        '200':
+        "200":
           description: Adventure filename and metadata list
           content:
             application/json:
@@ -118,7 +123,7 @@ paths:
             type: string
           description: Adventure filename stem without `.json` extension.
       responses:
-        '200':
+        "200":
           description: Metadata for the adventure
           content:
             application/json:
@@ -127,11 +132,11 @@ paths:
                 properties:
                   metadata:
                     type: object
-        '404':
+        "404":
           description: Adventure not found
-        '400':
+        "400":
           description: Invalid adventure filename
-        '422':
+        "422":
           description: Adventure data malformed
   /api/adventures/{adventureFile}/chapters:
     get:
@@ -144,7 +149,7 @@ paths:
             type: string
           description: Adventure filename stem without `.json` extension.
       responses:
-        '200':
+        "200":
           description: Chapter count and chapter preview list
           content:
             application/json:
@@ -165,9 +170,9 @@ paths:
                         title:
                           type: string
                           nullable: true
-        '404':
+        "404":
           description: Adventure not found
-        '422':
+        "422":
           description: Adventure chapters malformed
   /api/adventures/{adventureFile}/chapters/{chapterId}:
     get:
@@ -185,7 +190,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Full chapter payload
           content:
             application/json:
@@ -194,11 +199,11 @@ paths:
                 properties:
                   chapter:
                     type: object
-        '404':
+        "404":
           description: Adventure or chapter not found
-        '400':
+        "400":
           description: Invalid chapterId or adventure filename
-        '422':
+        "422":
           description: Adventure chapters malformed
   /api/adventures/{adventureFile}/npcs:
     get:
@@ -211,7 +216,7 @@ paths:
             type: string
           description: Adventure filename stem without `.json` extension.
       responses:
-        '200':
+        "200":
           description: NPC count and NPC preview list
           content:
             application/json:
@@ -232,9 +237,9 @@ paths:
                         name:
                           type: string
                           nullable: true
-        '404':
+        "404":
           description: Adventure not found
-        '422':
+        "422":
           description: Adventure NPC section malformed
   /api/adventures/{adventureFile}/npcs/{npcId}:
     get:
@@ -252,7 +257,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Full NPC payload
           content:
             application/json:
@@ -261,9 +266,9 @@ paths:
                 properties:
                   npc:
                     type: object
-        '404':
+        "404":
           description: Adventure or NPC not found
-        '400':
+        "400":
           description: Invalid npcId or adventure filename
-        '422':
+        "422":
           description: Adventure NPC section malformed

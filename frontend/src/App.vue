@@ -1,22 +1,34 @@
 <script setup>
-// import JsonImportExport from './components/JsonImportExport.vue'
 import NavigationBar from './components/NavigationBar.vue';
 </script>
 
 <template>
-  <div>
-    <NavigationBar></NavigationBar>
-  </div>
-  <div>
+  <NavigationBar></NavigationBar>
+  <div class="app-content">
     <router-view />
   </div>
 </template>
 
 <style>
-/* div {
-  padding-left: 1em;
-  margin: 1em;
-  border-style: solid;
-  border-color: white;
-} */
+:root {
+  --app-nav-height: 5rem;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+* {
+  font-family: 'Roboto', sans-serif;
+}
+
+.app-content {
+  margin-top: var(--app-nav-height);
+  height: calc(100dvh - var(--app-nav-height));
+  overflow: hidden;
+}
 </style>

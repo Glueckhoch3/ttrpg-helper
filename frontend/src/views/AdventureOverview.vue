@@ -4,9 +4,9 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import AdventureSummary from '@/components/AdventureSummary.vue'
-import Button from 'primevue/button'
+import Card from 'primevue/card'
 import { getAllAdventures, saveFile } from '@/utils/api'
-import { createAdventureFilename, createAdventureTemplate } from '@/utils/adventureTemplates.js'
+import { createAdventureFilename, createAdventureTemplate, nextAdventureId } from '@/utils/adventureTemplates.js'
 
 const adventures = ref([])
 const loading = ref(true)
@@ -27,14 +27,23 @@ onMounted(async () => {
 })
 
 async function handleCreateAdventure() {
+  if (creating.value) {
+    return
+  }
+
   creating.value = true
   createError.value = null
 
-  const template = createAdventureTemplate()
+  const template = createAdventureTemplate(nextAdventureId(adventures.value))
   const filename = createAdventureFilename(template.metadata.title)
 
   try {
-    await saveFile(template, filename)
+    const result = await saveFile(template, filename)
+    const resolvedMetadataId = result?.metadataId
+    if (typeof resolvedMetadataId === 'string' && resolvedMetadataId.trim().length > 0) {
+      template.metadata.id = resolvedMetadataId
+    }
+
     adventures.value = [
       {
         filename,
@@ -60,17 +69,32 @@ async function handleCreateAdventure() {
   <div class="overview-page">
     <div class="overview-header">
       <p class="page-title">Adventure Overview</p>
-      <Button
-        label="Add Adventure"
-        icon="pi pi-plus"
-        :loading="creating"
-        @click="handleCreateAdventure"
-      />
     </div>
     <div v-if="createError" class="error">Error: {{ createError }}</div>
     <div v-if="loading">Loading adventures...</div>
     <div v-else-if="error" class="error">Error: {{ error }}</div>
-    <div v-else style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <div v-else class="adventure-grid">
+      <Card
+        class="adventure-card add-adventure-card"
+        role="button"
+        tabindex="0"
+        aria-label="Add adventure"
+        @click="handleCreateAdventure"
+        @keydown.enter.prevent="handleCreateAdventure"
+        @keydown.space.prevent="handleCreateAdventure"
+      >
+        <template #title>
+          <span class="add-card-title">Add Adventure</span>
+        </template>
+        <template #subtitle>
+          Create a new campaign file
+        </template>
+        <template #content>
+          <p class="add-card-content">
+            {{ creating ? 'Creating adventure...' : 'Start from a fresh template and open it immediately.' }}
+          </p>
+        </template>
+      </Card>
       <AdventureSummary 
         v-for="adv in adventures" 
         :key="adv.filename" 
@@ -89,9 +113,47 @@ async function handleCreateAdventure() {
 .overview-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
   margin-bottom: 1rem;
+}
+
+.adventure-grid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.adventure-card {
+  width: 25rem;
+  height: 15rem;
+  overflow: hidden;
+}
+
+.add-adventure-card {
+  cursor: pointer;
+  border: 1px dashed var(--p-primary-color, #14b8a6);
+}
+
+.add-adventure-card:focus-visible {
+  outline: 2px solid var(--p-primary-color, #14b8a6);
+  outline-offset: 2px;
+}
+
+.add-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.add-card-title::before {
+  content: '+';
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.add-card-content {
+  margin: 0;
 }
 
 .page-title {

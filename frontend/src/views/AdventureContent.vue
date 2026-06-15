@@ -26,9 +26,26 @@ const adventureData = ref(null);
 const loading = ref(false);
 const error = ref(null);
 const actionError = ref(null);
+const newChapterSignal = ref({ token: 0, chapterId: '' });
+const newEncounterSignal = ref({ token: 0, chapterId: '', encounterId: '' });
+const newNpcSignal = ref({ token: 0, npcId: '' });
+const focusedNpcSignal = ref({ token: 0, npcId: '' });
 
 provide('adventureChapters', computed(() => adventureData.value?.chapters || []));
 provide('adventureNPCs', computed(() => adventureData.value?.npcs || []));
+provide('requestNpcFocus', requestNpcFocus);
+
+function requestNpcFocus(npcId) {
+    const normalizedNpcId = String(npcId ?? '').trim();
+    if (!normalizedNpcId) {
+        return;
+    }
+
+    focusedNpcSignal.value = {
+        token: focusedNpcSignal.value.token + 1,
+        npcId: normalizedNpcId
+    };
+}
 
 async function loadAdventure(filename) {
     loading.value = true;
@@ -87,19 +104,33 @@ async function saveMetadata(metadataDraft) {
 }
 
 async function addChapter() {
+    let createdChapter = null;
+
     await mutateAdventure((adventure) => {
         adventure.chapters = Array.isArray(adventure.chapters) ? adventure.chapters : [];
-        adventure.chapters.push(createChapterTemplate(adventure.chapters));
+        createdChapter = createChapterTemplate(adventure.chapters);
+        adventure.chapters.push(createdChapter);
     });
+
+    if (createdChapter?.id) {
+        newChapterSignal.value = {
+            token: newChapterSignal.value.token + 1,
+            chapterId: createdChapter.id
+        };
+    }
 }
 
 async function saveChapter({ chapterIndex, chapter }) {
     await mutateAdventure((adventure) => {
-        if (!Array.isArray(adventure.chapters) || !adventure.chapters[chapterIndex]) {
+        const currentChapter = adventure.chapters?.[chapterIndex];
+        if (!Array.isArray(adventure.chapters) || !currentChapter) {
             throw new Error('Chapter not found');
         }
 
-        adventure.chapters[chapterIndex] = chapter;
+        adventure.chapters[chapterIndex] = {
+            ...chapter,
+            id: currentChapter.id
+        };
     });
 }
 
@@ -114,6 +145,9 @@ async function deleteChapter(chapterIndex) {
 }
 
 async function addEncounter({ chapterIndex }) {
+    let createdEncounter = null;
+    let chapterId = '';
+
     await mutateAdventure((adventure) => {
         const chapter = adventure.chapters?.[chapterIndex];
         if (!chapter) {
@@ -121,18 +155,32 @@ async function addEncounter({ chapterIndex }) {
         }
 
         chapter.encounters = Array.isArray(chapter.encounters) ? chapter.encounters : [];
-        chapter.encounters.push(createEncounterTemplate(chapter.encounters));
+        chapterId = chapter.id || '';
+        createdEncounter = createEncounterTemplate(chapter.id, chapter.encounters);
+        chapter.encounters.push(createdEncounter);
     });
+
+    if (createdEncounter?.id && chapterId) {
+        newEncounterSignal.value = {
+            token: newEncounterSignal.value.token + 1,
+            chapterId,
+            encounterId: createdEncounter.id
+        };
+    }
 }
 
 async function saveEncounter({ chapterIndex, encounterIndex, encounter }) {
     await mutateAdventure((adventure) => {
         const chapter = adventure.chapters?.[chapterIndex];
-        if (!chapter || !chapter.encounters?.[encounterIndex]) {
+        const currentEncounter = chapter?.encounters?.[encounterIndex];
+        if (!chapter || !currentEncounter) {
             throw new Error('Encounter not found');
         }
 
-        chapter.encounters[encounterIndex] = encounter;
+        chapter.encounters[encounterIndex] = {
+            ...encounter,
+            id: currentEncounter.id
+        };
     });
 }
 
@@ -148,19 +196,33 @@ async function deleteEncounter({ chapterIndex, encounterIndex }) {
 }
 
 async function addNpc() {
+    let createdNpc = null;
+
     await mutateAdventure((adventure) => {
         adventure.npcs = Array.isArray(adventure.npcs) ? adventure.npcs : [];
-        adventure.npcs.push(createNpcTemplate(adventure.npcs));
+        createdNpc = createNpcTemplate(adventure.npcs);
+        adventure.npcs.push(createdNpc);
     });
+
+    if (createdNpc?.id) {
+        newNpcSignal.value = {
+            token: newNpcSignal.value.token + 1,
+            npcId: createdNpc.id
+        };
+    }
 }
 
 async function saveNpc({ npcIndex, npc }) {
     await mutateAdventure((adventure) => {
-        if (!Array.isArray(adventure.npcs) || !adventure.npcs[npcIndex]) {
+        const currentNpc = adventure.npcs?.[npcIndex];
+        if (!Array.isArray(adventure.npcs) || !currentNpc) {
             throw new Error('NPC not found');
         }
 
-        adventure.npcs[npcIndex] = npc;
+        adventure.npcs[npcIndex] = {
+            ...npc,
+            id: currentNpc.id
+        };
     });
 }
 
@@ -189,6 +251,8 @@ async function deleteNpc(npcIndex) {
                 ></AdventureMeta>
                 <div class="spacer"></div>
                 <ChapterOverview
+                    :newChapterSignal="newChapterSignal"
+                    :newEncounterSignal="newEncounterSignal"
                     :onAddChapter="addChapter"
                     :onDeleteChapter="deleteChapter"
                     :onSaveChapter="saveChapter"
@@ -201,6 +265,8 @@ async function deleteNpc(npcIndex) {
             <!-- Right side containing Middle and Right Panes -->
             <SplitterPanel class="right-pane" :size="25" :minSize="25">
                 <NPCOverview
+                    :newNpcSignal="newNpcSignal"
+                    :focusedNpcSignal="focusedNpcSignal"
                     :onAddNpc="addNpc"
                     :onSaveNpc="saveNpc"
                     :onDeleteNpc="deleteNpc"
@@ -212,9 +278,10 @@ async function deleteNpc(npcIndex) {
 
 <style scoped>
 .adventure-content-wrapper {
-    height: 100vh;
+    height: 100%;
     padding: 1rem;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .status-message {
@@ -234,7 +301,9 @@ async function deleteNpc(npcIndex) {
 .left-pane {
     display: flex;
     flex-direction: column;
+    min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .spacer {
@@ -242,10 +311,14 @@ async function deleteNpc(npcIndex) {
 }
 
 .right-pane {
+    display: flex;
+    flex-direction: column;
     padding-left: 1rem;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .middle-pane, .right-pane {
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 </style>

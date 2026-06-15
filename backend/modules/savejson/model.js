@@ -20,10 +20,7 @@ export async function saveJson(obj, filename) {
   const destPath = path.resolve(UPLOAD_DIR, path.basename(safeName));
 
   const data = JSON.stringify(obj, null, 2);
-  // debug: log paths to help test diagnostics
-  console.log('saveJson UPLOAD_DIR=', UPLOAD_DIR, 'destPath=', destPath);
   await fs.writeFile(destPath, data, { encoding: 'utf8' });
-  console.log('saveJson completed write for', destPath);
 
   return { id: path.basename(destPath), path: destPath };
 }

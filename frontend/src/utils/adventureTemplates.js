@@ -1,5 +1,14 @@
 import { toRaw } from "vue";
 
+const ADVENTURE_ID_PREFIX = 'adv';
+const ADVENTURE_ID_PATTERN = /^adv-(\d+)$/;
+const ADVENTURE_ID_PADDING = 3;
+const CHAPTER_ID_PATTERN = /^ch-(\d+)$/;
+const NPC_ID_PATTERN = /^npc-(\d+)$/;
+const CHAPTER_ID_PADDING = 3;
+const NPC_ID_PADDING = 3;
+const ENCOUNTER_ID_PADDING = 2;
+
 function toPlainValue(value) {
   const rawValue = toRaw(value);
 
@@ -20,23 +29,49 @@ export function cloneValue(value) {
   return structuredClone(toPlainValue(value));
 }
 
-function nextSequentialId(prefix, items = []) {
+function nextPaddedId(items, idPattern, prefix, padding) {
   const numbers = items
     .map((item) => String(item?.id ?? ''))
     .map((id) => {
-      const match = new RegExp(String.raw`^${prefix}-(\d+)$`).exec(id);
+      const match = idPattern.exec(id);
       return match ? Number(match[1]) : Number.NaN;
     })
     .filter((value) => Number.isFinite(value));
 
   const nextIndex = numbers.length > 0 ? Math.max(...numbers) + 1 : 0;
-  return `${prefix}-${nextIndex}`;
+  return `${prefix}-${String(nextIndex).padStart(padding, '0')}`;
 }
 
-export function createAdventureTemplate() {
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function parseAdventureSequence(id) {
+  const match = ADVENTURE_ID_PATTERN.exec(String(id ?? '').trim());
+  if (!match) {
+    return Number.NaN;
+  }
+
+  return Number(match[1]);
+}
+
+function formatAdventureId(sequence) {
+  return `${ADVENTURE_ID_PREFIX}-${String(sequence).padStart(ADVENTURE_ID_PADDING, '0')}`;
+}
+
+export function nextAdventureId(adventures = []) {
+  const usedSequences = adventures
+    .map((adventure) => parseAdventureSequence(adventure?.metadata?.id))
+    .filter((sequence) => Number.isFinite(sequence));
+
+  const nextSequence = usedSequences.length > 0 ? Math.max(...usedSequences) + 1 : 0;
+  return formatAdventureId(nextSequence);
+}
+
+export function createAdventureTemplate(adventureId = formatAdventureId(0)) {
   return {
     metadata: {
-      id: '0',
+      id: adventureId,
       title: 'Template',
       version: '',
       author: '',
@@ -49,7 +84,7 @@ export function createAdventureTemplate() {
 
 export function createChapterTemplate(chapters = []) {
   return {
-    id: nextSequentialId('ch', chapters),
+    id: nextPaddedId(chapters, CHAPTER_ID_PATTERN, 'ch', CHAPTER_ID_PADDING),
     title: 'template',
     summary: '',
     story: '',
@@ -57,9 +92,13 @@ export function createChapterTemplate(chapters = []) {
   };
 }
 
-export function createEncounterTemplate(encounters = []) {
+export function createEncounterTemplate(chapterId = '', encounters = []) {
+  const normalizedChapterId = String(chapterId ?? '').trim() || 'ch-000';
+  const encounterIdPattern = new RegExp(`^enc-${escapeRegex(normalizedChapterId)}-(\\d+)$`);
+  const nextEncounterId = nextPaddedId(encounters, encounterIdPattern, `enc-${normalizedChapterId}`, ENCOUNTER_ID_PADDING);
+
   return {
-    id: nextSequentialId('enc', encounters),
+    id: nextEncounterId,
     type: 'template',
     description: ''
   };
@@ -67,7 +106,7 @@ export function createEncounterTemplate(encounters = []) {
 
 export function createNpcTemplate(npcs = []) {
   return {
-    id: nextSequentialId('npc', npcs),
+    id: nextPaddedId(npcs, NPC_ID_PATTERN, 'npc', NPC_ID_PADDING),
     name: 'template',
     backstory: '',
     motivation: '',
