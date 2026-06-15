@@ -140,7 +140,8 @@ async function saveNpc() {
 }
 
 async function deleteNpc() {
-    if (!globalThis.confirm(`Delete NPC ${props.npc?.id || ''}?`)) {
+    const npcName = String(props.npc?.name || '').trim() || 'this NPC';
+    if (!globalThis.confirm(`Delete NPC ${npcName}?`)) {
         return;
     }
 
