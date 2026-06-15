@@ -224,9 +224,10 @@ async function deleteNpc(npcIndex) {
 
 <style scoped>
 .adventure-content-wrapper {
-    height: 100vh;
+    height: 100%;
     padding: 1rem;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .status-message {
@@ -246,7 +247,9 @@ async function deleteNpc(npcIndex) {
 .left-pane {
     display: flex;
     flex-direction: column;
+    min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .spacer {
@@ -254,10 +257,14 @@ async function deleteNpc(npcIndex) {
 }
 
 .right-pane {
+    display: flex;
+    flex-direction: column;
     padding-left: 1rem;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .middle-pane, .right-pane {
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 </style>

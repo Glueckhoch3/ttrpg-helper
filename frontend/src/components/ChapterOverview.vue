@@ -85,7 +85,7 @@ const props = defineProps({
 
 <style scoped>
 .chapter-overview {
-  margin: 1em;
+        margin: 1em;
 }
 
 .overview-header {
@@ -99,6 +99,7 @@ h3 {
     margin-top: 0;
     margin-bottom: 1rem;
 }
+
 .chapter-details {
     display: flex;
     flex-wrap: wrap;

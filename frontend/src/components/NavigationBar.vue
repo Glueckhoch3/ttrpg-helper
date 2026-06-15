@@ -36,12 +36,14 @@ function goToOverview() {
   left: 0;
   right: 0;
   width: 100%;
+  height: var(--app-nav-height, 5rem);
   z-index: 1000;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 1rem;
-  padding: 0.875rem 1.25rem;
+  box-sizing: border-box;
+  padding: 0 1.25rem;
   background: var(--color-background, #111827);
   color: var(--color-text, #f9fafb);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
