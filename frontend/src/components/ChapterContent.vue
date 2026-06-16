@@ -104,20 +104,30 @@ function appendNpcLinkToHtml(sourceHtml, npc) {
     const container = document.createElement('div');
     container.innerHTML = normalizedHtml || '<p></p>';
 
-    let paragraph = container.querySelector('p:last-of-type');
-    if (!paragraph) {
-        paragraph = document.createElement('p');
-        container.appendChild(paragraph);
+    let targetElement = container.lastElementChild;
+    while (targetElement && targetElement.tagName === 'BR') {
+        targetElement = targetElement.previousElementSibling;
     }
 
-    if (paragraph.textContent?.trim()) {
-        paragraph.appendChild(document.createTextNode(' '));
+    if (!targetElement) {
+        targetElement = document.createElement('p');
+        container.appendChild(targetElement);
+    }
+
+    if (targetElement.tagName === 'OL' || targetElement.tagName === 'UL') {
+        const newItem = document.createElement('li');
+        targetElement.appendChild(newItem);
+        targetElement = newItem;
+    }
+
+    if (targetElement.textContent?.trim()) {
+        targetElement.appendChild(document.createTextNode(' '));
     }
 
     const anchor = document.createElement('a');
     anchor.setAttribute('href', href);
     anchor.textContent = label;
-    paragraph.appendChild(anchor);
+    targetElement.appendChild(anchor);
 
     return container.innerHTML;
 }
@@ -227,7 +237,8 @@ async function handleSave() {
 }
 
 async function handleDelete() {
-    if (!globalThis.confirm(`Delete chapter ${props.chapter?.id || ''}?`)) {
+    const chapterName = String(props.chapter?.title || '').trim() || 'this chapter';
+    if (!globalThis.confirm(`Delete chapter ${chapterName}?`)) {
         return;
     }
 

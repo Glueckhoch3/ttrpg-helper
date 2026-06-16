@@ -54,6 +54,11 @@ function openAdventure() {
 <style scoped>
 .adventure-card {
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.adventure-card:hover {
+  background-color: var(--p-content-hover-background, var(--p-surface-800, #e9ecef));
 }
 
 .adventure-card:focus-visible {

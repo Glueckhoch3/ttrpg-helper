@@ -140,7 +140,8 @@ async function saveNpc() {
 }
 
 async function deleteNpc() {
-    if (!globalThis.confirm(`Delete NPC ${props.npc?.id || ''}?`)) {
+    const npcName = String(props.npc?.name || '').trim() || 'this NPC';
+    if (!globalThis.confirm(`Delete NPC ${npcName}?`)) {
         return;
     }
 
@@ -159,7 +160,7 @@ async function deleteNpc() {
         <template #header>
             <div class="npc-header flex flex-col w-full">
                 <div class="npc-title-row">
-                    <span class="font-bold text-lg npc-name">{{ props.npc.name }}</span>
+                    <span class="font-bold text-lg npc-name" :title="props.npc.name">{{ props.npc.name }}</span>
                     <div class="npc-actions">
                         <Button
                             :icon="isEditing ? 'pi pi-check' : 'pi pi-pencil'"
@@ -263,19 +264,25 @@ async function deleteNpc() {
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     width: 100%;
 }
 
 .npc-actions {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.5rem;
     margin-left: 0.5rem;
+    flex: 0 0 auto;
 }
 
 .npc-name {
     display: inline-block;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .stats-row {

@@ -1,7 +1,7 @@
 <!-- View that holds all the contents for an Adventure -->
 
 <script setup>
-import { ref, provide, computed, watch } from 'vue';
+import { ref, provide, computed, watch, inject, nextTick } from 'vue';
 import AdventureMeta from '@/components/AdventureMeta.vue';
 import ChapterOverview from '@/components/ChapterOverview.vue';
 import NPCOverview from '@/components/NPCOverview.vue';
@@ -30,16 +30,27 @@ const newChapterSignal = ref({ token: 0, chapterId: '' });
 const newEncounterSignal = ref({ token: 0, chapterId: '', encounterId: '' });
 const newNpcSignal = ref({ token: 0, npcId: '' });
 const focusedNpcSignal = ref({ token: 0, npcId: '' });
+const npcPaneUi = inject('npcPaneUi', null);
+
+const isNpcPaneVisible = computed(() => Boolean(npcPaneUi?.isNpcPaneVisible?.value));
+
+const leftPaneSize = computed(() => (isNpcPaneVisible.value ? 72 : 100));
+const leftPaneMinSize = computed(() => (isNpcPaneVisible.value ? 40 : 100));
+const rightPaneSize = computed(() => (isNpcPaneVisible.value ? 28 : 0));
+const rightPaneMinSize = computed(() => (isNpcPaneVisible.value ? 20 : 0));
 
 provide('adventureChapters', computed(() => adventureData.value?.chapters || []));
 provide('adventureNPCs', computed(() => adventureData.value?.npcs || []));
 provide('requestNpcFocus', requestNpcFocus);
 
-function requestNpcFocus(npcId) {
+async function requestNpcFocus(npcId) {
     const normalizedNpcId = String(npcId ?? '').trim();
     if (!normalizedNpcId) {
         return;
     }
+
+    npcPaneUi?.openNpcPane?.();
+    await nextTick();
 
     focusedNpcSignal.value = {
         token: focusedNpcSignal.value.token + 1,
@@ -242,9 +253,9 @@ async function deleteNpc(npcIndex) {
         <div v-if="loading" class="status-message">Loading adventure...</div>
         <div v-else-if="error" class="status-message error">Error: {{ error }}</div>
         <div v-else-if="actionError" class="status-message error">Error: {{ actionError }}</div>
-        <Splitter class="adventure-layout-splitter">
+        <Splitter class="adventure-layout-splitter" :class="{ 'npc-pane-hidden': !isNpcPaneVisible }">
             <!-- Left Pane: Meta + Chapters -->
-            <SplitterPanel class="left-pane flex flex-col" :size="75" :minSize="30">
+            <SplitterPanel class="left-pane flex flex-col" :size="leftPaneSize" :minSize="leftPaneMinSize">
                 <AdventureMeta
                     :metadata="adventureData?.metadata"
                     :onSaveMetadata="saveMetadata"
@@ -263,7 +274,12 @@ async function deleteNpc(npcIndex) {
             </SplitterPanel>
             
             <!-- Right side containing Middle and Right Panes -->
-            <SplitterPanel class="right-pane" :size="25" :minSize="25">
+            <SplitterPanel
+                class="right-pane"
+                :class="{ 'right-pane-hidden': !isNpcPaneVisible }"
+                :size="rightPaneSize"
+                :minSize="rightPaneMinSize"
+            >
                 <NPCOverview
                     :newNpcSignal="newNpcSignal"
                     :focusedNpcSignal="focusedNpcSignal"
@@ -296,12 +312,14 @@ async function deleteNpc(npcIndex) {
     height: 100%;
     width: 100%;
     border: none;
+    min-width: 0;
 }
 
 .left-pane {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    min-width: 0;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -313,12 +331,47 @@ async function deleteNpc(npcIndex) {
 .right-pane {
     display: flex;
     flex-direction: column;
+    min-width: 340px;
     padding-left: 1rem;
     min-height: 0;
     overflow: hidden;
 }
 
+.right-pane-hidden {
+    min-width: 0;
+    width: 0;
+    padding-left: 0;
+    border: 0;
+    pointer-events: none;
+    flex: 0 0 0 !important;
+    overflow: hidden;
+}
+
+.right-pane-hidden :deep(*) {
+    visibility: hidden;
+}
+
+.adventure-layout-splitter.npc-pane-hidden :deep(.p-splitter-gutter) {
+    display: none;
+}
+
 .middle-pane, .right-pane {
     overflow-y: hidden;
+}
+
+@media (max-width: 1023px) {
+    .adventure-content-wrapper {
+        padding: 0.75rem;
+    }
+
+    .right-pane {
+        min-width: 320px;
+        padding-left: 0.75rem;
+    }
+
+    .right-pane.right-pane-hidden {
+        min-width: 0;
+        padding-left: 0;
+    }
 }
 </style>

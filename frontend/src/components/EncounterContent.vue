@@ -121,7 +121,8 @@ async function saveEncounter(encounter, index) {
 }
 
 async function deleteEncounter(encounter, index) {
-    if (!globalThis.confirm(`Delete encounter ${encounter?.id || ''}?`)) {
+    const encounterType = String(encounter?.type || '').trim() || 'Unknown';
+    if (!globalThis.confirm(`Delete ${encounterType} Encounter?`)) {
         return;
     }
 
@@ -166,20 +167,30 @@ function appendNpcLinkToHtml(sourceHtml, npc) {
     const container = document.createElement('div');
     container.innerHTML = normalizedHtml || '<p></p>';
 
-    let paragraph = container.querySelector('p:last-of-type');
-    if (!paragraph) {
-        paragraph = document.createElement('p');
-        container.appendChild(paragraph);
+    let targetElement = container.lastElementChild;
+    while (targetElement && targetElement.tagName === 'BR') {
+        targetElement = targetElement.previousElementSibling;
     }
 
-    if (paragraph.textContent?.trim()) {
-        paragraph.appendChild(document.createTextNode(' '));
+    if (!targetElement) {
+        targetElement = document.createElement('p');
+        container.appendChild(targetElement);
+    }
+
+    if (targetElement.tagName === 'OL' || targetElement.tagName === 'UL') {
+        const newItem = document.createElement('li');
+        targetElement.appendChild(newItem);
+        targetElement = newItem;
+    }
+
+    if (targetElement.textContent?.trim()) {
+        targetElement.appendChild(document.createTextNode(' '));
     }
 
     const anchor = document.createElement('a');
     anchor.setAttribute('href', href);
     anchor.textContent = label;
-    paragraph.appendChild(anchor);
+    targetElement.appendChild(anchor);
 
     return container.innerHTML;
 }
