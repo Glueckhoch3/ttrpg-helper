@@ -25,14 +25,14 @@ Der Einsatz von LLMs ist aus zwei Gründen relevant:
 
 | Kapitel | Inhalt |
 |---------|--------|
-| 2 | Projektbeschreibung: Problemstellung, Zielgruppe, Funktionsumfang und User Stories |
-| 3 | Softwarearchitektur: Systemüberblick, Frontend, Backend, LLM-Integration, Sicherheit |
-| 4 | Implementierung: Vorgehensmodell, Code-Module, Datenmodell, Versionskontrolle |
-| 5 | Einsatz der LLMs und Prompt Engineering |
-| 6 | Erfahrungen, Herausforderungen und Reflexion |
-| 7 | Zusammenfassung und Fazit |
-| 8 | Literatur und Quellen |
-| 9 | Anhang |
+| [2](#2-projektbeschreibung) | Projektbeschreibung: Problemstellung, Zielgruppe, Funktionsumfang und User Stories |
+| [3](#3-softwarearchitektur-und-technologie) | Softwarearchitektur: Systemüberblick, Frontend, Backend, LLM-Integration, Sicherheit |
+| [4](#4-implementierung) | Implementierung: Vorgehensmodell, Code-Module, Datenmodell, Versionskontrolle |
+| [5](#5-einsatz-der-llms-und-prompt-engineering) | Einsatz der LLMs und Prompt Engineering |
+| [6](#6-erfahrungen-herausforderungen-und-reflexion) | Erfahrungen, Herausforderungen und Reflexion |
+| [7](#7-zusammenfassung-und-fazit) | Zusammenfassung und Fazit |
+| [8](#8-literatur-und-quellen) | Literatur und Quellen |
+| [9](#9-anhang) | Anhang |
 
 ---
 
@@ -58,14 +58,14 @@ Spielleiter von Tabletop-Rollenspielen stehen häufig vor der Aufgabe, mehrstün
 | JSON Import/Export | ✓ | |
 | Zusammenfassung bearbeiten | ✓ | |
 | Abenteuer laden | ✓ | |
-| KI-Generierung von Abenteuern | | ✓ |
-| KI-basierte Inhaltsbearbeitung | | ✓ |
-| NPC automatisch generieren | | ✓ |
-| KI-basierte Zusammenfassungen | | ✓ |
+| KI-Generierung von Abenteuern | |  |
+| KI-basierte Inhaltsbearbeitung | |  |
+| NPC automatisch generieren | |  |
+| KI-basierte Zusammenfassungen | |  |
 
 **Nicht-funktionale Anforderungen:**
 - Browserbasiert, keine Installation auf Client-Seite notwendig
-- Lokal betrieben (kein Cloud-Zwang)
+- Lokal betrieben
 - Sicherheit: Validierung aller externen Daten, kein Path Traversal, keine Codeausführung aus JSON-Daten
 
 Sicherheitsanforderungen (SEC-01 bis SEC-19) sowie Missbrauchsszenarien (M1–M6) sind im Anhang vollständig aufgeführt.
@@ -293,6 +293,8 @@ Das Backend ist als modularer Express-5-Server aufgebaut. Jedes API-Feature ist 
 
 **API-Endpunkte:**
 
+Die vollständige API-Spezifikation liegt als OpenAPI 3.0.3-Dokument vor: `doc/ttrpg-API.yaml`.
+
 | Methode | Pfad | Beschreibung |
 |---------|------|--------------|
 | `GET` | `/health` | Healthcheck |
@@ -305,22 +307,20 @@ Das Backend ist als modularer Express-5-Server aufgebaut. Jedes API-Feature ist 
 | `GET` | `/api/adventures/:file/npcs` | NPC-Übersicht eines Abenteuers |
 | `GET` | `/api/adventures/:file/npcs/:id` | Einzelner NPC |
 
-Die vollständige API-Spezifikation liegt als OpenAPI 3.0.3-Dokument vor: `doc/ttrpg-API.yaml`.
-
 **Konfiguration (Environment-Variablen):**
 
 | Variable | Standardwert | Beschreibung |
 |----------|-------------|--------------|
 | `PORT` | `3000` | Server-Port |
-| `BODY_LIMIT` | `5mb` | Maximale Request-Größe (SEC-02) |
+| `BODY_LIMIT` | `5mb` | Maximale Request/Abenteuer-Größe (SEC-02) |
 | `UPLOAD_DIR` | `./uploads` | Speicherverzeichnis für JSON-Dateien |
-| `ALLOW_OVERWRITE` | `false` | Überschreiben bestehender Dateien erlauben (SEC-08) |
+| `ALLOW_OVERWRITE` | `true` | Überschreiben bestehender Dateien erlauben (SEC-08), `false` führt zu read only |
 
 ### 3d. LLM-Integration (MCP, Wrapper, API)
 
-Im aktuellen Entwicklungsstand (MVP) ist keine direkte LLM-Integration in der Anwendungslaufzeit implementiert. Die KI-Unterstützung erfolgt derzeit **auf Entwicklerebene**: Claude Sonnet 4.6 (Anthropic) wurde zur Codegenerierung, Planung und Inhaltserstellung eingesetzt.
+Im aktuellen Entwicklungsstand (MVP) ist keine direkte LLM-Integration in der Anwendungslaufzeit implementiert. Die KI-Unterstützung erfolgt derzeit **auf Entwicklerebene** siehe Kapitel [5](#5-einsatz-der-llms-und-prompt-engineering).
 
-**Geplante Produktintegration (Post-MVP):**
+**Geplante Produktintegration (Post-MVP) (Out of Scope):**
 
 ```plantuml
 @startuml
@@ -372,7 +372,7 @@ Das System ist für den lokalen Betrieb konzipiert und enthält keine Nutzer-Aut
 | SEC-18 | Keine Pfade in Logs | Error Handler gibt keine internen Dateisystempfade zurück |
 | SEC-19 | Fail Fast bei Fehlern | Frühzeitiger Abbruch und 4xx-Response bei Validierungsfehlern |
 
-Die vollständige Traceability Matrix inkl. Missbrauchsszenarien M1–M6 ist im Anhang (Abschnitt 9) dokumentiert.
+Die vollständige Traceability Matrix inkl. Missbrauchsszenarien M1–M6 ist im [Anhang](#9-anhang) dokumentiert.
 
 ---
 
@@ -400,7 +400,9 @@ Die Aufgabenverteilung und Fortschrittsverfolgung erfolgte über Git-Feature-Bra
 
 ### 4b. Code-Generierung und Entwicklung
 
-Die Implementierung wurde maßgeblich durch KI-Unterstützung (Claude Code / Claude Sonnet 4.6) begleitet. Alle generierten Code-Abschnitte wurden manuell geprüft, getestet und bei Bedarf angepasst.
+Die Implementierung wurde maßgeblich durch KI-Unterstützung (Github Copilot / Claude Code) begleitet.
+Die generierten Abschnitte wurden größtenteils manuell geprüft und angepasst.
+In der Reflektion siehe Punkt 6.
 
 **Backend-Modulstruktur:**
 
@@ -531,24 +533,24 @@ NPC "1" *-- "1" Stats
 | NPC | `npc-NNN` | `npc-001` |
 
 **Save-Flow mit Validierung:**
-
 ```plantuml
 @startuml
 title Save-Flow – Ablauf
 
 start
-:POST /api/save\n{ payload, filename? }]
+:POST /api/save\n{ payload, filename? };
 :AJV Schema Validation;
-if (valid?) then (nein)
-  :400 Bad Request\n{ errors }]
-  stop
+if (valid?) then (yes)
+  :Filename sanitisieren\n(sanitize-filename + path.basename);
+  :Bestehende Adventure-IDs\nim uploads/-Verzeichnis lesen;
+  :Eingehende ID prüfen\nBei Kollision: neue ID vergeben;
+  :JSON-Datei schreiben\nnach uploads/;
+  :201 Created\n{ id, path, metadataId };
+else (no)
+  :400 Bad Request\n{ errors };
 endif
-:Filename sanitisieren\n(sanitize-filename + path.basename);
-:Bestehende Adventure-IDs\nim uploads/-Verzeichnis lesen;
-:Eingehende ID prüfen;\nBei Kollision: neue ID vergeben;
-:JSON-Datei schreiben\nnach uploads/;
-:201 Created\n{ id, path, metadataId }]
-stop
+
+stop;
 @enduml
 ```
 
@@ -571,8 +573,6 @@ stop
 | Backend Start | `npm start` | `node server.js` |
 | Backend Tests | `npm test` | Jest + supertest (alle API-Endpunkte) |
 
-![Platzhalter: CI/CD Pipeline Übersicht](./images/placeholder_ci_pipeline.png)
-
 ---
 
 ## 5. Einsatz der LLMs und Prompt Engineering
@@ -581,21 +581,68 @@ stop
 
 *[Zu ergänzen: Begründung für die Wahl bestimmter Modelle, APIs bzw. Agenten, inklusive Benchmarks.]*
 
+- KI-Chats
+  - ChatGPT
+  - Gemini
+  - Claude
+KI-Chats wurden für das Planen der Applikation, vorschlagen lassen von Methoden und generieren von Textabschnitten genutzt. 
+
+- VSCode integriertes Copilot
+  - GPT 5 mini, 5.4 mini: einfache Aufgaben wie code refactoring
+
+- Github Agents
+
+- Claude Code
+  - Haiku: einfache Aufgaben wie code refactoring
+  - Sonnet: standart Aufgaben mit Kontext und Abhängikeiten im Code
+  - Opus: größere Aufgaben mit komplexem Kontext oder Abhängigkeiten zu speziellen Bibliotheken.
+
 ### 5b. Aufbau und Dokumentation der Prompts
 
 *[Zu ergänzen: Beschreibung, wie Prompts formuliert und verfeinert wurden; Beispiele für erfolgreiche und weniger erfolgreiche Prompts.]*
+
+**Aufbau**
+
+Die Struktur der Prompts folgte zu Ende hin meist nachfolgendem Schema:
+- Kurze Beschreibung der Aufgabe
+- Regeln, Beschränkungen, Scope für die KI
+- Detailierte Beschreibung mit Verweis auf Dokumente, Abhängikeiten, Bibliotheken
+- Ausgabe Format
 
 ### 5c. Generierte Assets (Code, Bilder, Audio, Video, Text)
 
 *[Zu ergänzen: Sammlung und Kommentierung von KI-generierten Ergebnissen.]*
 
+- Mockups (Bild)
+- Vorschläge (Google Doc)
+- Erklärungen und Evaluierungen (Google Doc)
+- Code generierung (Copilot Chats, Github Agents)
+- Dokumenation (Copilot/Claude Code Chats)
+
 ### 5d. Fehleranalyse und Optimierungen
 
 *[Zu ergänzen: Darstellung von Fehlversuchen, Halluzinationen oder Limitierungen des Modells und der daraus abgeleiteten Verbesserungen.]*
 
+#### Korrigier Schleife bei Tests
+Fehleranalyse von Test (Backend) halluziniert, Fehler gefunden zu haben, aber verschlimmbessert indem Tests immer komplexer wurden. Manueller Eingriff/Abbruch erforderlich um Schleife aus Änderung, Testdruchführung, Fehlersuche zu brechen.
+
+#### Fehlender Kontext bei PrimeVue Komponenten
+Trotz Nennung der PrimeVue Bibliothek und Präsenz im Code hat Gemini 5 mini diese nicht verwendet. Zum einen fehlte das Wissen des Programmierers über dieses Framework, zum anderen hat die KI die Präsenz des Frameworks im Code nicht erfasst.
+
+
 ### 5e. Qualitätssicherung bei der LLM-Nutzung
 
 *[Zu ergänzen: Vorgehensweisen zur Überprüfung der Ergebnisse (z. B. Code-Reviews, Validierung durch Experten).]*
+
+#### Tests (Backend)
+Mit bestehenden Test kann die KI sofort Rückmeldung einholen ob die Code Änderung die bestehenden Abläufe stört und welche Funktionalität gestört wurde.
+
+#### Reviews der KI Diffs
+Durch Git in VS Code kann man sich die konkreten Änderungen anzeigen lassen, hierbei müssen Vorherige Änderrungen staged oder commited sein. Mit Copilot und Claude Code-Addon in VS Code bekommt man ein extra Diff für die KI Änderungen, bevor man diese aktzepiert (sofern eingestellt).
+
+#### Betrachtung der laufenden Applikation
+Bei visuellen Änderungen kann die laufende Applikation als schnellste validierungs Methode genutzt werden, nachdem in der Diff sichergestellt wurde, dass keine Logikänderung erfolgte.
+
 
 ---
 
