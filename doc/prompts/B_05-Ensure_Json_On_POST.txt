@@ -1,0 +1,1 @@
+Improve the importer and export with a validator that chekcs if the filename in the POST request ends with ".json" else it should give an error back explaining that "the file ending has been tampered with" and that the user should ensure a .json file

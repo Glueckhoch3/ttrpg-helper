@@ -384,10 +384,16 @@ Das Projekt wurde nach einem **iterativ-inkrementellen Vorgehen** entwickelt. Di
 
 1. **Planungsphase:** Anforderungsanalyse, User Stories, Sicherheitsanforderungen, UI-Mockups
 2. **Architekturphase:** Technologieauswahl, API-Design (OpenAPI-Spezifikation), Datenmodell
-3. **Implementierungsphase:** Backend-Module, Frontend-Komponenten, Integrationstests
-4. **Stabilisierungsphase:** Bugfixes, Code-Review durch KI, Dokumentation
+3. **Implementierungsphase:** Backend-Module, Frontend-Komponenten, Integrationstests, Code-Review direkt bei Implementierung (Pairprogramming)
+4. **Stabilisierungsphase:** Bugfixes, Dokumentation
 
-Die Aufgabenverteilung und Fortschrittsverfolgung erfolgte über Git-Feature-Branches und GitHub. Detailpläne für einzelne Features wurden als Markdown-Dokumente im Verzeichnis `doc/plans/` gepflegt:
+Die Aufgabenverteilung erfolgte über ein in Google Drive geteiltes Worddokument.
+
+Die Fortschrittsverfolgung erfolgt über Git-Feature-Branches und GitHub.
+
+Prompts für einzelne Features werden als Txt-Dokumente im Verzeichnis `doc/prompts/` abgelegt.
+
+Von Copilot erstellte Pläne wurden teilweise im Verzeichnis `doc/plans/` abgelegt.
 
 | Datei | Inhalt |
 |-------|--------|
@@ -395,8 +401,6 @@ Die Aufgabenverteilung und Fortschrittsverfolgung erfolgte über Git-Feature-Bra
 | `plan_backendcreation.md` | Backend-Aufbau |
 | `plan_backendJsonProvidingAPI.md` | JSON-API-Design |
 | `plan_npc_reference_links.md` | NPC-Verlinkung zwischen Kapiteln |
-
-![Platzhalter: GitHub Issues / Projektboard](./images/placeholder_projectboard.png)
 
 ### 4b. Code-Generierung und Entwicklung
 

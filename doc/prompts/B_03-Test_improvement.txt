@@ -1,0 +1,2 @@
+The tests should use the uploads folder and a single Exmaple file for the tests.
+If they need a specific json file this file should be cleaned afterwards.

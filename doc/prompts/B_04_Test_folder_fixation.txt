@@ -1,0 +1,1 @@
+Make the teste use the upload dir configured in .env enviroment.

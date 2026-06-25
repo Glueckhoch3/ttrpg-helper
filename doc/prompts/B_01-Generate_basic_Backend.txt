@@ -1,0 +1,18 @@
+Create a backend application with the following features:
+Whole Json File to API for Frontend
+API can send Backend whole Json file
+Functions separated in modules by task
+Inside each module:
+model.js: Defines the database schema or model for that module.
+index.js: Acts as the entry point for the module, typically exporting routes or integrating the module into the app.
+controller.js: Manages incoming HTTP requests and sends appropriate responses.
+service.js: Contains the business logic, abstracting complex operations and interactions with the model.
+config constants in .env
+Express in app.js
+Server in server.js
+
+Furthermore:
+Consider the Security concerns in the documentation
+
+Plan:
+plan_backendcreation.md

@@ -1,0 +1,51 @@
+Enable Editing the whole Project:
+Use PrimeVue Library to implement the editing features for:
+
+Adding adventures, chapters, encounters, npcs and stats
+Editing metadata, chapters, encounters, npcs, stats
+Deleting adventures, chapters encounters, npcs, stats
+Detailed description:
+
+When adding the adventure the basic structure with minimal template content is generated and the user is forwarded to the adventure page:
+
+{
+"metadata": {
+"id": "0",
+"title": "Template",
+"version": "",
+"author": "",
+"summary": ""
+},
+"npcs": [],
+"chapters": []
+}
+
+Now the metadata can be edited [button] and saved [button].
+
+Deleting an adventure is currently not needed as the source file can be manually deleted for that.
+Chapters get an add [+] button next to the chapter text which adds an empty chapter with pregenerated template
+
+{
+ "id": "ch-0",
+ "title": "template",
+ "summary": "",
+ "story": "",
+ "encounters": []
+}
+
+Encounters:
+
+In the expanded chapters the encounters can be added with the button [+] next to the Encounter text with id “enc-0”; edited with the existing edit button that should also turn the id visible and editable, as well as the type editable; deletable with a button next to the edit button.
+Npcs get an add [+] button next to the NPC Overview text which adds an empty NPC with pregenerated template id, name and stats :
+
+{ 
+  "id": "npc-0",
+  "name": "template",
+  "backstory": "",
+  "motivation": "",
+  "stats": {"health": 1,"strength": 1,"dexterity": 1,"intelligence": 1,"wisdom": 1,"charisma": 1}
+}
+
+Editing the NPC is enabled with a button next to the individual npc name in an expanded view of the npc each key gets its own edit field as done before, the stats can be a simple editable text field stacked under the id and directly under the name field since they do not need formatting.
+
+Deleting the NPC is enabled with a button next to the individual npc name.
