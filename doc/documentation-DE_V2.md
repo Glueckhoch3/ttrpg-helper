@@ -665,23 +665,37 @@ Bei visuellen Änderungen kann die laufende Applikation als schnellste validieru
 
 ### 6a. Positive Erfahrungen und Erfolgsgeschichten
 
-_[Zu ergänzen: Was hat gut funktioniert, welche Vorteile bot der Einsatz von LLMs?]_
+Im Projekt wurde KI nicht nur punktuell zur Unterstützung eingesetzt, sondern diente über weite Strecken als primäres Mittel der Codegenerierung. Ein großer Teil der Implementierung in Frontend und Backend entstand aus KI-generierten Vorschlägen, die anschließend integriert, getestet und schrittweise angepasst wurden. Dadurch konnten auch bei begrenzter Entwicklungszeit in kurzer Folge funktionsfähige Inkremente umgesetzt werden.
+
+Besonders wirksam war dieser Ansatz bei wiederkehrenden Standardaufgaben wie Grundgerüsten für Module, API-Routen, Komponentenstrukturen und typischen Datenflussmustern. Die Modelle lieferten hier häufig direkt nutzbare Ergebnisse, die den manuellen Implementierungsaufwand deutlich reduzierten. Auch für einzelne, klar abgrenzbare Logikketten erwies sich die KI als hilfreich, beispielsweise beim konsistenten Darstellen von Encounter-Inhalten im jeweils passenden Kapitel eines konkreten Abenteuers.
+
+Ein weiterer positiver Effekt zeigte sich im UI-Bereich: Leistungsfähigere Modelle konnten auf Basis textueller Anforderungen sinnvolle Layout- und Strukturvorschläge erzeugen, die als Grundlage für die weitere Ausarbeitung dienten. In Kombination mit dem in VS Code integrierten Browser und agentenbasierter Interaktion ließen sich generierte Änderungen schnell in der laufenden Anwendung überprüfen. Die Rolle des Entwicklungsteams verlagerte sich damit stärker auf Steuerung, Review, Testen und qualitative Absicherung der KI-generierten Ergebnisse.
 
 ### 6b. Schwierigkeiten und Probleme
 
-_[Zu ergänzen: Welche Herausforderungen traten auf (z. B. unpassende Antworten, unklare Lizenzsituation)?]_
+Trotz der hohen Produktivität traten im praktischen Einsatz mehrere wiederkehrende Schwierigkeiten auf. Ein zentrales Problem war die starke Abhängigkeit von der Prompt-Qualität: Bereits kleine Unklarheiten in der Formulierung führten häufig zu unerwarteten oder nur teilweise passenden Ergebnissen. Hinzu kam, dass das Textverständnis je nach Modell variiert und sich sowohl Interpretationsspielraum als auch Wörtlichkeit der Umsetzung deutlich unterscheiden können.
+
+Erschwerend wirkte zudem, dass einzelne Modelle zu umfangreichen Implementierungen tendierten und dabei über den eigentlichen Auftrag hinausgingen. Dadurch entstanden zusätzliche Änderungen, die zwar technisch plausibel wirkten, aber nicht immer dem beabsichtigten Scope entsprachen. In Einzelfällen wurden selbst klar definierte Regeln aus Instruction-Dateien nicht konsequent eingehalten, was nachträgliche Korrekturen erforderlich machte.
+
+Eine weitere Herausforderung lag in der Qualitätssicherung: Längere KI-Outputs oder Änderungen über viele Dateien hinweg erhöhen den Review-Aufwand erheblich. Auch iterative Rückfragen und das Einfordern von Begründungen sind weniger direkt als in der Zusammenarbeit mit einem menschlichen Entwicklerteam. Insgesamt zeigte sich, dass ein stark KI-getriebener Entwicklungsprozess nur dann stabil bleibt, wenn Prompting, Scope-Kontrolle und systematische Reviews als feste Bestandteile eingeplant werden.
 
 ### 6c. Grenzen und Risiken von LLMs
 
-_[Zu ergänzen: Reflexion über die Grenzen der Technologie, inklusive ethischer Aspekte, Bias und Datenschutz.]_
+LLMs ersetzen kein fachliches Vorwissen und keine solide Programmiererfahrung. Das zeigt sich besonders bei sicherheitskritischen Themen: Ohne manuelle Prüfung können problematische Muster wie hartkodierte API-Keys oder Klartext-Passwörter in den Code gelangen. Zusätzlich besteht ein Automation Bias: Generierte Code-Inhalte werden aufgrund eines aufgebauten Vertrauensniveaus leicht vorschnell akzeptiert, statt sie vollständig zu überprüfen.
+
+Ethische und urheberrechtliche Fragen sind vor allem bei der Generierung kreativer Inhalte relevant; im Softwarekontext ist das Risiko oft geringer, da Wissen aus Open-Source-Quellen ohnehin breit verfügbar ist.
 
 ### 6d. Lessons Learned und Empfehlungen
 
-_[Zu ergänzen: Wichtige Erkenntnisse für künftige Projekte und Hinweise für Nachfolgende.]_
+Für künftige Projekte hat sich gezeigt, dass KI-gestützte Entwicklung klare Leitplanken benötigt. Prompts sollten standardisiert werden (Ziel, Scope, Constraints, Ausgabeformat), um Interpretationsspielraum zu reduzieren. KI-generierter Code sollte grundsätzlich als Entwurf behandelt und über feste Qualitätsgates abgesichert werden, insbesondere durch Reviews, Tests und Sicherheitsprüfungen.
+
+Darüber hinaus empfiehlt sich eine strikte Scope-Kontrolle pro Arbeitsschritt, damit Modelle nicht unbeabsichtigt zu große Änderungen erzeugen. Um Automation Bias zu vermeiden, sollten Teams aktiv eine Prüfkultur etablieren, in der Vertrauen in das Modell nicht die vollständige inhaltliche und sicherheitstechnische Kontrolle ersetzt. Insgesamt ist KI dann am wirksamsten, wenn sie als Beschleuniger in einem disziplinierten Entwicklungsprozess eingesetzt wird, nicht als Ersatz für fachliche Verantwortung.
 
 ### 6e. Zukunft der LLM-gestützten Entwicklung
 
-_[Zu ergänzen: Kurzreflexion über Trends und Entwicklungen im Bereich LLM.]_
+Die LLM-gestützte Entwicklung wird sich voraussichtlich weiter in Richtung agentenbasierter, teilautonomer Workflows bewegen, bei denen Modelle nicht nur Code vorschlagen, sondern komplette Arbeitspakete vorbereiten. Gleichzeitig werden Qualitäts- und Sicherheitsmechanismen an Bedeutung gewinnen, etwa durch strengere Review-Prozesse, bessere Nachvollziehbarkeit von Änderungen und stärker integrierte Prüfwerkzeuge.
+
+Für Entwicklerinnen und Entwickler verschiebt sich der Schwerpunkt damit zunehmend von reiner Implementierung hin zu Anforderungspräzisierung, Bewertung und Verantwortung für die Ergebnisqualität. Langfristig dürfte sich KI als fester Bestandteil moderner Entwicklungsprozesse etablieren, sofern technischer Fortschritt konsequent mit methodischer Disziplin kombiniert wird.
 
 ---
 
