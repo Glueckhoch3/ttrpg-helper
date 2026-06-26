@@ -10,7 +10,7 @@ von Leonhardit07 und GrumpyPants
 
 Der TTRPG Helper ist ein browserbasiertes Tool zum Anlegen und Verwalten von Abenteuern sowie zugehöriger Non-Player-Characters (NPCs) für Tabletop-Rollenspiele (TTRPGs). Spielleiter können Abenteuer strukturiert erfassen, in Kapitel und Begegnungen untergliedern sowie NPCs mit Hintergrundinformationen und Statistiken anlegen. Alle Daten lassen sich als JSON-Datei exportieren und wieder importieren. Zur Erstellung und Überarbeitung von Inhalten kann zusätzlich ein integriertes LLM herangezogen werden.
 
-Das Projekt entsteht im Rahmen des Wahlpflichtfachmoduls *KI-gestützte Softwareentwicklung* an der Hochschule Esslingen (Sommersemester 2026).
+Das Projekt entsteht im Rahmen des Wahlpflichtfachmoduls _KI-gestützte Softwareentwicklung_ an der Hochschule Esslingen (Sommersemester 2026).
 
 ### 1b. Zielsetzung und Relevanz
 
@@ -23,16 +23,16 @@ Der Einsatz von LLMs ist aus zwei Gründen relevant:
 
 ### 1c. Aufbau der Arbeit
 
-| Kapitel | Inhalt |
-|---------|--------|
-| [2](#2-projektbeschreibung) | Projektbeschreibung: Problemstellung, Zielgruppe, Funktionsumfang und User Stories |
-| [3](#3-softwarearchitektur-und-technologie) | Softwarearchitektur: Systemüberblick, Frontend, Backend, LLM-Integration, Sicherheit |
-| [4](#4-implementierung) | Implementierung: Vorgehensmodell, Code-Module, Datenmodell, Versionskontrolle |
-| [5](#5-einsatz-der-llms-und-prompt-engineering) | Einsatz der LLMs und Prompt Engineering |
-| [6](#6-erfahrungen-herausforderungen-und-reflexion) | Erfahrungen, Herausforderungen und Reflexion |
-| [7](#7-zusammenfassung-und-fazit) | Zusammenfassung und Fazit |
-| [8](#8-literatur-und-quellen) | Literatur und Quellen |
-| [9](#9-anhang) | Anhang |
+| Kapitel                                             | Inhalt                                                                               |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [2](#2-projektbeschreibung)                         | Projektbeschreibung: Problemstellung, Zielgruppe, Funktionsumfang und User Stories   |
+| [3](#3-softwarearchitektur-und-technologie)         | Softwarearchitektur: Systemüberblick, Frontend, Backend, LLM-Integration, Sicherheit |
+| [4](#4-implementierung)                             | Implementierung: Vorgehensmodell, Code-Module, Datenmodell, Versionskontrolle        |
+| [5](#5-einsatz-der-llms-und-prompt-engineering)     | Einsatz der LLMs und Prompt Engineering                                              |
+| [6](#6-erfahrungen-herausforderungen-und-reflexion) | Erfahrungen, Herausforderungen und Reflexion                                         |
+| [7](#7-zusammenfassung-und-fazit)                   | Zusammenfassung und Fazit                                                            |
+| [8](#8-literatur-und-quellen)                       | Literatur und Quellen                                                                |
+| [9](#9-anhang)                                      | Anhang                                                                               |
 
 ---
 
@@ -43,6 +43,7 @@ Der Einsatz von LLMs ist aus zwei Gründen relevant:
 Spielleiter von Tabletop-Rollenspielen stehen häufig vor der Aufgabe, mehrstündige Spielsitzungen inhaltlich vorzubereiten. Traditionell erfolgt dies über Notizbücher, Textverarbeitungsprogramme oder lose Zettel – ohne einheitliche Struktur und ohne direkten Zugang zu KI-gestützter Inhaltsgenerierung.
 
 **Zu lösendes Problem:** Es fehlt ein leichtgewichtiges, browserbasiertes Werkzeug, das:
+
 - Abenteuer als strukturierte Einheiten (Kapitel, Begegnungen) verwaltbar macht,
 - NPCs mit Eigenschaften und Hintergrundgeschichten verknüpft,
 - Import/Export über ein offenes Format (JSON) ermöglicht,
@@ -50,22 +51,23 @@ Spielleiter von Tabletop-Rollenspielen stehen häufig vor der Aufgabe, mehrstün
 
 **MVP-Abgrenzung:**
 
-| Feature | MVP | Erweiterung |
-|---------|:---:|:-----------:|
-| Abenteuer manuell erstellen | ✓ | |
-| Kapitel und Begegnungen anlegen | ✓ | |
-| NPC erstellen und zuweisen | ✓ | |
-| JSON Import/Export | ✓ | |
-| Zusammenfassung bearbeiten | ✓ | |
-| Abenteuer laden | ✓ | |
-| KI-Generierung von Abenteuern | |  |
-| KI-basierte Inhaltsbearbeitung | |  |
-| NPC automatisch generieren | |  |
-| KI-basierte Zusammenfassungen | |  |
+| Feature                         | MVP | Erweiterung |
+| ------------------------------- | :-: | :---------: |
+| Abenteuer manuell erstellen     |  ✓  |             |
+| Kapitel und Begegnungen anlegen |  ✓  |             |
+| NPC erstellen und zuweisen      |  ✓  |             |
+| JSON Import/Export              |  ✓  |             |
+| Zusammenfassung bearbeiten      |  ✓  |             |
+| Abenteuer laden                 |  ✓  |             |
+| KI-Generierung von Abenteuern   |     |             |
+| KI-basierte Inhaltsbearbeitung  |     |             |
+| NPC automatisch generieren      |     |             |
+| KI-basierte Zusammenfassungen   |     |             |
 
 **Nicht-funktionale Anforderungen:**
+
 - Browserbasiert, keine Installation auf Client-Seite notwendig
-- Lokal betrieben
+- Lokal betrieben <font color="red">Widerspruch?</font>
 - Sicherheit: Validierung aller externen Daten, kein Path Traversal, keine Codeausführung aus JSON-Daten
 
 Sicherheitsanforderungen (SEC-01 bis SEC-19) sowie Missbrauchsszenarien (M1–M6) sind im Anhang vollständig aufgeführt.
@@ -104,7 +106,7 @@ Die Funktionen sind in fünf Epics gegliedert. Als Minimum Viable Product (MVP) 
 
 Als Spielleiter möchte ich ein neues Abenteuer erstellen können, damit ich meine eigene Geschichte strukturieren kann.
 
-*Akzeptanzkriterien:* Nutzer kann neues Abenteuer anlegen; Abenteuer enthält mindestens Beschreibung und Zusammenfassung; Felder können initial leer sein; Abenteuer wird im System gespeichert.
+_Akzeptanzkriterien:_ Nutzer kann neues Abenteuer anlegen; Abenteuer enthält mindestens Beschreibung und Zusammenfassung; Felder können initial leer sein; Abenteuer wird im System gespeichert.
 
 ---
 
@@ -112,7 +114,7 @@ Als Spielleiter möchte ich ein neues Abenteuer erstellen können, damit ich mei
 
 Als Spielleiter möchte ich ein Abenteuer durch KI generieren lassen, damit ich schnell eine Grundlage habe.
 
-*Akzeptanzkriterien:* Nutzer kann Prompt eingeben; System generiert Beschreibung und Zusammenfassung; generierter Inhalt wird automatisch übernommen; Nutzer kann Ergebnis übernehmen oder verwerfen.
+_Akzeptanzkriterien:_ Nutzer kann Prompt eingeben; System generiert Beschreibung und Zusammenfassung; generierter Inhalt wird automatisch übernommen; Nutzer kann Ergebnis übernehmen oder verwerfen.
 
 ---
 
@@ -120,7 +122,7 @@ Als Spielleiter möchte ich ein Abenteuer durch KI generieren lassen, damit ich 
 
 Als Spielleiter möchte ich ein bestehendes Abenteuer mit KI anpassen, damit ich Inhalte schnell erweitern oder verbessern kann.
 
-*Akzeptanzkriterien:* Nutzer kann bestehende Beschreibung auswählen und Änderungswunsch eingeben; KI liefert überarbeitete Version; Nutzer kann Änderung übernehmen oder verwerfen.
+_Akzeptanzkriterien:_ Nutzer kann bestehende Beschreibung auswählen und Änderungswunsch eingeben; KI liefert überarbeitete Version; Nutzer kann Änderung übernehmen oder verwerfen.
 
 ---
 
@@ -128,11 +130,11 @@ Als Spielleiter möchte ich ein bestehendes Abenteuer mit KI anpassen, damit ich
 
 Als Spielleiter möchte ich mein Abenteuer als JSON-Datei speichern, damit ich es lokal sichern und weiterverwenden kann.
 
-*Akzeptanzkriterien:* Datei wird im JSON-Format gespeichert und enthält Beschreibung, Zusammenfassung, NPCs und Story-Struktur.
+_Akzeptanzkriterien:_ Datei wird im JSON-Format gespeichert und enthält Beschreibung, Zusammenfassung, NPCs und Story-Struktur.
 
 ---
 
-#### EPIC 2: Story-Verzweigungen
+#### EPIC 2: Story-Verzweigungen <font color="red">wurde aus MVP weggelassen, wie darauf hinweisen?</font>
 
 **US-5: Story-Knoten hinzufügen (MVP)**
 
@@ -142,7 +144,7 @@ Als Spielleiter möchte ich meinem Abenteuer mehrere Story-Abschnitte (Kapitel) 
 
 Als Spielleiter möchte ich Entscheidungen zwischen Story-Knoten definieren, damit Spieler unterschiedliche Wege gehen können.
 
-*Akzeptanzkriterien:* Nutzer kann einem Knoten mehrere Auswahlmöglichkeiten hinzufügen; jede Auswahl verweist auf einen Ziel-Knoten; Verweise sind valide.
+_Akzeptanzkriterien:_ Nutzer kann einem Knoten mehrere Auswahlmöglichkeiten hinzufügen; jede Auswahl verweist auf einen Ziel-Knoten; Verweise sind valide.
 
 ---
 
@@ -152,7 +154,7 @@ Als Spielleiter möchte ich Entscheidungen zwischen Story-Knoten definieren, dam
 
 Als Spielleiter möchte ich NPCs erstellen können, damit ich mein Abenteuer mit Charakteren füllen kann.
 
-*Akzeptanzkriterien:* NPC enthält Beschreibung, NPC-Story und Zusammenfassung; Felder sind editierbar.
+_Akzeptanzkriterien:_ NPC enthält Beschreibung, NPC-Story und Zusammenfassung; Felder sind editierbar.
 
 **US-8: NPC automatisch generieren**
 
@@ -182,7 +184,7 @@ Als Spielleiter möchte ich automatisch eine Zusammenfassung generieren lassen, 
 
 Als Spielleiter möchte ich ein gespeichertes Abenteuer laden, damit ich daran weiterarbeiten kann.
 
-*Akzeptanzkriterien:* Nutzer kann JSON-Datei auswählen; System lädt Struktur korrekt; Daten werden im Editor angezeigt.
+_Akzeptanzkriterien:_ Nutzer kann JSON-Datei auswählen; System lädt Struktur korrekt; Daten werden im Editor angezeigt.
 
 ---
 
@@ -190,7 +192,7 @@ Als Spielleiter möchte ich ein gespeichertes Abenteuer laden, damit ich daran w
 
 ### 3a. Gesamtübersicht der Architektur
 
-Der TTRPG Helper folgt einer klassischen Client-Server-Architektur: Eine Vue 3 Single-Page-Application kommuniziert über eine REST-API mit einem Node.js-Backend. Als Persistenzschicht dient das lokale Dateisystem – Abenteuer werden als JSON-Dateien gespeichert.
+Der TTRPG Helper folgt einer klassischen Client-Server-Architektur: Eine Vue 3 Single-Page-Application kommuniziert über eine REST-API mit einem Node.js-Backend. Als Persistenzschicht dient das lokale Dateisystem – Abenteuer werden als JSON-Dateien gespeichert. <font color="red">kein externer server wird betrieben, also ist loakle "installation"/ ausführung notwendig. verweis wieder auf NFRs</font>
 
 ```plantuml
 @startuml
@@ -221,19 +223,19 @@ Security -up-> Backend : Middleware
 
 **Technologiestack im Überblick:**
 
-| Schicht | Technologie | Version |
-|---------|------------|---------|
-| Frontend-Framework | Vue 3 | ^3.5 |
-| Build-Tool | Vite | ^8.0 |
-| UI-Bibliothek | PrimeVue | ^4.5 |
-| Rich-Text-Editor | Quill | ^2.0 |
-| Frontend-Routing | vue-router | ^5.0 |
-| Backend-Framework | Express | ^5.2 |
-| Runtime | Node.js | ≥ 20.19 |
-| Schema-Validierung | AJV | ^8.12 |
-| Sicherheits-Middleware | helmet | ^7.0 |
-| Dateinamen-Sanitisierung | sanitize-filename | ^1.6 |
-| Testing | Jest + supertest | ^29 / ^6 |
+| Schicht                  | Technologie       | Version  |
+| ------------------------ | ----------------- | -------- |
+| Frontend-Framework       | Vue 3             | ^3.5     |
+| Build-Tool               | Vite              | ^8.0     |
+| UI-Bibliothek            | PrimeVue          | ^4.5     |
+| Rich-Text-Editor         | Quill             | ^2.0     |
+| Frontend-Routing         | vue-router        | ^5.0     |
+| Backend-Framework        | Express           | ^5.2     |
+| Runtime                  | Node.js           | ≥ 20.19  |
+| Schema-Validierung       | AJV               | ^8.12    |
+| Sicherheits-Middleware   | helmet            | ^7.0     |
+| Dateinamen-Sanitisierung | sanitize-filename | ^1.6     |
+| Testing                  | Jest + supertest  | ^29 / ^6 |
 
 ### 3b. Frontend/Benutzeroberfläche
 
@@ -270,20 +272,20 @@ component App {
 
 **UI-Konzept:**
 
-Die Benutzeroberfläche ist zweispaltig aufgebaut: Links befindet sich der Abenteuer-Editor mit Kapiteln und Begegnungen, rechts ein aufklappbares NPC-Panel. Die Breite beider Panels ist per `Splitter`-Divider (PrimeVue) anpassbar. Der Quill-Editor ermöglicht Rich-Text-Eingabe für Story-Texte und Begegnungsbeschreibungen.
+Die Benutzeroberfläche ist zweispaltig aufgebaut: Links befindet sich der Abenteuer-Editor mit Kapiteln und Begegnungen, rechts ein aufklappbares NPC-Panel. Die Breite beider Panels ist per `Splitter`-Divider (PrimeVue) anpassbar. Der Quill-Editor ermöglicht Rich-Text-Eingabe für Story-Texte und Begegnungsbeschreibungen. <font color="red">hier wird fertiges design beschrieben, aber mockups gezeigt. auftrennen in 2 sektionen? also gegenüberstellung plan und umsetzung? oder einfach screenshot des aktuellen standes einfügen?</font>
 
-*Hinweis: Die UI-Mockups zeigen den geplanten Funktionsumfang; der aktuelle Fokus liegt auf manueller Erstellung (MVP).*
+_Hinweis: Die UI-Mockups zeigen den geplanten Funktionsumfang; der aktuelle Fokus liegt auf manueller Erstellung (MVP)._
 
 ![UI-Mockup Übersicht](./images/UI_Mockup_1.png)
 ![UI-Mockup Editor](./images/UI_Mockup_2.png)
 
 **Routing:**
 
-| Pfad | Komponente | Beschreibung |
-|------|-----------|--------------|
-| `/` | – | Redirect zu `/overview` |
-| `/overview` | AdventureOverview | Abenteuer-Liste |
-| `/content/:filename?` | AdventureContent | Abenteuer-Editor |
+| Pfad                  | Komponente        | Beschreibung            |
+| --------------------- | ----------------- | ----------------------- |
+| `/`                   | –                 | Redirect zu `/overview` |
+| `/overview`           | AdventureOverview | Abenteuer-Liste         |
+| `/content/:filename?` | AdventureContent  | Abenteuer-Editor        |
 
 ### 3c. Backend, Datenbank und Schnittstellen
 
@@ -295,30 +297,30 @@ Das Backend ist als modularer Express-5-Server aufgebaut. Jedes API-Feature ist 
 
 Die vollständige API-Spezifikation liegt als OpenAPI 3.0.3-Dokument vor: `doc/ttrpg-API.yaml`.
 
-| Methode | Pfad | Beschreibung |
-|---------|------|--------------|
-| `GET` | `/health` | Healthcheck |
-| `POST` | `/api/save?filename=` | Abenteuer als JSON speichern (Import) |
-| `GET` | `/api/load?filename=` | Gespeichertes JSON laden (Export) |
-| `GET` | `/api/adventures` | Liste aller Abenteuer (Metadaten-Übersicht) |
-| `GET` | `/api/adventures/:file/metadata` | Metadaten eines Abenteuers |
-| `GET` | `/api/adventures/:file/chapters` | Kapitel-Übersicht eines Abenteuers |
-| `GET` | `/api/adventures/:file/chapters/:id` | Einzelnes Kapitel |
-| `GET` | `/api/adventures/:file/npcs` | NPC-Übersicht eines Abenteuers |
-| `GET` | `/api/adventures/:file/npcs/:id` | Einzelner NPC |
+| Methode | Pfad                                 | Beschreibung                                |
+| ------- | ------------------------------------ | ------------------------------------------- |
+| `GET`   | `/health`                            | Healthcheck                                 |
+| `POST`  | `/api/save?filename=`                | Abenteuer als JSON speichern (Import)       |
+| `GET`   | `/api/load?filename=`                | Gespeichertes JSON laden (Export)           |
+| `GET`   | `/api/adventures`                    | Liste aller Abenteuer (Metadaten-Übersicht) |
+| `GET`   | `/api/adventures/:file/metadata`     | Metadaten eines Abenteuers                  |
+| `GET`   | `/api/adventures/:file/chapters`     | Kapitel-Übersicht eines Abenteuers          |
+| `GET`   | `/api/adventures/:file/chapters/:id` | Einzelnes Kapitel                           |
+| `GET`   | `/api/adventures/:file/npcs`         | NPC-Übersicht eines Abenteuers              |
+| `GET`   | `/api/adventures/:file/npcs/:id`     | Einzelner NPC                               |
 
 **Konfiguration (Environment-Variablen):**
 
-| Variable | Standardwert | Beschreibung |
-|----------|-------------|--------------|
-| `PORT` | `3000` | Server-Port |
-| `BODY_LIMIT` | `5mb` | Maximale Request/Abenteuer-Größe (SEC-02) |
-| `UPLOAD_DIR` | `./uploads` | Speicherverzeichnis für JSON-Dateien |
-| `ALLOW_OVERWRITE` | `true` | Überschreiben bestehender Dateien erlauben (SEC-08), `false` führt zu read only |
+| Variable          | Standardwert | Beschreibung                                                                    |
+| ----------------- | ------------ | ------------------------------------------------------------------------------- |
+| `PORT`            | `3000`       | Server-Port                                                                     |
+| `BODY_LIMIT`      | `5mb`        | Maximale Request/Abenteuer-Größe (SEC-02)                                       |
+| `UPLOAD_DIR`      | `./uploads`  | Speicherverzeichnis für JSON-Dateien                                            |
+| `ALLOW_OVERWRITE` | `true`       | Überschreiben bestehender Dateien erlauben (SEC-08), `false` führt zu read only |
 
 ### 3d. LLM-Integration (MCP, Wrapper, API)
 
-Im aktuellen Entwicklungsstand (MVP) ist keine direkte LLM-Integration in der Anwendungslaufzeit implementiert. Die KI-Unterstützung erfolgt derzeit **auf Entwicklerebene** siehe Kapitel [5](#5-einsatz-der-llms-und-prompt-engineering).
+Im aktuellen Entwicklungsstand (MVP) ist keine direkte LLM-Integration in der Anwendungslaufzeit implementiert. Die KI-Unterstützung erfolgt derzeit **auf Entwicklerebene** (siehe [Kapitel 5](#5-einsatz-der-llms-und-prompt-engineering)).
 
 **Geplante Produktintegration (Post-MVP) (Out of Scope):**
 
@@ -342,12 +344,14 @@ Frontend -> Spielleiter : Vorschau anzeigen\n(Übernehmen / Verwerfen)
 ```
 
 Die Integration ist für folgende Use Cases vorgesehen (US-2, US-3, US-8, US-11):
+
 - Abenteuer aus Prompt generieren
 - Bestehenden Inhalt per KI überarbeiten
 - NPC passend zum Abenteuer generieren
 - Zusammenfassungen automatisch erstellen
 
 **Sicherheitsprinzipien für die LLM-Integration:**
+
 - Strikte Trennung von System-Prompt und Nutzerinhalt (SEC-10)
 - KI darf ausschließlich Text generieren, keine Systemaktionen auslösen (SEC-11)
 - Alle KI-Ausgaben werden vor Speicherung gegen das JSON-Schema validiert (SEC-12)
@@ -359,18 +363,18 @@ Das System ist für den lokalen Betrieb konzipiert und enthält keine Nutzer-Aut
 
 **Implementierte Sicherheitsmaßnahmen:**
 
-| SEC-ID | Maßnahme | Implementierung |
-|--------|---------|----------------|
-| SEC-01 | JSON Schema Validation | AJV validiert eingehende Payloads in `savejson/service.js` |
-| SEC-02 | Dateigröße limitieren | `BODY_LIMIT=5mb` via Express-Middleware in `app.js` |
-| SEC-07 | Path Traversal verhindern | `sanitize-filename` + `path.basename()` Check in `model.js` |
-| SEC-08 | Kein Überschreiben ohne Bestätigung | `ALLOW_OVERWRITE=false` per Default-Konfiguration |
-| SEC-09 | Input als unsicher behandeln | Alle externen Daten durchlaufen Validierungsschicht |
-| SEC-14 | Fehlerlogging ohne Crash | Zentraler `errorHandler` in `middleware/errorHandler.js` |
-| SEC-15/16 | Sichere Dependencies | Bekannte npm-Pakete (express, helmet, ajv, sanitize-filename) |
-| SEC-17 | Keine Codeausführung aus Daten | Kein `eval()`, keine dynamische Ausführung aus JSON |
-| SEC-18 | Keine Pfade in Logs | Error Handler gibt keine internen Dateisystempfade zurück |
-| SEC-19 | Fail Fast bei Fehlern | Frühzeitiger Abbruch und 4xx-Response bei Validierungsfehlern |
+| SEC-ID    | Maßnahme                            | Implementierung                                               |
+| --------- | ----------------------------------- | ------------------------------------------------------------- |
+| SEC-01    | JSON Schema Validation              | AJV validiert eingehende Payloads in `savejson/service.js`    |
+| SEC-02    | Dateigröße limitieren               | `BODY_LIMIT=5mb` via Express-Middleware in `app.js`           |
+| SEC-07    | Path Traversal verhindern           | `sanitize-filename` + `path.basename()` Check in `model.js`   |
+| SEC-08    | Kein Überschreiben ohne Bestätigung | `ALLOW_OVERWRITE=false` per Default-Konfiguration             |
+| SEC-09    | Input als unsicher behandeln        | Alle externen Daten durchlaufen Validierungsschicht           |
+| SEC-14    | Fehlerlogging ohne Crash            | Zentraler `errorHandler` in `middleware/errorHandler.js`      |
+| SEC-15/16 | Sichere Dependencies                | Bekannte npm-Pakete (express, helmet, ajv, sanitize-filename) |
+| SEC-17    | Keine Codeausführung aus Daten      | Kein `eval()`, keine dynamische Ausführung aus JSON           |
+| SEC-18    | Keine Pfade in Logs                 | Error Handler gibt keine internen Dateisystempfade zurück     |
+| SEC-19    | Fail Fast bei Fehlern               | Frühzeitiger Abbruch und 4xx-Response bei Validierungsfehlern |
 
 Die vollständige Traceability Matrix inkl. Missbrauchsszenarien M1–M6 ist im [Anhang](#9-anhang) dokumentiert.
 
@@ -387,20 +391,20 @@ Das Projekt wurde nach einem **iterativ-inkrementellen Vorgehen** entwickelt. Di
 3. **Implementierungsphase:** Backend-Module, Frontend-Komponenten, Integrationstests, Code-Review direkt bei Implementierung (Pairprogramming)
 4. **Stabilisierungsphase:** Bugfixes, Dokumentation
 
-Die Aufgabenverteilung erfolgte über ein in Google Drive geteiltes Worddokument.
+Die Aufgabenverteilung erfolgte über ein in Google Drive geteiltes Textdokument.
 
 Die Fortschrittsverfolgung erfolgt über Git-Feature-Branches und GitHub.
 
-Prompts für einzelne Features werden als Txt-Dokumente im Verzeichnis `doc/prompts/` abgelegt.
+Prompts für einzelne Features wurden teilweise als .txt-Dokumente im Verzeichnis `doc/prompts/` abgelegt.
 
 Von Copilot erstellte Pläne wurden teilweise im Verzeichnis `doc/plans/` abgelegt.
 
-| Datei | Inhalt |
-|-------|--------|
-| `plan.md` | Gesamtplan und Meilensteine |
-| `plan_backendcreation.md` | Backend-Aufbau |
-| `plan_backendJsonProvidingAPI.md` | JSON-API-Design |
-| `plan_npc_reference_links.md` | NPC-Verlinkung zwischen Kapiteln |
+| Datei                             | Inhalt                           |
+| --------------------------------- | -------------------------------- |
+| `plan.md`                         | Gesamtplan und Meilensteine      |
+| `plan_backendcreation.md`         | Backend-Aufbau                   |
+| `plan_backendJsonProvidingAPI.md` | JSON-API-Design                  |
+| `plan_npc_reference_links.md`     | NPC-Verlinkung zwischen Kapiteln |
 
 ### 4b. Code-Generierung und Entwicklung
 
@@ -529,14 +533,15 @@ NPC "1" *-- "1" Stats
 
 **ID-Konventionen:**
 
-| Entität | Schema | Beispiel |
-|---------|--------|---------|
-| Adventure | `adv-NNN` | `adv-000` |
-| Chapter | `ch-NNN` | `ch-001` |
+| Entität   | Schema       | Beispiel     |
+| --------- | ------------ | ------------ |
+| Adventure | `adv-NNN`    | `adv-000`    |
+| Chapter   | `ch-NNN`     | `ch-001`     |
 | Encounter | `enc-CCC-EE` | `enc-001-01` |
-| NPC | `npc-NNN` | `npc-001` |
+| NPC       | `npc-NNN`    | `npc-001`    |
 
 **Save-Flow mit Validierung:**
+
 ```plantuml
 @startuml
 title Save-Flow – Ablauf
@@ -561,21 +566,22 @@ stop;
 ### 4d. Versionskontrolle, Build- und CI-Prozesse
 
 **Versionskontrolle:**
+
 - Git mit GitHub als Remote-Repository
 - Feature-Branches pro Aufgabe (z. B. `smoothing`, `feat/npc-linking`)
 - Commit-Konvention: Präfix `feat:`, `fix:`, `refactor:` + Beschreibung (vgl. `copilot-instructions.md`)
 
 **Build-Prozesse:**
 
-| Umgebung | Befehl | Ergebnis |
-|----------|--------|---------|
-| Frontend Dev | `npm run dev` | Vite Dev-Server mit Hot Module Replacement |
-| Frontend Build | `npm run build` | Statische Dateien in `dist/` |
-| Frontend Lint | `npm run lint` | oxlint + ESLint |
-| Frontend Format | `npm run format` | Prettier |
-| Backend Dev | `npm run dev` | nodemon mit Auto-Reload |
-| Backend Start | `npm start` | `node server.js` |
-| Backend Tests | `npm test` | Jest + supertest (alle API-Endpunkte) |
+| Umgebung        | Befehl           | Ergebnis                                   |
+| --------------- | ---------------- | ------------------------------------------ |
+| Frontend Dev    | `npm run dev`    | Vite Dev-Server mit Hot Module Replacement |
+| Frontend Build  | `npm run build`  | Statische Dateien in `dist/`               |
+| Frontend Lint   | `npm run lint`   | oxlint + ESLint                            |
+| Frontend Format | `npm run format` | Prettier                                   |
+| Backend Dev     | `npm run dev`    | nodemon mit Auto-Reload                    |
+| Backend Start   | `npm start`      | `node server.js`                           |
+| Backend Tests   | `npm test`       | Jest + supertest (alle API-Endpunkte)      |
 
 ---
 
@@ -583,16 +589,17 @@ stop;
 
 ### 5a. Auswahl der LLMs und Dienste
 
-*[Zu ergänzen: Begründung für die Wahl bestimmter Modelle, APIs bzw. Agenten, inklusive Benchmarks.]*
+_[Zu ergänzen: Begründung für die Wahl bestimmter Modelle, APIs bzw. Agenten, inklusive Benchmarks.]_
 
 - KI-Chats
   - ChatGPT
   - Gemini
   - Claude
-KI-Chats wurden für das Planen der Applikation, vorschlagen lassen von Methoden und generieren von Textabschnitten genutzt. 
+    KI-Chats wurden für das Planen der Applikation, vorschlagen lassen von Methoden und generieren von Textabschnitten genutzt.
 
 - VSCode integriertes Copilot
-  - GPT 5 mini, 5.4 mini: einfache Aufgaben wie code refactoring
+  - GPT 5 mini, 5.4 , 5.4 mini: einfache Aufgaben wie code refactoring
+  - GPT 5.3-Codex, Gemini 3.1 PRo (Preview): Planung und Umsetzung vieler Features, vor allem bei größerem Kontext-Bedarf und Verwendung von speziellen Bibliotheken.
 
 - Github Agents
 
@@ -603,11 +610,12 @@ KI-Chats wurden für das Planen der Applikation, vorschlagen lassen von Methoden
 
 ### 5b. Aufbau und Dokumentation der Prompts
 
-*[Zu ergänzen: Beschreibung, wie Prompts formuliert und verfeinert wurden; Beispiele für erfolgreiche und weniger erfolgreiche Prompts.]*
+_[Zu ergänzen: Beschreibung, wie Prompts formuliert und verfeinert wurden; Beispiele für erfolgreiche und weniger erfolgreiche Prompts.]_
 
 **Aufbau**
 
 Die Struktur der Prompts folgte zu Ende hin meist nachfolgendem Schema:
+
 - Kurze Beschreibung der Aufgabe
 - Regeln, Beschränkungen, Scope für die KI
 - Detailierte Beschreibung mit Verweis auf Dokumente, Abhängikeiten, Bibliotheken
@@ -615,7 +623,7 @@ Die Struktur der Prompts folgte zu Ende hin meist nachfolgendem Schema:
 
 ### 5c. Generierte Assets (Code, Bilder, Audio, Video, Text)
 
-*[Zu ergänzen: Sammlung und Kommentierung von KI-generierten Ergebnissen.]*
+_[Zu ergänzen: Sammlung und Kommentierung von KI-generierten Ergebnissen.]_
 
 - Mockups (Bild)
 - Vorschläge (Google Doc)
@@ -625,28 +633,31 @@ Die Struktur der Prompts folgte zu Ende hin meist nachfolgendem Schema:
 
 ### 5d. Fehleranalyse und Optimierungen
 
-*[Zu ergänzen: Darstellung von Fehlversuchen, Halluzinationen oder Limitierungen des Modells und der daraus abgeleiteten Verbesserungen.]*
+_[Zu ergänzen: Darstellung von Fehlversuchen, Halluzinationen oder Limitierungen des Modells und der daraus abgeleiteten Verbesserungen.]_
 
 #### Korrigier Schleife bei Tests
+
 Fehleranalyse von Test (Backend) halluziniert, Fehler gefunden zu haben, aber verschlimmbessert indem Tests immer komplexer wurden. Manueller Eingriff/Abbruch erforderlich um Schleife aus Änderung, Testdruchführung, Fehlersuche zu brechen.
 
 #### Fehlender Kontext bei PrimeVue Komponenten
-Trotz Nennung der PrimeVue Bibliothek und Präsenz im Code hat Gemini 5 mini diese nicht verwendet. Zum einen fehlte das Wissen des Programmierers über dieses Framework, zum anderen hat die KI die Präsenz des Frameworks im Code nicht erfasst.
 
+Trotz Nennung der PrimeVue Bibliothek und Präsenz im Code hat GPT 5 mini diese nicht verwendet. Zum einen fehlte das Wissen des Programmierers über dieses Framework, zum anderen hat die KI die Präsenz des Frameworks im Code nicht erfasst.
 
 ### 5e. Qualitätssicherung bei der LLM-Nutzung
 
-*[Zu ergänzen: Vorgehensweisen zur Überprüfung der Ergebnisse (z. B. Code-Reviews, Validierung durch Experten).]*
+_[Zu ergänzen: Vorgehensweisen zur Überprüfung der Ergebnisse (z. B. Code-Reviews, Validierung durch Experten).]_
 
 #### Tests (Backend)
+
 Mit bestehenden Test kann die KI sofort Rückmeldung einholen ob die Code Änderung die bestehenden Abläufe stört und welche Funktionalität gestört wurde.
 
 #### Reviews der KI Diffs
+
 Durch Git in VS Code kann man sich die konkreten Änderungen anzeigen lassen, hierbei müssen Vorherige Änderrungen staged oder commited sein. Mit Copilot und Claude Code-Addon in VS Code bekommt man ein extra Diff für die KI Änderungen, bevor man diese aktzepiert (sofern eingestellt).
 
 #### Betrachtung der laufenden Applikation
-Bei visuellen Änderungen kann die laufende Applikation als schnellste validierungs Methode genutzt werden, nachdem in der Diff sichergestellt wurde, dass keine Logikänderung erfolgte.
 
+Bei visuellen Änderungen kann die laufende Applikation als schnellste validierungs Methode genutzt werden, nachdem in der Diff sichergestellt wurde, dass keine Logikänderung erfolgte.
 
 ---
 
@@ -654,23 +665,23 @@ Bei visuellen Änderungen kann die laufende Applikation als schnellste validieru
 
 ### 6a. Positive Erfahrungen und Erfolgsgeschichten
 
-*[Zu ergänzen: Was hat gut funktioniert, welche Vorteile bot der Einsatz von LLMs?]*
+_[Zu ergänzen: Was hat gut funktioniert, welche Vorteile bot der Einsatz von LLMs?]_
 
 ### 6b. Schwierigkeiten und Probleme
 
-*[Zu ergänzen: Welche Herausforderungen traten auf (z. B. unpassende Antworten, unklare Lizenzsituation)?]*
+_[Zu ergänzen: Welche Herausforderungen traten auf (z. B. unpassende Antworten, unklare Lizenzsituation)?]_
 
 ### 6c. Grenzen und Risiken von LLMs
 
-*[Zu ergänzen: Reflexion über die Grenzen der Technologie, inklusive ethischer Aspekte, Bias und Datenschutz.]*
+_[Zu ergänzen: Reflexion über die Grenzen der Technologie, inklusive ethischer Aspekte, Bias und Datenschutz.]_
 
 ### 6d. Lessons Learned und Empfehlungen
 
-*[Zu ergänzen: Wichtige Erkenntnisse für künftige Projekte und Hinweise für Nachfolgende.]*
+_[Zu ergänzen: Wichtige Erkenntnisse für künftige Projekte und Hinweise für Nachfolgende.]_
 
 ### 6e. Zukunft der LLM-gestützten Entwicklung
 
-*[Zu ergänzen: Kurzreflexion über Trends und Entwicklungen im Bereich LLM.]*
+_[Zu ergänzen: Kurzreflexion über Trends und Entwicklungen im Bereich LLM.]_
 
 ---
 
@@ -678,23 +689,23 @@ Bei visuellen Änderungen kann die laufende Applikation als schnellste validieru
 
 ### 7a. Zusammenfassung der Arbeit
 
-*[Zu ergänzen: Kompakte Zusammenfassung der wichtigsten Ergebnisse.]*
+_[Zu ergänzen: Kompakte Zusammenfassung der wichtigsten Ergebnisse.]_
 
 ### 7b. Persönliche Reflexion und Fazit
 
 **Leonhardit07:**
 
-*[Zu ergänzen: Bewertung des Projekts und des eigenen Lernfortschritts; Einschätzung des Einsatzes von LLMs.]*
+_[Zu ergänzen: Bewertung des Projekts und des eigenen Lernfortschritts; Einschätzung des Einsatzes von LLMs.]_
 
 **GrumpyPants:**
 
-*[Zu ergänzen: Bewertung des Projekts und des eigenen Lernfortschritts; Einschätzung des Einsatzes von LLMs.]*
+_[Zu ergänzen: Bewertung des Projekts und des eigenen Lernfortschritts; Einschätzung des Einsatzes von LLMs.]_
 
 ---
 
 ## 8. Literatur und Quellen
 
-*[Zu ergänzen: Vollständige Angabe aller verwendeten Literatur, Weblinks und Quellen.]*
+_[Zu ergänzen: Vollständige Angabe aller verwendeten Literatur, Weblinks und Quellen.]_
 
 ---
 
@@ -706,9 +717,10 @@ Bei visuellen Änderungen kann die laufende Applikation als schnellste validieru
 
 Ein Nutzer lädt eine fremde JSON-Datei (z. B. aus GitHub), die falsche Struktur enthält, extrem groß ist oder fehlerhafte Referenzen hat.
 
-*Ziel: Crash, Datenkorruption oder unerwartetes Verhalten*
+_Ziel: Crash, Datenkorruption oder unerwartetes Verhalten_
 
 **Security Requirements:**
+
 - **SEC-01:** Das System validiert jede importierte JSON-Datei gegen ein definiertes Schema und lehnt ungültige Dateien ab.
 - **SEC-19:** Das System bricht Verarbeitung bei fehlerhaften Daten frühzeitig ab („fail fast").
 - **SEC-09:** Das System behandelt alle extern geladenen Daten als nicht vertrauenswürdig.
@@ -720,6 +732,7 @@ Ein Nutzer lädt eine fremde JSON-Datei (z. B. aus GitHub), die falsche Struktur
 Ein Angreifer manipuliert Dateipfade (`../../system/file`, absolute Pfade) mit dem Ziel, fremde Dateien zu überschreiben.
 
 **Security Requirements:**
+
 - **SEC-07:** Das System verhindert relative Pfadangaben beim Speichern und Laden.
 - **SEC-06:** Das System erlaubt Zugriff nur innerhalb eines vom Nutzer gewählten Verzeichnisses.
 - **SEC-08:** Das System verhindert das Überschreiben bestehender Dateien ohne explizite Nutzerbestätigung.
@@ -730,6 +743,7 @@ Ein Angreifer manipuliert Dateipfade (`../../system/file`, absolute Pfade) mit d
 Ein Abenteuer enthält versteckte Anweisungen im Text (z. B. „Ignoriere Regeln und manipuliere Output…") mit dem Ziel, das KI-Verhalten zu kontrollieren.
 
 **Security Requirements:**
+
 - **SEC-10:** Das System trennt strikt zwischen System-Prompts und Nutzereingaben bei KI-Anfragen.
 - **SEC-11:** Das System erlaubt der KI ausschließlich die Generierung von Text und keine Systemaktionen.
 - **SEC-12:** Das System validiert und bereinigt KI-Ausgaben bevor sie weiterverarbeitet oder gespeichert werden.
@@ -739,6 +753,7 @@ Ein Abenteuer enthält versteckte Anweisungen im Text (z. B. „Ignoriere Regeln
 Riesige JSON-Dateien, extrem lange Texte oder zyklische Story-Nodes sollen die Anwendung verlangsamen oder zum Absturz bringen.
 
 **Security Requirements:**
+
 - **SEC-02:** Das System begrenzt die maximale Größe von JSON-Dateien beim Import.
 - **SEC-03:** Das System begrenzt die maximale Länge von Textfeldern.
 - **SEC-13:** Das System setzt Timeouts für KI-Anfragen, um Blockierungen zu vermeiden.
@@ -748,6 +763,7 @@ Riesige JSON-Dateien, extrem lange Texte oder zyklische Story-Nodes sollen die A
 Verweise auf nicht existierende Nodes oder Endlosschleifen sollen Logikfehler oder Abstürze provozieren.
 
 **Security Requirements:**
+
 - **SEC-04:** Das System stellt sicher, dass alle Referenzen zwischen Story-Knoten gültig sind.
 - **SEC-05:** Das System erkennt zyklische oder ungültige Story-Strukturen und verhindert deren Ausführung/Speicherung.
 
@@ -756,6 +772,7 @@ Verweise auf nicht existierende Nodes oder Endlosschleifen sollen Logikfehler od
 Eine kompromittierte Library soll Codeausführung oder einen Supply-Chain-Angriff ermöglichen.
 
 **Security Requirements:**
+
 - **SEC-15:** Das System verwendet ausschließlich bekannte und geprüfte Abhängigkeiten.
 - **SEC-16:** Das System hält alle Dependencies aktuell und überprüft sie regelmäßig auf bekannte Schwachstellen.
 
@@ -787,8 +804,8 @@ Eine kompromittierte Library soll Codeausführung oder einen Supply-Chain-Angrif
 
 ### Prompt-Transkripte
 
-*[Verweise auf Dateien im Git-Repository genügen.]*
+_[Verweise auf Dateien im Git-Repository genügen.]_
 
 ### Weitere Datenblätter
 
-*[Zu ergänzen: Datenblätter, weitere Transkripte, etc.]*
+_[Zu ergänzen: Datenblätter, weitere Transkripte, etc.]_
