@@ -1,6 +1,6 @@
 # Projekt TTRPG Helper (DE)
 
-von Leonhardit07 und GrumpyPants
+von Leonhardit07 und GrumpyPants <font color="red">evtl auf Klarnamen ändern? dann auch unten bei reflektion</font>
 
 ---
 
@@ -134,7 +134,7 @@ _Akzeptanzkriterien:_ Datei wird im JSON-Format gespeichert und enthält Beschre
 
 ---
 
-#### EPIC 2: Story-Verzweigungen <font color="red">wurde aus MVP weggelassen, wie darauf hinweisen?</font>
+#### EPIC 2: Story-Verzweigungen <font color="red">wurde aus MVP weggelassen, wie darauf hinweisen? -> habe hinweis in projektzusammenfassung</font>
 
 **US-5: Story-Knoten hinzufügen (MVP)**
 
@@ -703,7 +703,15 @@ Für Entwicklerinnen und Entwickler verschiebt sich der Schwerpunkt damit zunehm
 
 ### 7a. Zusammenfassung der Arbeit
 
-_[Zu ergänzen: Kompakte Zusammenfassung der wichtigsten Ergebnisse.]_
+Nachfolgend wird aufgelisted, welche Features komplett oder gar nicht umgesetzt wurden.
+
+**Vollständige Umsetzung:**
+
+- Abenteuer erstellen, bearbeiten, speichern, laden
+- Encounter zu Kapiteln hinzufügen
+- NPCs zum Abenteuer hinzufügen, im Text referenzieren
+
+Alle nicht im MVP enthaltenen Features sowie die Story-Verzweigungen wurden nicht umgesetzt.
 
 ### 7b. Persönliche Reflexion und Fazit
 
