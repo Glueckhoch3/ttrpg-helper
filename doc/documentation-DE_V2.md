@@ -589,75 +589,80 @@ stop;
 
 ### 5a. Auswahl der LLMs und Dienste
 
-_[Zu ergänzen: Begründung für die Wahl bestimmter Modelle, APIs bzw. Agenten, inklusive Benchmarks.]_
+Im Projektverlauf wurden mehrere KI-gestützte Werkzeuge und Dienste eingesetzt, die je nach Aufgabentyp und Kontext variiert wurden. Die Auswahl orientierte sich dabei primär an der Verfügbarkeit innerhalb der verwendeten Entwicklungsumgebung sowie an der praktischen Eignung für die jeweilige Aufgabe.
 
-- KI-Chats
-  - ChatGPT
-  - Gemini
-  - Claude
-    KI-Chats wurden für das Planen der Applikation, vorschlagen lassen von Methoden und generieren von Textabschnitten genutzt.
+**KI-Chats (ChatGPT, Gemini, Claude)**
 
-- VSCode integriertes Copilot
-  - GPT 5 mini, 5.4 , 5.4 mini: einfache Aufgaben wie code refactoring
-  - GPT 5.3-Codex, Gemini 3.1 PRo (Preview): Planung und Umsetzung vieler Features, vor allem bei größerem Kontext-Bedarf und Verwendung von speziellen Bibliotheken.
+Browserbasierte KI-Chats wurden vor allem in frühen Projektphasen genutzt, um die Applikation zu planen, geeignete Methoden und Architekturansätze vorschlagen zu lassen sowie erste Textabschnitte für die Dokumentation zu generieren. Der Einsatz erfolgte unabhängig von der Entwicklungsumgebung und eignete sich besonders für konzeptionelle und explorative Fragestellungen.
 
-- Github Agents
+**VSCode-integriertes Copilot**
 
-- Claude Code
-  - Haiku: einfache Aufgaben wie code refactoring
-  - Sonnet: standart Aufgaben mit Kontext und Abhängikeiten im Code
-  - Opus: größere Aufgaben mit komplexem Kontext oder Abhängigkeiten zu speziellen Bibliotheken.
+Das in VS Code integrierte GitHub Copilot ermöglichte eine direkte Einbindung von Modellanfragen in den Entwicklungsworkflow. Für einfachere Aufgaben wie Code-Refactoring kamen dabei leichtgewichtige Modelle wie GPT 5 mini, GPT 5.4 und GPT 5.4 mini zum Einsatz. Aufgaben mit größerem Kontextbedarf – etwa die Planung und Umsetzung komplexerer Features oder die Arbeit mit spezialisierten Bibliotheken – wurden an leistungsfähigere Modelle wie GPT 5.3-Codex und Gemini 3.1 Pro (Preview) delegiert.
+
+**GitHub Agents**
+
+GitHub Agents wurden paralell zum integrierten Copilot genutzt, haupsächlich zum Testen.
+
+**Claude Code**
+
+Claude Code wurde als altenatives integriertes Werkzeug zu Copilot eingesetzt und ermöglichte eine fein abgestufte Modellwahl je nach Aufgabenkomplexität. Einfache Aufgaben wie isoliertes Code-Refactoring wurden mit dem Haiku-Modell durchgeführt, das bei geringem Ressourcenbedarf schnelle Ergebnisse liefert. Für Standardaufgaben mit Kontextbezug und Abhängigkeiten innerhalb des Codebases kam das Sonnet-Modell zum Einsatz. Aufgaben mit hoher Komplexität, weitreichendem Kontext oder starken Abhängigkeiten zu spezialisierten Bibliotheken wurden dem Opus-Modell übergeben.
 
 ### 5b. Aufbau und Dokumentation der Prompts
 
-_[Zu ergänzen: Beschreibung, wie Prompts formuliert und verfeinert wurden; Beispiele für erfolgreiche und weniger erfolgreiche Prompts.]_
+Die Qualität der Modellantworten erwies sich im Projektverlauf als stark abhängig von der Struktur und Präzision der formulierten Prompts. Im Laufe des Projekts entwickelte sich ein standardisiertes Schema, das die Vergleichbarkeit der Ergebnisse verbesserte und den Interpretationsspielraum der Modelle einschränkte.
 
-**Aufbau**
+Die Struktur der Prompts folgte dabei zunehmend einem einheitlichen Aufbau:
 
-Die Struktur der Prompts folgte zu Ende hin meist nachfolgendem Schema:
+1. **Kurze Beschreibung der Aufgabe** – eine knappe Einleitung, die das Ziel des Prompts klar benennt
+2. **Regeln, Beschränkungen und Scope** – explizite Vorgaben dazu, was das Modell tun und was es unterlassen soll
+3. **Detaillierte Beschreibung** – ergänzende Informationen mit Verweisen auf relevante Dokumente, Abhängigkeiten und verwendete Bibliotheken
+4. **Ausgabeformat** – Vorgaben zur gewünschten Form der Antwort, etwa Codeblöcke, Listen oder Fließtext
 
-- Kurze Beschreibung der Aufgabe
-- Regeln, Beschränkungen, Scope für die KI
-- Detailierte Beschreibung mit Verweis auf Dokumente, Abhängikeiten, Bibliotheken
-- Ausgabe Format
+Dieser strukturierte Ansatz reduzierte die Häufigkeit unpassender oder zu weit gefasster Antworten und erleichterte die Nachvollziehbarkeit der Modellausgaben.
 
 ### 5c. Generierte Assets (Code, Bilder, Audio, Video, Text)
 
-_[Zu ergänzen: Sammlung und Kommentierung von KI-generierten Ergebnissen.]_
+<font color="red">Überprüfen und weiter ausführen, bzw. Assets hinterlegen</font>
 
-- Mockups (Bild)
-- Vorschläge (Google Doc)
-- Erklärungen und Evaluierungen (Google Doc)
-- Code generierung (Copilot Chats, Github Agents)
-- Dokumenation (Copilot/Claude Code Chats)
+KI-generierte Inhalte begleiteten das Projekt in verschiedenen Phasen und Formaten. Die nachfolgende Übersicht gibt einen Überblick über die entstandenen Asset-Typen und die jeweils verwendeten Werkzeuge:
+
+- **Mockups (Bilder):** Visuelle Entwürfe für die Benutzeroberfläche wurden auf Basis textueller Anforderungen durch KI-Modelle generiert und als Ausgangspunkt für die weitere UI-Ausarbeitung verwendet.
+- **Vorschläge (Google Doc):** Architektur-, Feature- und Methodenvorschläge wurden in gemeinsam genutzten Dokumenten gesammelt und dienen als Referenz für Entscheidungen im Projektverlauf.
+- **Erklärungen und Evaluierungen (Google Doc):** Konzepterklärungen sowie Bewertungen von Lösungsalternativen wurden ebenfalls dokumentiert, um den Entscheidungsprozess nachvollziehbar zu halten.
+- **Codegenerierung (Copilot Chats, GitHub Agents):** Der größte Teil des KI-generierten Codes entstand über Copilot-Chats und GitHub Agents. Die Ergebnisse wurden anschließend geprüft, angepasst und in das Projekt integriert.
+- **Dokumentation (Copilot / Claude Code Chats):** Textabschnitte der Projektdokumentation wurden mit Unterstützung von Copilot und Claude Code formuliert und ausgearbeitet.
 
 ### 5d. Fehleranalyse und Optimierungen
 
-_[Zu ergänzen: Darstellung von Fehlversuchen, Halluzinationen oder Limitierungen des Modells und der daraus abgeleiteten Verbesserungen.]_
+Trotz der positiven Gesamtbilanz traten im Projektverlauf wiederkehrende Problemmuster auf, die Anpassungen im Umgang mit den Modellen erforderlich machten.
 
-#### Korrigier Schleife bei Tests
+#### Korrekturschleife bei Backend-Tests
 
-Fehleranalyse von Test (Backend) halluziniert, Fehler gefunden zu haben, aber verschlimmbessert indem Tests immer komplexer wurden. Manueller Eingriff/Abbruch erforderlich um Schleife aus Änderung, Testdruchführung, Fehlersuche zu brechen.
+Bei der automatisierten Fehleranalyse von Backend-Tests zeigte sich ein charakteristisches Fehlverhalten: Das Modell diagnostizierte Fehler, die von der Umgebung abhängig waren, und reagierte auf die ausbleibende Verbesserung mit zunehmend komplexen Testanpassungen. Die Änderungen verstärkten das Problem dabei anstatt es zu lösen, da jeder Iterationsschritt neue Komplexität einführte. Die Schleife aus Codeänderung, Testausführung und erneuter Fehlersuche ließ sich nur durch manuellen Eingriff und Abbruch des Prozesses durchbrechen. Dieser Vorfall verdeutlicht das Risiko unkontrollierter iterativer KI-Workflows ohne definierte Abbruchbedingungen.
 
-#### Fehlender Kontext bei PrimeVue Komponenten
+#### Fehlender Bibliothekskontext bei PrimeVue-Komponenten
 
-Trotz Nennung der PrimeVue Bibliothek und Präsenz im Code hat GPT 5 mini diese nicht verwendet. Zum einen fehlte das Wissen des Programmierers über dieses Framework, zum anderen hat die KI die Präsenz des Frameworks im Code nicht erfasst.
+In einem weiteren Fall ignorierte das eingesetzte Modell (GPT 5 mini) die im Projekt bereits verwendete PrimeVue-Komponentenbibliothek, obwohl diese explizit im Prompt genannt und in der Codebase präsent war. Das Problem hatte zwei Ursachen: Zum einen verfügte das Entwicklungsteam zu diesem Zeitpunkt selbst über begrenztes Wissen zu PrimeVue, sodass die Anforderungen nicht mit ausreichender Präzision formuliert wurden. Zum anderen erfasste das Modell die Präsenz der Bibliothek im bestehenden Code nicht zuverlässig. Als Konsequenz wurden Vorgaben für Bibliotheken und Frameworks seitdem konkreter und mit Verwendungsbeispielen belegt.
 
 ### 5e. Qualitätssicherung bei der LLM-Nutzung
 
-_[Zu ergänzen: Vorgehensweisen zur Überprüfung der Ergebnisse (z. B. Code-Reviews, Validierung durch Experten).]_
+Um die Qualität KI-generierter Ergebnisse sicherzustellen, wurden im Projektverlauf mehrere komplementäre Prüfmethoden verwendet. Diese ergänzen sich gegenseitig und decken unterschiedliche Ebenen (von der inhaltlichen Planung bis zur visuellen Überprüfung im laufenden System), wenn parallel ausgeführt.
+
+#### Planning Review
+
+Vor der Umsetzung einer Aufgabe durch das Modell wurde dessen Ausführungsplan eingehend geprüft. Ziel war es sicherzustellen, dass das Modell alle wesentlichen Anforderungen korrekt verstanden und in die geplante Vorgehensweise integriert hat. Abweichungen oder Lücken wurden vor Beginn der Implementierung durch präzisierte Prompts korrigiert, um Fehlentwicklungen im Vorfeld zu verhindern.
 
 #### Tests (Backend)
 
-Mit bestehenden Test kann die KI sofort Rückmeldung einholen ob die Code Änderung die bestehenden Abläufe stört und welche Funktionalität gestört wurde.
+Die bestehende Backend-Testsuite ermöglichte es, KI-generierte Codeänderungen unmittelbar auf Korrektheit zu prüfen. Schlugen bestehende Tests fehl, lieferte das Ergebnis konkrete Hinweise darauf, welche Abläufe durch die Änderung gestört wurden. Dieser Feedback-Mechanismus beschleunigte die Identifikation unerwünschter Nebeneffekte erheblich.
 
-#### Reviews der KI Diffs
+#### Reviews der KI-Diffs
 
-Durch Git in VS Code kann man sich die konkreten Änderungen anzeigen lassen, hierbei müssen Vorherige Änderrungen staged oder commited sein. Mit Copilot und Claude Code-Addon in VS Code bekommt man ein extra Diff für die KI Änderungen, bevor man diese aktzepiert (sofern eingestellt).
+Vor der Übernahme von KI-generierten Änderungen wurden diese systematisch als Git-Diff in VS Code geprüft. Voraussetzung hierfür war, dass vorherige Änderungen gestaged oder committed vorlagen, um eine saubere Vergleichsbasis zu gewährleisten. Das Copilot- und das Claude-Code-Addon in VS Code stellen dabei einen gesonderten Diff-View für KI-Änderungen bereit, der eine gezielte Überprüfung ermöglicht, bevor die Änderungen akzeptiert werden. Dieses Vorgehen reduzierte das Risiko, unbeabsichtigte Änderungen an bestehender Logik zu übersehen.
 
 #### Betrachtung der laufenden Applikation
 
-Bei visuellen Änderungen kann die laufende Applikation als schnellste validierungs Methode genutzt werden, nachdem in der Diff sichergestellt wurde, dass keine Logikänderung erfolgte.
+Bei visuellen Änderungen an der Benutzeroberfläche wurde die laufende Anwendung als schnellste Validierungsmethode herangezogen. Voraussetzung war, dass zuvor über den Diff-Review sichergestellt wurde, dass keine unbeabsichtigten Logikänderungen vorlagen. Die direkte Betrachtung im Browser ermöglichte eine unmittelbare Einschätzung, ob das visuelle Ergebnis den Anforderungen entsprach.
 
 ---
 
@@ -717,7 +722,21 @@ Alle nicht im MVP enthaltenen Features sowie die Story-Verzweigungen wurden nich
 
 **Leonhardit07:**
 
-_[Zu ergänzen: Bewertung des Projekts und des eigenen Lernfortschritts; Einschätzung des Einsatzes von LLMs.]_
+KI ist ein sehr nützliches und starkes Werkzeug, dennoch bedarf es Übung und Methodik um die Qualität des Ergebnisses zu erhalten.
+Mit generativen Modellen der aktuellen Generation Claude Opus 4.8 oder Gemini 3 selbst Personen ohne Programmier-Kenntnisse können ganze Apps erstellen.
+Durch dieses Projekt ist mir weiter bewusst geworden inwiefern tieferes Wissen zur Funktionalität von Code, Kennen von Bibliotheken und Einhalten von Entwicklungsstrategien die Qualität der generierten Ausgaben verbessern kann.
+
+Eine detailierte Aufgaben Beshreibung/Prompt schränkt den Ergebnisvektor merktbar ein, sodass relativ sicher relevante Ergebnisse generiert werden.
+
+Das Nutzen von Fähigkeiten der KI, wie das _Planen_ lassen den Anwender den generierungs Prozess überprüfen, verstehen und nachbessern. So können z.B. Haluzinationen früh erkannt und mit zusätzlichen Informationen für das weitere Vorgehen eliminiert werden. Dies ist ein Vorteil des GitHub Agent gewesen, bei dem man Prompts in den Prozess der KI _einwerfen_ konnte.
+
+Vorlagen für Prompts helfen die Qualität von Prompts sicherzustellen, da ich in diesem Projekt ohne Vorlage Prompts generiert habe, unterscheiden sich diese stark voneinander und ich konnte nicht von meinen Erkentnnissen bei nachfolgenden Prompts profitieren, da Informationen wie Rollen weggelassen wurden.
+Eine von uns verwendete Art der Vorlagen, die Instructions, war subjektiv gesehen etwas enttäuschend, da sie uns keine spührbaren Verbesserungen gebracht hat. Zugegebener Maßen hatten wir nach dessen Generierung nicht mehr darauf geachtet, oder diese verbessert. Meine Vermutung ist, dass die Instructions uns Tokens gespart haben, da grundlegende Informationen wie genutzte Technologien nicht jedes mal von der KI herausgefunden werden mussten, wenn diese nicht im Prompt spezifiziert waren.
+
+**Lernfortschritt**: Neben der gesammelten Erfahrung und Einsichten in verschidene Vorgehensweisen bei der Prompt generierung, konnte ich ein gutes Instruction Template verfassen, welches mir schon beim Aufsetzen eines neuen Projektes geholfen hat.
+Zusätzlich konnte ich auch einzelne Punkte aus dem Schwerpunkt Medieninformatik auffrischen, sowie Erfahrung mit provisorischer Organisationsstruktur gewinnen.
+
+Druch das Projekt habe ich auch den verlockenden Aspekt der generativen KI kennengelernt (Vibe Coding), sowie dessen Nachteil durch die breite Ergebnissspanne.
 
 **GrumpyPants:**
 
