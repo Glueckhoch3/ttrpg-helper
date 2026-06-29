@@ -601,7 +601,7 @@ Das in VS Code integrierte GitHub Copilot ermöglichte eine direkte Einbindung v
 
 **GitHub Agents**
 
-GitHub Agents wurden paralell zum integrierten Copilot genutzt, haupsächlich zum Testen.
+GitHub Agents wurden paralell zum integrierten Copilot genutzt, haupsächlich um das Feature zu testen.
 
 **Claude Code**
 
@@ -720,7 +720,7 @@ Alle nicht im MVP enthaltenen Features sowie die Story-Verzweigungen wurden nich
 
 ### 7b. Persönliche Reflexion und Fazit
 
-**Leonhardit07:**
+#### Leonhardit07:
 
 KI ist ein sehr nützliches und starkes Werkzeug, dennoch bedarf es Übung und Methodik um die Qualität des Ergebnisses zu erhalten.
 Mit generativen Modellen der aktuellen Generation Claude Opus 4.8 oder Gemini 3 selbst Personen ohne Programmier-Kenntnisse können ganze Apps erstellen.
@@ -738,32 +738,43 @@ Zusätzlich konnte ich auch einzelne Punkte aus dem Schwerpunkt Medieninformatik
 
 Druch das Projekt habe ich auch den verlockenden Aspekt der generativen KI kennengelernt (Vibe Coding), sowie dessen Nachteil durch die breite Ergebnissspanne.
 
-**GrumpyPants:**
+#### GrumpyPants:
 
-_[Zu ergänzen: Bewertung des Projekts und des eigenen Lernfortschritts; Einschätzung des Einsatzes von LLMs.]_
+Die Projektarbeit bot mir eine gute Gelegenheit, tiefer in die Nutzung generativer KI einzusteigen und sie in einem tatsächlichen Projektkontext zu nutzen. Bisher nutzte ich hauptsächlich gängige Chatbots wie ChatGPT, sowie die Inline-Vorschläge von Copilot in VS Code.
 
----
+Für die Planung des Projekts wurden Chatbots wie ChatGPT und Gemini genutzt. Sie halfen bei der Ausarbeitung der Idee, gab Vorschläge zu möglichen Projektstrukturen und Technologien und wies auf mögliche Stolperfallen hin. Dies war im Allgemeinen hilfreicher als erwartet. Das Erstellen von Mockups mit generativer KI erwies sich als Enttäuschung, hierfür mussten händische SKizzen mit FigJam erstellt werden.
+
+Vor Beginn der Implementierung wurden Instruction-Files für die jeweiligen Domänen des Projektes angelegt. Der tatsächliche praktische Nutzen war für mich nicht vollständig ersichtlich, da mehrere unserer Vorgaben teilweise oder sogar vollständig ignoriert wurden (dies war Modellabhängig, was eventuell auf Kontextgrenzen hinweist).
+
+Für die Implementierung wurde ausgiebig das _Plan_ Feature genutzt. Hiermit ließ sich sicherstellen, dass die gestellten Anforderungen wie erwartet verstanden wurden und gegebenenfalls nachgebessert werden konnten. Zudem ließ sich daraus ableiten, wie gut die eigenen Prompts formuliert waren. Eine gute Metrik für die Präzision eines Promptes waren die Menge und der Umfang der Rückfragen, die vom _Plan_ Feature gestellt werden können.
+
+Während des Semesters konnte ich ein Gefühl für den Umgang mit dem _Plan_ Feature sowie _Agents_ erlangen, das mir seither auch in anderen Projekten half. Durch die Umstellung des Bezahlmodells des Github Copilots habe ich auch ein besseres Verständnis für eine sinnvolle Modellauswahl entwickelt.
+Mittlerweile habe ich ein größeres Vertrauen in die Fähigkeiten generativer KI entwickelt, sofern sinnvolle Modellauswahl, Planung, Prompts und Reviews verfolgt wurden.
 
 ## 8. Literatur und Quellen
 
 _[Zu ergänzen: Vollständige Angabe aller verwendeten Literatur, Weblinks und Quellen.]_
 
-#### KI-Handhabung
-| Tätigkeit | Art der Verwendung | Bemerkungen |
-|-          |-                   |-            |
-| Ausarbeitung Konzept | Chat Konversation | VS Code Setup |
-| Mockups generieren | Bilderstellung | |
-| Anweisungen zu Architektur Entscheidungen | Instruction set für DevEnv mit integrierter KI wird bei lesen eines Ordners an die KI mitgegeben | Architectural Decision Record (ADR); Wird trotz Vermerk in instructions “ApplyTo: **/” vergessen zu dokumentieren. Erster Eintrag im falschen Format.
-| Epics und User Stories | Generierung des Doku Teils | Chat-GPT 22.04.2025 |
-| Planning the backend | Backend erstellen mit Hilfe des Planning Skills. Gespeicherter Plan dann implementieren lassen. | Tests mit externen Daten (File) enthalten Fehler, keine Lösung der KI zufriedenstellend.
-| Implementing Frontend components | Plan/Agent | Missachtung der Instruction Files (verwendet Composition API statt Options API)
-| Backend Erweiterung | Plan/Agent in Github Agents Tab | Gute Qualität, schnell;Codex modell; Prompt Guidance ist nett.
-| FrontendUI mit PrimeVue Komponenten erstellen | Plan/Agent mit Copilot; Modell GPT5 mini; gemini 3.1 pro | GPT-5 mini: nicht in der Lage, einzelne Komponenten zu implementieren, auch nach mehrfachen hin und her mit beschreibung des outputs. beispiel zur verwendung der komponenten scheint notwendig zu sein; gemini: sehr viel kompetenter, scheint gutes verständnis für ui layout und interaktionsmuster zu besitzen
-| Debugging | Chat in IDE | große Änderungen/ Commits lassen sich schwer lesen/ verstehen/ debuggen. KI kann beim einarbeiten helfen (übersicht geben lassen, dann immer tiefer einsteigen). Debugging selbst funktioniert besser mit “besseren” modellen, allerdings am besten wenn mögliche problemstellen vom user angesprochen werden können
-| UI verbessern | Chat in IDE | bei kleinen änderungen und mit genügend referenzmaterial lässt sich ohne nennenswerte probleme UI umbauen
-| UI verbessern (klein) | Claude Code Integration, Chat addon (Sonnet+Opus) | schnellere Ergebnisse als mit Copilot Modellen, kann Kontext besser erkennen (auch bei nicht ausführlichen Anweisungen) und liefert entsprechend bessere Ergebnisse.
-| Generell | Chat in IDE | vor allem unter Zeitdruck/ mit geringer Motivation ist es sehr leicht, den Output einfach hinzunehmen und nicht zu hinterfragen; kleinschrittig mit bestehendem mentalen plan/ modell zu arbeiten erlaubt überblick zu behalten, fehler früh zu erkennen und abzuwenden
+<font color="red">evtl KI-Handhabung in anhang veschieben; ist ja keine quelle unabhängig unserer eigenen gedanken; entweder kapitel weglassen oder notiz mit: außer KI wurden keine externen quellen verwendet (oder so ähnlich)</font>
 
+#### KI-Handhabung
+
+Die nachfolgende Tabelle wurde aus dem geteilten Google-Doc übernommen und beschreibt unsere Erfahrungen mit KI während des Projekts in Notiz-Form. Für diese Dokumentation wurde sie inhaltlich nicht überarbeitet, ausformuliert oder verbessert. Sie diente lediglich als Grundlage für die Ausformulierungen in vorherigen Kapiteln.
+
+| Tätigkeit                                     | Art der Verwendung                                                                               | Bemerkungen                                                                                                                                                                                                                                                                                                          |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ausarbeitung Konzept                          | Chat Konversation                                                                                | VS Code Setup                                                                                                                                                                                                                                                                                                        |
+| Mockups generieren                            | Bilderstellung                                                                                   |                                                                                                                                                                                                                                                                                                                      |
+| Anweisungen zu Architektur Entscheidungen     | Instruction set für DevEnv mit integrierter KI wird bei lesen eines Ordners an die KI mitgegeben | Architectural Decision Record (ADR); Wird trotz Vermerk in instructions “ApplyTo: \*\*/” vergessen zu dokumentieren. Erster Eintrag im falschen Format.                                                                                                                                                              |
+| Epics und User Stories                        | Generierung des Doku Teils                                                                       | Chat-GPT 22.04.2025                                                                                                                                                                                                                                                                                                  |
+| Planning the backend                          | Backend erstellen mit Hilfe des Planning Skills. Gespeicherter Plan dann implementieren lassen.  | Tests mit externen Daten (File) enthalten Fehler, keine Lösung der KI zufriedenstellend.                                                                                                                                                                                                                             |
+| Implementing Frontend components              | Plan/Agent                                                                                       | Missachtung der Instruction Files (verwendet Composition API statt Options API)                                                                                                                                                                                                                                      |
+| Backend Erweiterung                           | Plan/Agent in Github Agents Tab                                                                  | Gute Qualität, schnell;Codex modell; Prompt Guidance ist nett.                                                                                                                                                                                                                                                       |
+| FrontendUI mit PrimeVue Komponenten erstellen | Plan/Agent mit Copilot; Modell GPT5 mini; gemini 3.1 pro                                         | GPT-5 mini: nicht in der Lage, einzelne Komponenten zu implementieren, auch nach mehrfachen hin und her mit beschreibung des outputs. beispiel zur verwendung der komponenten scheint notwendig zu sein; gemini: sehr viel kompetenter, scheint gutes verständnis für ui layout und interaktionsmuster zu besitzen   |
+| Debugging                                     | Chat in IDE                                                                                      | große Änderungen/ Commits lassen sich schwer lesen/ verstehen/ debuggen. KI kann beim einarbeiten helfen (übersicht geben lassen, dann immer tiefer einsteigen). Debugging selbst funktioniert besser mit “besseren” modellen, allerdings am besten wenn mögliche problemstellen vom user angesprochen werden können |
+| UI verbessern                                 | Chat in IDE                                                                                      | bei kleinen änderungen und mit genügend referenzmaterial lässt sich ohne nennenswerte probleme UI umbauen                                                                                                                                                                                                            |
+| UI verbessern (klein)                         | Claude Code Integration, Chat addon (Sonnet+Opus)                                                | schnellere Ergebnisse als mit Copilot Modellen, kann Kontext besser erkennen (auch bei nicht ausführlichen Anweisungen) und liefert entsprechend bessere Ergebnisse.                                                                                                                                                 |
+| Generell                                      | Chat in IDE                                                                                      | vor allem unter Zeitdruck/ mit geringer Motivation ist es sehr leicht, den Output einfach hinzunehmen und nicht zu hinterfragen; kleinschrittig mit bestehendem mentalen plan/ modell zu arbeiten erlaubt überblick zu behalten, fehler früh zu erkennen und abzuwenden                                              |
 
 ---
 
