@@ -1,6 +1,6 @@
 # Projekt TTRPG Helper (DE)
 
-von Leonhardit07 und GrumpyPants <font color="red">evtl auf Klarnamen ändern? dann auch unten bei reflektion</font>
+von lescit07 und tifait01
 
 ---
 
@@ -8,9 +8,11 @@ von Leonhardit07 und GrumpyPants <font color="red">evtl auf Klarnamen ändern? d
 
 ### 1a. Vorstellung des Projekts
 
+_Hinweis: die hier vorgelegte Beschreibung bezieht sich auf den geplanten Projektumfang._
+
 Der TTRPG Helper ist ein browserbasiertes Tool zum Anlegen und Verwalten von Abenteuern sowie zugehöriger Non-Player-Characters (NPCs) für Tabletop-Rollenspiele (TTRPGs). Spielleiter können Abenteuer strukturiert erfassen, in Kapitel und Begegnungen untergliedern sowie NPCs mit Hintergrundinformationen und Statistiken anlegen. Alle Daten lassen sich als JSON-Datei exportieren und wieder importieren. Zur Erstellung und Überarbeitung von Inhalten kann zusätzlich ein integriertes LLM herangezogen werden.
 
-Das Projekt entsteht im Rahmen des Wahlpflichtfachmoduls _KI-gestützte Softwareentwicklung_ an der Hochschule Esslingen (Sommersemester 2026).
+Das Projekt entsteht im Rahmen des Wahlpflichtfachmoduls _LLM-gestützte Softwareentwicklung_ an der Hochschule Esslingen (Sommersemester 2026).
 
 ### 1b. Zielsetzung und Relevanz
 
@@ -66,8 +68,8 @@ Spielleiter von Tabletop-Rollenspielen stehen häufig vor der Aufgabe, mehrstün
 
 **Nicht-funktionale Anforderungen:**
 
-- Browserbasiert, keine Installation auf Client-Seite notwendig
-- Lokal betrieben <font color="red">Widerspruch?</font>
+- Browserbasiert
+- Lokal betrieben
 - Sicherheit: Validierung aller externen Daten, kein Path Traversal, keine Codeausführung aus JSON-Daten
 
 Sicherheitsanforderungen (SEC-01 bis SEC-19) sowie Missbrauchsszenarien (M1–M6) sind im Anhang vollständig aufgeführt.
@@ -134,17 +136,19 @@ _Akzeptanzkriterien:_ Datei wird im JSON-Format gespeichert und enthält Beschre
 
 ---
 
-#### EPIC 2: Story-Verzweigungen <font color="red">wurde aus MVP weggelassen, wie darauf hinweisen? -> habe hinweis in projektzusammenfassung</font>
+#### EPIC 2: Story-Verzweigungen
 
-**US-5: Story-Knoten hinzufügen (MVP)**
+**US-5: Story-Knoten hinzufügen (MVP\*)**
 
 Als Spielleiter möchte ich meinem Abenteuer mehrere Story-Abschnitte (Kapitel) hinzufügen, damit ich die Handlung strukturieren kann.
 
-**US-6: Verzweigungen zwischen Knoten definieren (MVP)**
+**US-6: Verzweigungen zwischen Knoten definieren (MVP\*)**
 
 Als Spielleiter möchte ich Entscheidungen zwischen Story-Knoten definieren, damit Spieler unterschiedliche Wege gehen können.
 
 _Akzeptanzkriterien:_ Nutzer kann einem Knoten mehrere Auswahlmöglichkeiten hinzufügen; jede Auswahl verweist auf einen Ziel-Knoten; Verweise sind valide.
+
+_\* Wurde aus zeitlichen Gründen nicht umgesetzt_
 
 ---
 
@@ -192,7 +196,7 @@ _Akzeptanzkriterien:_ Nutzer kann JSON-Datei auswählen; System lädt Struktur k
 
 ### 3a. Gesamtübersicht der Architektur
 
-Der TTRPG Helper folgt einer klassischen Client-Server-Architektur: Eine Vue 3 Single-Page-Application kommuniziert über eine REST-API mit einem Node.js-Backend. Als Persistenzschicht dient das lokale Dateisystem – Abenteuer werden als JSON-Dateien gespeichert. <font color="red">kein externer server wird betrieben, also ist loakle "installation"/ ausführung notwendig. verweis wieder auf NFRs</font>
+Der TTRPG Helper folgt einer klassischen Client-Server-Architektur: Eine Vue 3 Single-Page-Application kommuniziert über eine REST-API mit einem Node.js-Backend. Als Persistenzschicht dient das lokale Dateisystem – Abenteuer werden als JSON-Dateien gespeichert.
 
 ```plantuml
 @startuml
@@ -272,12 +276,14 @@ component App {
 
 **UI-Konzept:**
 
-Die Benutzeroberfläche ist zweispaltig aufgebaut: Links befindet sich der Abenteuer-Editor mit Kapiteln und Begegnungen, rechts ein aufklappbares NPC-Panel. Die Breite beider Panels ist per `Splitter`-Divider (PrimeVue) anpassbar. Der Quill-Editor ermöglicht Rich-Text-Eingabe für Story-Texte und Begegnungsbeschreibungen. <font color="red">hier wird fertiges design beschrieben, aber mockups gezeigt. auftrennen in 2 sektionen? also gegenüberstellung plan und umsetzung? oder einfach screenshot des aktuellen standes einfügen?</font>
+Die Benutzeroberfläche des Editors ist zweispaltig aufgebaut: Links befindet sich der Abenteuer-Editor mit Kapiteln und Begegnungen, rechts ein aufklappbares NPC-Panel. Die Breite beider Panels ist per `Splitter`-Divider (PrimeVue) anpassbar. Der Quill-Editor ermöglicht Rich-Text-Eingabe für Story-Texte und Begegnungsbeschreibungen. Die ursprünglichen UI Mockups, die den zu Anfang geplanten Funktionsumfang darstellen, sowie die überarbeitete Editor-Ansicht, werden aus Platzgründen hier verlinkt ([Übersicht](/doc/images/UI_Mockup_1.png), [Editor](/doc/images/UI_Mockup_2.png), [EditorV2](/doc/images/UI_Mockup_final.png)).
 
-_Hinweis: Die UI-Mockups zeigen den geplanten Funktionsumfang; der aktuelle Fokus liegt auf manueller Erstellung (MVP)._
+<!-- _Hinweis: Die UI-Mockups zeigen den geplanten Funktionsumfang; der aktuelle Fokus liegt auf manueller Erstellung (MVP)._
 
 ![UI-Mockup Übersicht](./images/UI_Mockup_1.png)
-![UI-Mockup Editor](./images/UI_Mockup_2.png)
+![UI-Mockup Editor](./images/UI_Mockup_2.png) -->
+
+![UI-final Editor](./images/UI_final_editor.png)
 
 **Routing:**
 
@@ -622,11 +628,9 @@ Dieser strukturierte Ansatz reduzierte die Häufigkeit unpassender oder zu weit 
 
 ### 5c. Generierte Assets (Code, Bilder, Audio, Video, Text)
 
-<font color="red">Überprüfen und weiter ausführen, bzw. Assets hinterlegen</font>
-
 KI-generierte Inhalte begleiteten das Projekt in verschiedenen Phasen und Formaten. Die nachfolgende Übersicht gibt einen Überblick über die entstandenen Asset-Typen und die jeweils verwendeten Werkzeuge:
 
-- **Mockups (Bilder):** Visuelle Entwürfe für die Benutzeroberfläche wurden auf Basis textueller Anforderungen durch KI-Modelle generiert und als Ausgangspunkt für die weitere UI-Ausarbeitung verwendet.
+- **Mockups (Bilder):** Visuelle Entwürfe für die Benutzeroberfläche wurden auf Basis textueller Anforderungen durch KI-Modelle generiert und teilweise als Ausgangspunkt für die weitere UI-Ausarbeitung verwendet.
 - **Vorschläge (Google Doc):** Architektur-, Feature- und Methodenvorschläge wurden in gemeinsam genutzten Dokumenten gesammelt und dienen als Referenz für Entscheidungen im Projektverlauf.
 - **Erklärungen und Evaluierungen (Google Doc):** Konzepterklärungen sowie Bewertungen von Lösungsalternativen wurden ebenfalls dokumentiert, um den Entscheidungsprozess nachvollziehbar zu halten.
 - **Codegenerierung (Copilot Chats, GitHub Agents):** Der größte Teil des KI-generierten Codes entstand über Copilot-Chats und GitHub Agents. Die Ergebnisse wurden anschließend geprüft, angepasst und in das Projekt integriert.
@@ -720,7 +724,7 @@ Alle nicht im MVP enthaltenen Features sowie die Story-Verzweigungen wurden nich
 
 ### 7b. Persönliche Reflexion und Fazit
 
-#### Leonhardit07:
+#### lescit07:
 
 KI ist ein sehr nützliches und starkes Werkzeug, dennoch bedarf es Übung und Methodik um die Qualität des Ergebnisses zu erhalten.
 Mit generativen Modellen der aktuellen Generation Claude Opus 4.8 oder Gemini 3 selbst Personen ohne Programmier-Kenntnisse können ganze Apps erstellen.
@@ -738,7 +742,7 @@ Zusätzlich konnte ich auch einzelne Punkte aus dem Schwerpunkt Medieninformatik
 
 Druch das Projekt habe ich auch den verlockenden Aspekt der generativen KI kennengelernt (Vibe Coding), sowie dessen Nachteil durch die breite Ergebnissspanne.
 
-#### GrumpyPants:
+#### tifait01:
 
 Die Projektarbeit bot mir eine gute Gelegenheit, tiefer in die Nutzung generativer KI einzusteigen und sie in einem tatsächlichen Projektkontext zu nutzen. Bisher nutzte ich hauptsächlich gängige Chatbots wie ChatGPT, sowie die Inline-Vorschläge von Copilot in VS Code.
 
@@ -753,11 +757,13 @@ Mittlerweile habe ich ein größeres Vertrauen in die Fähigkeiten generativer K
 
 ## 8. Literatur und Quellen
 
-_[Zu ergänzen: Vollständige Angabe aller verwendeten Literatur, Weblinks und Quellen.]_
+Neben der Verwendung generativer KI wurden keine externen Quellen herangezogen.
 
-<font color="red">evtl KI-Handhabung in anhang veschieben; ist ja keine quelle unabhängig unserer eigenen gedanken; entweder kapitel weglassen oder notiz mit: außer KI wurden keine externen quellen verwendet (oder so ähnlich)</font>
+---
 
-#### KI-Handhabung
+## 9. Anhang
+
+### KI-Handhabung
 
 Die nachfolgende Tabelle wurde aus dem geteilten Google-Doc übernommen und beschreibt unsere Erfahrungen mit KI während des Projekts in Notiz-Form. Für diese Dokumentation wurde sie inhaltlich nicht überarbeitet, ausformuliert oder verbessert. Sie diente lediglich als Grundlage für die Ausformulierungen in vorherigen Kapiteln.
 
@@ -775,10 +781,6 @@ Die nachfolgende Tabelle wurde aus dem geteilten Google-Doc übernommen und besc
 | UI verbessern                                 | Chat in IDE                                                                                      | bei kleinen änderungen und mit genügend referenzmaterial lässt sich ohne nennenswerte probleme UI umbauen                                                                                                                                                                                                            |
 | UI verbessern (klein)                         | Claude Code Integration, Chat addon (Sonnet+Opus)                                                | schnellere Ergebnisse als mit Copilot Modellen, kann Kontext besser erkennen (auch bei nicht ausführlichen Anweisungen) und liefert entsprechend bessere Ergebnisse.                                                                                                                                                 |
 | Generell                                      | Chat in IDE                                                                                      | vor allem unter Zeitdruck/ mit geringer Motivation ist es sehr leicht, den Output einfach hinzunehmen und nicht zu hinterfragen; kleinschrittig mit bestehendem mentalen plan/ modell zu arbeiten erlaubt überblick zu behalten, fehler früh zu erkennen und abzuwenden                                              |
-
----
-
-## 9. Anhang
 
 ### Missbrauchsszenarien und Sicherheitsanforderungen
 
@@ -870,11 +872,3 @@ Eine kompromittierte Library soll Codeausführung oder einen Supply-Chain-Angrif
 | SEC-17 | Keine Codeausführung               | M1         | Security Requirement | Integrity                   | Secure Coding                     | US-4, US-12       |
 | SEC-18 | Keine sensiblen Pfade in Logs      | M2         | Security Requirement | Confidentiality             | Information Disclosure Prevention | US-4              |
 | SEC-19 | Fail Fast bei Fehlern              | M1         | Security Requirement | Integrity                   | Secure Design                     | US-12             |
-
-### Prompt-Transkripte
-
-_[Verweise auf Dateien im Git-Repository genügen.]_
-
-### Weitere Datenblätter
-
-_[Zu ergänzen: Datenblätter, weitere Transkripte, etc.]_
