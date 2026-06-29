@@ -748,6 +748,23 @@ _[Zu ergänzen: Bewertung des Projekts und des eigenen Lernfortschritts; Einsch�
 
 _[Zu ergänzen: Vollständige Angabe aller verwendeten Literatur, Weblinks und Quellen.]_
 
+#### KI-Handhabung
+| Tätigkeit | Art der Verwendung | Bemerkungen |
+|-          |-                   |-            |
+| Ausarbeitung Konzept | Chat Konversation | VS Code Setup |
+| Mockups generieren | Bilderstellung | |
+| Anweisungen zu Architektur Entscheidungen | Instruction set für DevEnv mit integrierter KI wird bei lesen eines Ordners an die KI mitgegeben | Architectural Decision Record (ADR); Wird trotz Vermerk in instructions “ApplyTo: **/” vergessen zu dokumentieren. Erster Eintrag im falschen Format.
+| Epics und User Stories | Generierung des Doku Teils | Chat-GPT 22.04.2025 |
+| Planning the backend | Backend erstellen mit Hilfe des Planning Skills. Gespeicherter Plan dann implementieren lassen. | Tests mit externen Daten (File) enthalten Fehler, keine Lösung der KI zufriedenstellend.
+| Implementing Frontend components | Plan/Agent | Missachtung der Instruction Files (verwendet Composition API statt Options API)
+| Backend Erweiterung | Plan/Agent in Github Agents Tab | Gute Qualität, schnell;Codex modell; Prompt Guidance ist nett.
+| FrontendUI mit PrimeVue Komponenten erstellen | Plan/Agent mit Copilot; Modell GPT5 mini; gemini 3.1 pro | GPT-5 mini: nicht in der Lage, einzelne Komponenten zu implementieren, auch nach mehrfachen hin und her mit beschreibung des outputs. beispiel zur verwendung der komponenten scheint notwendig zu sein; gemini: sehr viel kompetenter, scheint gutes verständnis für ui layout und interaktionsmuster zu besitzen
+| Debugging | Chat in IDE | große Änderungen/ Commits lassen sich schwer lesen/ verstehen/ debuggen. KI kann beim einarbeiten helfen (übersicht geben lassen, dann immer tiefer einsteigen). Debugging selbst funktioniert besser mit “besseren” modellen, allerdings am besten wenn mögliche problemstellen vom user angesprochen werden können
+| UI verbessern | Chat in IDE | bei kleinen änderungen und mit genügend referenzmaterial lässt sich ohne nennenswerte probleme UI umbauen
+| UI verbessern (klein) | Claude Code Integration, Chat addon (Sonnet+Opus) | schnellere Ergebnisse als mit Copilot Modellen, kann Kontext besser erkennen (auch bei nicht ausführlichen Anweisungen) und liefert entsprechend bessere Ergebnisse.
+| Generell | Chat in IDE | vor allem unter Zeitdruck/ mit geringer Motivation ist es sehr leicht, den Output einfach hinzunehmen und nicht zu hinterfragen; kleinschrittig mit bestehendem mentalen plan/ modell zu arbeiten erlaubt überblick zu behalten, fehler früh zu erkennen und abzuwenden
+
+
 ---
 
 ## 9. Anhang
