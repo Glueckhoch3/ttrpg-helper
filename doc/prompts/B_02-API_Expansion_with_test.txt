@@ -1,6 +1,0 @@
-Expand the application to provide a json File on an API called export.
-The Json file is stored locally.
-Improve the tests to use Json objects to validate if the code works.
-
-Plan:
-plan_backendJsonProvidingAPI.md
