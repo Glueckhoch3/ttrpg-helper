@@ -2,12 +2,14 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import i18n from './i18n'
+import { initTheme } from './themes'
 
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
 import { definePreset } from '@primeuix/themes'
 import 'primeicons/primeicons.css'
 
+initTheme()
 const app = createApp(App)
 
 app.use(router)
@@ -67,7 +69,8 @@ const CustomPreset = definePreset(Aura, {
 
 app.use(PrimeVue, {
     theme: {
-        preset: CustomPreset
+        preset: CustomPreset,
+        options: { darkModeSelector: '.app-dark' }
     }
 })
 

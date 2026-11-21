@@ -10,6 +10,7 @@ Vue 3 + Vite + PrimeVue frontend, Express 5 (ESM) + AJV + Jest backend. It was a
 ## Architecture
 - `backend/` Express 5, ESM, `node:sqlite` (no native deps), SSE for live updates, binary image upload via `express.raw` (magic-byte checked). Serves built frontend in production → one process, one port, reachable at `http://<host-ip>:3000` in the WLAN.
 - `frontend/` Vue 3 + PrimeVue + vue-router. Map editor is plain SVG (no canvas lib).
+- Looks: `frontend/src/themes.js` template, ADR-012; own CSS uses `var(--app-*)` only (see CLAUDE.md).
 - Auth: players join with a name + shared group password (ADR-009; HttpOnly cookie). GM unlocks with a PIN (env `GM_PIN`, auto-generated + printed at start when unset) → bearer token. Server enforces: locked story parts are never sent to players.
 
 ## Data model (SQLite)
@@ -18,7 +19,7 @@ sessions(id, number, title, played_on, summary) · notes(id, session_id, author,
 ## API (all JSON under /api unless noted)
 - `POST /auth/join {password}` (sets cookie) · `POST /auth/leave` · `GET /auth/me` · `POST /auth/gm {pin}` → `{token}` · `GET /health` · `GET /events` (SSE). All other routes need the member cookie or GM token.
 - Sessions: `GET/POST /sessions`, `GET/PATCH/DELETE /sessions/:id`; notes: `GET/POST /sessions/:id/notes`, `PATCH/DELETE /notes/:id`; `GET/POST /sessions/:id/attachments` (raw PNG/PDF), `GET /files/:name`
-- Story (GM write; players read unlocked only): `GET/POST /story`, `PATCH/DELETE /story/:id`, `POST /story/:id/unlock|lock`, `POST /story/reorder`
+- Story (GM write; players only ever see unlocked parts, locked ones are 404/omitted): `GET/POST /story`, `PATCH/DELETE /story/:id`, `POST /story/:id/unlock|lock`, `POST /story/reorder`
 - Maps: `GET/POST /maps` (raw image upload, `?title=`), `GET/PATCH/DELETE /maps/:id`; tokens `GET/POST /maps/:id/tokens`, `PATCH/DELETE /tokens/:id`
 
 ## Frontend views

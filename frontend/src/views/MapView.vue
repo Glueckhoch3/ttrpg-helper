@@ -208,11 +208,11 @@ const attach = () => run(async () => {
 
 <style scoped>
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 1rem; align-items: start; }
-.stage { background: #222; border-radius: 8px; overflow: auto; }
+.stage { background: var(--app-stage); border-radius: 8px; overflow: auto; }
 svg { display: block; width: 100%; height: auto; user-select: none; }
 aside .card { display: flex; flex-direction: column; gap: .4rem; }
 .palette { display: flex; flex-wrap: wrap; gap: .3rem; }
-.palette button { font-size: 1.4rem; width: 2.4rem; height: 2.4rem; cursor: pointer; border: 1px solid #ccc; border-radius: 6px; background: #fff; }
-.sw { width: 1.6rem; height: 1.6rem; border: 1px solid #888; border-radius: 50%; cursor: pointer; }
+.palette button { font-size: 1.4rem; width: 2.4rem; height: 2.4rem; cursor: pointer; border: 1px solid var(--app-border); border-radius: 6px; background: var(--app-panel); color: var(--app-text); }
+.sw { width: 1.6rem; height: 1.6rem; border: 1px solid var(--app-muted); border-radius: 50%; cursor: pointer; }
 @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
 </style>

@@ -3,8 +3,13 @@ import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
+import Select from 'primevue/select'
+import { THEME_IDS, themeChoice, setTheme } from '@/themes'
+import { useI18n } from 'vue-i18n'
 import { auth, setName, setToken, loginGm, checkSession, joinGroup, leaveGroup } from '@/lib/api'
 
+const { t } = useI18n()
+const themeOptions = THEME_IDS.map((id) => ({ id, label: t(`theme.${id}`) }))
 const nameInput = ref(auth.name)
 const groupPw = ref('')
 const showGm = ref(false)
@@ -40,6 +45,7 @@ async function gmLogin() {
       <router-link to="/story">{{ $t('nav.story') }}</router-link>
       <router-link to="/maps">{{ $t('nav.maps') }}</router-link>
       <span class="spacer" />
+      <Select :model-value="themeChoice" :options="themeOptions" option-label="label" option-value="id" size="small" :aria-label="$t('theme.label')" :title="$t('theme.label')" @update:model-value="setTheme" />
       <span>{{ auth.name }}<template v-if="auth.token"> · {{ $t('nav.gm') }}</template></span>
       <Button v-if="auth.token" size="small" severity="secondary" :label="$t('nav.leaveGm')" @click="setToken('')" />
       <Button v-else size="small" severity="secondary" :label="$t('nav.gmLogin')" @click="showGm = !showGm" />
@@ -56,17 +62,19 @@ async function gmLogin() {
 </template>
 
 <style>
-body { margin: 0; font-family: system-ui, sans-serif; background: var(--p-surface-50, #fafafa); color: #222; }
-.nav { display: flex; gap: 1rem; align-items: center; padding: .6rem 1rem; background: #fff; border-bottom: 1px solid #ddd; flex-wrap: wrap; }
-.nav a { text-decoration: none; color: #0f766e; font-weight: 500; }
-.nav a.router-link-active { border-bottom: 2px solid #0f766e; }
+body { margin: 0; font-family: system-ui, sans-serif; background: var(--app-bg); color: var(--app-text); }
+a { color: var(--app-accent); }
+input[type=range], input[type=file] { accent-color: var(--app-accent); }
+.nav { display: flex; gap: 1rem; align-items: center; padding: .6rem 1rem; background: var(--app-panel); border-bottom: 1px solid var(--app-border); flex-wrap: wrap; }
+.nav a { text-decoration: none; color: var(--app-accent); font-weight: 500; }
+.nav a.router-link-active { border-bottom: 2px solid var(--app-accent); }
 .spacer { flex: 1; }
-.gm { padding: .6rem 1rem; display: flex; gap: .5rem; align-items: center; background: #fff8e1; }
+.gm { padding: .6rem 1rem; display: flex; gap: .5rem; align-items: center; background: var(--app-warn); }
 main { padding: 1rem; max-width: 1400px; margin: 0 auto; }
 .join { max-width: 22rem; margin: 15vh auto; display: flex; flex-direction: column; gap: .8rem; text-align: center; }
-.err { color: #b00020; }
-.card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: .8rem 1rem; margin-bottom: .8rem; }
+.err { color: var(--app-danger); }
+.card { background: var(--app-panel); border: 1px solid var(--app-border); border-radius: 8px; padding: .8rem 1rem; margin-bottom: .8rem; }
 .row { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
 .pre { white-space: pre-wrap; }
-.muted { color: #777; font-size: .85rem; }
+.muted { color: var(--app-muted); font-size: .85rem; }
 </style>

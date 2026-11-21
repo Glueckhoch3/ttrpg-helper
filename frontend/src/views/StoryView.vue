@@ -33,7 +33,7 @@ const move = (i, d) => run(() => {
 <template>
   <h2>{{ $t('story.title') }}</h2>
   <p v-if="!parts.length" class="muted">{{ $t('story.empty') }}<template v-if="!gm">{{ $t('story.emptyPlayer') }}</template></p>
-  <div v-for="(p, i) in parts" :key="p.id" class="card" :style="!p.unlocked && { opacity: gm ? 0.85 : 0.6 }">
+  <div v-for="(p, i) in parts" :key="p.id" class="card" :style="!p.unlocked && { opacity: 0.8 }">
     <div class="row">
       <strong>{{ p.unlocked ? '📖' : '🔒' }} {{ i + 1 }}. {{ p.title }}</strong>
       <span class="spacer" />
@@ -50,8 +50,7 @@ const move = (i, d) => run(() => {
       <Textarea v-model="edit.body" rows="8" fluid />
       <div class="row"><Button size="small" :label="$t('common.save')" @click="save(p)" /><Button size="small" severity="secondary" :label="$t('common.cancel')" @click="editing = null" /></div>
     </template>
-    <div v-else-if="p.body !== null" class="pre">{{ p.body }}</div>
-    <div v-else class="muted">{{ $t('story.locked') }}</div>
+    <div v-else class="pre">{{ p.body }}</div>
   </div>
   <div v-if="gm" class="card">
     <strong>{{ $t('story.new') }}</strong>

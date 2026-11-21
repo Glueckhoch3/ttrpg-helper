@@ -52,10 +52,9 @@
   "story": {
     "title": "Story",
     "empty": "Nothing here yet.",
-    "emptyPlayer": " The GM will unlock story parts as you progress.",
+    "emptyPlayer": " The GM will reveal story parts as you progress.",
     "unlock": "Unlock for group",
     "lock": "Lock",
-    "locked": "Locked – not yet discovered.",
     "new": "New story part (GM)",
     "titlePlaceholder": "Title",
     "bodyPlaceholder": "Content (only visible to players once unlocked)",
@@ -110,5 +109,14 @@
     "lockedHint": "Grid is locked. Place and move symbols; unlock to change the grid.",
     "unlockedHint": "Step 1: fit the grid to the picture (type, cell size, offset), then lock it to place symbols.",
     "confirmUnlock": "{n} symbol(s) are on this map. They stay in their grid cells, so they will move with the grid while you adjust it. Unlock anyway?"
+  },
+  "theme": {
+    "label": "Look",
+    "auto": "Auto (system)",
+    "daylight": "Daylight",
+    "parchment": "Parchment",
+    "midnight": "Midnight",
+    "dungeon": "Dungeon",
+    "forest": "Forest"
   }
 }
