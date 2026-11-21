@@ -12,6 +12,7 @@ async function toDataUrl(url) {
 export async function mapToPngBlob(svgEl, { width, height, maxSide = 4096 }) {
   const clone = svgEl.cloneNode(true)
   clone.querySelectorAll('[data-noexport]').forEach((n) => n.remove())
+  clone.querySelectorAll('[data-token]').forEach((n) => { n.style.opacity = '1' })
   for (const img of clone.querySelectorAll('image')) img.setAttribute('href', await toDataUrl(img.getAttribute('href')))
   clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
   clone.setAttribute('width', width)

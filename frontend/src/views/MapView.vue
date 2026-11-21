@@ -47,6 +47,12 @@ const run = async (fn) => { error.value = ''; try { await fn() } catch (e) { err
 
 // --- grid calibration (local while sliding, saved on change) ---
 const setGrid = (k, v) => { map.value[k] = v }
+const locked = computed(() => !!map.value.grid_locked)
+const setLock = (v) => {
+  if (!v && tokens.value.length && !confirm(t('map.confirmUnlock', { n: tokens.value.length }))) return
+  selectedId.value = null
+  return run(async () => { await api.patch(`/maps/${props.id}`, { grid_locked: v }); await load() })
+}
 const saveGrid = () => run(() => api.patch(`/maps/${props.id}`, {
   grid_type: map.value.grid_type, cell_px: Number(map.value.cell_px), offset_x: Number(map.value.offset_x), offset_y: Number(map.value.offset_y),
 }))
@@ -72,6 +78,7 @@ function svgPoint(e) {
 let press = null
 const stackAt = (tk) => tokens.value.filter((x) => x.col === tk.col && x.row === tk.row).sort((a, b) => a.id - b.id)
 function down(e, tk) {
+  if (!locked.value) return
   const stack = stackAt(tk)
   const sel = stack.find((x) => x.id === selectedId.value)
   const target = sel ?? tk
@@ -133,7 +140,7 @@ const attach = () => run(async () => {
           <g v-else-if="map.grid_type === 'hex'" stroke="#000" stroke-opacity=".45" :stroke-width="Math.max(1, map.cell_px / 40)" fill="none" pointer-events="none">
             <polygon v-for="c in cells" :key="`${c.col}_${c.row}`" :points="hexPoints(c.x, c.y, map.cell_px)" />
           </g>
-          <g v-for="t in ordered" :key="t.id" style="cursor:grab;touch-action:none" @pointerdown.stop="down($event, t)">
+          <g v-for="t in ordered" :key="t.id" data-token :style="{ cursor: locked ? 'grab' : 'default', touchAction: 'none', opacity: locked ? 1 : 0.45, pointerEvents: locked ? 'auto' : 'none' }" @pointerdown.stop="down($event, t)">
             <circle :cx="pos(t).x" :cy="pos(t).y" :r="radius(t)" :fill="t.color" fill-opacity=".35" :stroke="t.color" :stroke-width="t.id === selectedId ? map.cell_px / 10 : map.cell_px / 25" />
             <text :x="pos(t).x" :y="pos(t).y" text-anchor="middle" dominant-baseline="central" :font-size="radius(t) * 1.3">{{ t.symbol }}</text>
             <text v-if="t.label" :x="pos(t).x" :y="pos(t).y + radius(t) + map.cell_px * 0.3" text-anchor="middle" :font-size="map.cell_px * 0.3" font-weight="bold" fill="#fff" stroke="#000" :stroke-width="map.cell_px * 0.08" paint-order="stroke">{{ t.label }}</text>
@@ -147,9 +154,11 @@ const attach = () => run(async () => {
 
       <aside>
         <div class="card">
-          <strong>{{ $t('map.grid') }}</strong>
-          <div class="row"><Select :modelValue="map.grid_type" :options="GRIDS" optionLabel="l" optionValue="v" @update:modelValue="setGrid('grid_type', $event); saveGrid()" /></div>
-          <template v-if="map.grid_type !== 'none'">
+          <strong>{{ $t('map.grid') }} {{ locked ? '🔒' : '🔓' }}</strong>
+          <p class="muted">{{ locked ? $t('map.lockedHint') : $t('map.unlockedHint') }}</p>
+          <Button size="small" :severity="locked ? 'secondary' : 'success'" :icon="locked ? 'pi pi-lock-open' : 'pi pi-lock'" :label="locked ? $t('map.unlockGrid') : $t('map.lockGrid')" @click="setLock(!locked)" />
+          <div v-if="!locked" class="row"><Select :modelValue="map.grid_type" :options="GRIDS" optionLabel="l" optionValue="v" @update:modelValue="setGrid('grid_type', $event); saveGrid()" /></div>
+          <template v-if="!locked && map.grid_type !== 'none'">
             <label class="muted">{{ $t('map.cellSize') }}: {{ Math.round(map.cell_px) }}</label>
             <input type="range" min="10" :max="Math.max(map.img_w, map.img_h) / 4" step="1" :value="map.cell_px" @input="setGrid('cell_px', +$event.target.value)" @change="saveGrid" />
             <label class="muted">{{ $t('map.offsetX') }}: {{ Math.round(map.offset_x) }}</label>
@@ -159,12 +168,12 @@ const attach = () => run(async () => {
           </template>
         </div>
 
-        <div class="card">
+        <div v-if="locked" class="card">
           <strong>{{ $t('map.addSymbol') }}</strong>
           <div class="palette"><button v-for="[s, n] in PALETTE" :key="s" :title="$t(`map.symbols.${n}`)" @click="addToken(s)">{{ s }}</button></div>
         </div>
 
-        <div v-if="selected" class="card">
+        <div v-if="locked && selected" class="card">
           <strong>{{ $t('map.editSymbol') }}</strong>
           <InputText :modelValue="selected.label" :placeholder="$t('map.label')" maxlength="60" fluid @change="updateToken(selected, { label: $event.target.value })" />
           <InputText :modelValue="selected.symbol" maxlength="8" fluid @change="updateToken(selected, { symbol: $event.target.value })" />
