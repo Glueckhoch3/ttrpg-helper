@@ -1,0 +1,26 @@
+{
+  "app": { "title": "TTRPG Helper" },
+  "nav": { "sessions": "Sessions", "story": "Story", "maps": "Maps", "gm": "GM", "gmLogin": "GM login", "leaveGm": "Leave GM", "changeName": "Change name", "logout": "Leave group" },
+  "join": { "who": "Join your group", "name": "Your name", "password": "Group password", "submit": "Join the group", "loading": "Loading…" },
+  "gm": { "pin": "GM PIN", "unlock": "Unlock" },
+  "common": { "save": "Save", "cancel": "Cancel", "edit": "Edit", "delete": "Delete", "remove": "Remove", "confirmDelete": "Are you sure you want to delete this?" },
+  "sessions": {
+    "title": "Sessions", "newTitle": "New session title", "create": "Create session", "none": "No sessions yet.",
+    "back": "← Sessions", "summary": "Summary", "files": "Maps & files", "notes": "Notes", "notePlaceholder": "What happened?",
+    "addNote": "Add note", "edited": "(edited)", "openPdf": "Open PDF", "deleteSession": "Delete session (GM)",
+    "confirmNote": "Delete this note?", "confirmAttachment": "Are you sure you want to remove this attachment from the session?", "confirmSession": "Delete the whole session including all notes?"
+  },
+  "story": {
+    "title": "Story", "empty": "Nothing here yet.", "emptyPlayer": " The GM will unlock story parts as you progress.",
+    "unlock": "Unlock for group", "lock": "Lock", "locked": "Locked – not yet discovered.", "new": "New story part (GM)",
+    "titlePlaceholder": "Title", "bodyPlaceholder": "Content (only visible to players once unlocked)", "add": "Add part", "confirmDelete": "Delete \"{title}\"?"
+  },
+  "maps": { "title": "Maps", "mapTitle": "Map title", "upload": "Upload map", "back": "← Maps", "notImage": "Not a readable image" },
+  "map": {
+    "grid": "Grid", "square": "Square", "hex": "Hex", "none": "None", "cellSize": "Cell size (px)", "offsetX": "Offset X", "offsetY": "Offset Y",
+    "addSymbol": "Add symbol", "editSymbol": "Edit symbol", "label": "Label", "elevation": "Elevation", "size": "Size", "note": "Note (HP, status, …)",
+    "export": "Export", "download": "Download PNG", "attach": "Attach to session", "session": "Session", "attached": "Attached to session notes.",
+    "stack": "{n} symbols on this field – click again to cycle",
+    "symbols": { "player": "Player", "dragon": "Dragon", "monster": "Monster", "beast": "Beast", "undead": "Undead", "object": "Object", "key": "Key", "weapon": "Weapon", "landmark": "Landmark", "tree": "Tree", "mountain": "Mountain", "pit": "Pit", "hazard": "Hazard", "marker": "Marker" }
+  }
+}

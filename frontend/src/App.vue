@@ -1,103 +1,72 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import NavigationBar from './components/NavigationBar.vue';
+import { ref, onMounted } from 'vue'
+import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
+import Password from 'primevue/password'
+import { auth, setName, setToken, loginGm, checkSession, joinGroup, leaveGroup } from '@/lib/api'
 
-const NPC_PANE_BREAKPOINT = 1024;
-const route = useRoute();
-const isSmallViewport = ref(false);
-const isNpcPaneOpen = ref(true);
-const isAdventureContentRoute = computed(() => route.name === 'adventure-content');
-const isNpcPaneVisible = computed(() => isNpcPaneOpen.value);
+const nameInput = ref(auth.name)
+const groupPw = ref('')
+const showGm = ref(false)
+const pin = ref('')
+const error = ref('')
 
-function updateViewportState() {
-  if (typeof globalThis.window === 'undefined') {
-    return;
-  }
+onMounted(checkSession)
 
-  isSmallViewport.value = globalThis.window.innerWidth < NPC_PANE_BREAKPOINT;
+async function join() {
+  error.value = ''
+  try { await joinGroup(nameInput.value.trim(), groupPw.value); groupPw.value = '' } catch (e) { error.value = e.message }
 }
-
-function toggleNpcPane() {
-  if (!isAdventureContentRoute.value) {
-    return;
-  }
-
-  isNpcPaneOpen.value = !isNpcPaneOpen.value;
+async function gmLogin() {
+  error.value = ''
+  try { await loginGm(pin.value); showGm.value = false; pin.value = '' } catch (e) { error.value = e.message }
 }
-
-function openNpcPane() {
-  if (!isAdventureContentRoute.value) {
-    return;
-  }
-
-  isNpcPaneOpen.value = true;
-}
-
-function closeNpcPane() {
-  if (!isAdventureContentRoute.value) {
-    return;
-  }
-
-  isNpcPaneOpen.value = false;
-}
-
-watch(isSmallViewport, (smallViewport, wasSmallViewport) => {
-  if (smallViewport === wasSmallViewport) {
-    return;
-  }
-
-  isNpcPaneOpen.value = !smallViewport;
-});
-
-onMounted(() => {
-  updateViewportState();
-  globalThis.window?.addEventListener('resize', updateViewportState);
-});
-
-onBeforeUnmount(() => {
-  globalThis.window?.removeEventListener('resize', updateViewportState);
-});
-
-provide('npcPaneUi', {
-  isAdventureContentRoute,
-  isSmallViewport,
-  isNpcPaneOpen,
-  isNpcPaneVisible,
-  toggleNpcPane,
-  openNpcPane,
-  closeNpcPane,
-  npcPaneBreakpoint: NPC_PANE_BREAKPOINT
-});
 </script>
 
 <template>
-  <NavigationBar></NavigationBar>
-  <div class="app-content">
-    <router-view />
+  <div v-if="auth.member === null" class="join">{{ $t('join.loading') }}</div>
+  <div v-else-if="!auth.member || !auth.name" class="join">
+    <h1>🎲 {{ $t('app.title') }}</h1>
+    <p>{{ $t('join.who') }}</p>
+    <InputText v-model="nameInput" :placeholder="$t('join.name')" maxlength="60" autofocus />
+    <Password v-model="groupPw" :feedback="false" :placeholder="$t('join.password')" input-class="w-full" @keyup.enter="join" />
+    <Button :label="$t('join.submit')" :disabled="!nameInput.trim() || !groupPw" @click="join" />
+    <span class="err">{{ error }}</span>
   </div>
+  <template v-else>
+    <header class="nav">
+      <strong>🎲 {{ $t('app.title') }}</strong>
+      <router-link to="/sessions">{{ $t('nav.sessions') }}</router-link>
+      <router-link to="/story">{{ $t('nav.story') }}</router-link>
+      <router-link to="/maps">{{ $t('nav.maps') }}</router-link>
+      <span class="spacer" />
+      <span>{{ auth.name }}<template v-if="auth.token"> · {{ $t('nav.gm') }}</template></span>
+      <Button v-if="auth.token" size="small" severity="secondary" :label="$t('nav.leaveGm')" @click="setToken('')" />
+      <Button v-else size="small" severity="secondary" :label="$t('nav.gmLogin')" @click="showGm = !showGm" />
+      <Button size="small" text :label="$t('nav.changeName')" @click="setName('')" />
+      <Button size="small" text :label="$t('nav.logout')" @click="leaveGroup" />
+    </header>
+    <div v-if="showGm && !auth.token" class="gm">
+      <Password v-model="pin" :feedback="false" :placeholder="$t('gm.pin')" @keyup.enter="gmLogin" />
+      <Button :label="$t('gm.unlock')" @click="gmLogin" />
+      <span class="err">{{ error }}</span>
+    </div>
+    <main><router-view /></main>
+  </template>
 </template>
 
 <style>
-:root {
-  --app-nav-height: 5rem;
-}
-
-html,
-body,
-#app {
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
-}
-
-* {
-  font-family: 'Roboto', sans-serif;
-}
-
-.app-content {
-  margin-top: var(--app-nav-height);
-  height: calc(100dvh - var(--app-nav-height));
-  overflow: hidden;
-}
+body { margin: 0; font-family: system-ui, sans-serif; background: var(--p-surface-50, #fafafa); color: #222; }
+.nav { display: flex; gap: 1rem; align-items: center; padding: .6rem 1rem; background: #fff; border-bottom: 1px solid #ddd; flex-wrap: wrap; }
+.nav a { text-decoration: none; color: #0f766e; font-weight: 500; }
+.nav a.router-link-active { border-bottom: 2px solid #0f766e; }
+.spacer { flex: 1; }
+.gm { padding: .6rem 1rem; display: flex; gap: .5rem; align-items: center; background: #fff8e1; }
+main { padding: 1rem; max-width: 1400px; margin: 0 auto; }
+.join { max-width: 22rem; margin: 15vh auto; display: flex; flex-direction: column; gap: .8rem; text-align: center; }
+.err { color: #b00020; }
+.card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: .8rem 1rem; margin-bottom: .8rem; }
+.row { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+.pre { white-space: pre-wrap; }
+.muted { color: #777; font-size: .85rem; }
 </style>
