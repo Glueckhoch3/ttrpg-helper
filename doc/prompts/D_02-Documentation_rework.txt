@@ -1,6 +1,0 @@
-Erweitere die Dokumentation @doc/documentation-DE.md , sodass sie die Beispielgliederung @doc/LLM_Dokumentation_Beispielgliederung.pdf  strukturell abbildet.
-Lese die Beipielgliederung und dokumentirere die Punkte 1. bis 4. verwende dabei bestehende Informationen aus der @doc/documentation-DE.md .
-Erstelle für die Punkte 5. bis 9. nur die Grundstruktur.
-Erkunde das Projekt um die dokumentation um die Punkte 1. bis 4. zu erstellen.
-Wenn Bilder eingefügt werden sollen, die nicht vorhanden sind füge einen Platzhalter ein.
-Generiere Diagramme mit plantuml.

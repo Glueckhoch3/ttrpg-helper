@@ -1,2 +1,0 @@
-Currently, the adventurecontent.vue fetches a hardcoded file.
-This needs to be changed to be dynamic. when clicking on the button labeled "TEST" in adventuresummary.vue, the user should be routed to an adventureconent.vue page and the filename needs to be passed to the component (probably via a prop) and then used to fetch the corresponding adventure from the backend.
