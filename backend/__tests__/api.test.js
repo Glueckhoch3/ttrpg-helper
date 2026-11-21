@@ -73,25 +73,27 @@ describe('sessions and notes', () => {
 });
 
 describe('story', () => {
-  it('hides locked parts from players until unlocked', async () => {
+  it('locked parts do not exist for players until unlocked', async () => {
     await request(app).post('/api/story').send({ title: 'Ch1', body: 'secret' }).expect(403);
-    const p = (await request(app).post('/api/story').set(G(gm)).send({ title: 'Ch1', body: 'secret' }).expect(201)).body;
+    const p = (await request(app).post('/api/story').set(G(gm)).send({ title: 'Ch1 title', body: 'secret' }).expect(201)).body;
     let list = (await request(app).get('/api/story')).body;
-    expect(list[0].body).toBeNull();
-    expect(JSON.stringify(list)).not.toContain('secret');
-    await request(app).get(`/api/story/${p.id}`).expect(200).then((r) => expect(r.body.body).toBeNull());
+    expect(list).toEqual([]);
+    expect(JSON.stringify(list)).not.toMatch(/secret|Ch1/);
+    await request(app).get(`/api/story/${p.id}`).expect(404);
     expect((await request(app).get('/api/story').set(G(gm))).body[0].body).toBe('secret');
     await request(app).post(`/api/story/${p.id}/unlock`).set(G(gm)).expect(200);
     list = (await request(app).get('/api/story')).body;
     expect(list[0].body).toBe('secret');
+    await request(app).get(`/api/story/${p.id}`).expect(200);
     await request(app).post(`/api/story/${p.id}/lock`).set(G(gm)).expect(200);
-    expect((await request(app).get('/api/story')).body[0].body).toBeNull();
+    expect((await request(app).get('/api/story')).body).toEqual([]);
+    await request(app).get(`/api/story/${p.id}`).expect(404);
   });
   it('reorders parts', async () => {
     const a = (await request(app).post('/api/story').set(G(gm)).send({ title: 'A' })).body;
     const b = (await request(app).post('/api/story').set(G(gm)).send({ title: 'B' })).body;
     await request(app).post('/api/story/reorder').set(G(gm)).send({ ids: [b.id, a.id] }).expect(200);
-    expect((await request(app).get('/api/story')).body.map((x) => x.title)).toEqual(['B', 'A']);
+    expect((await request(app).get('/api/story').set(G(gm))).body.map((x) => x.title)).toEqual(['B', 'A']);
     await request(app).post('/api/story/reorder').set(G(gm)).send({ ids: [a.id] }).expect(400);
   });
 });

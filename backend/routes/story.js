@@ -1,20 +1,20 @@
 import { Router } from 'express';
 import { bad, notFound, str, patch } from '../lib/util.js';
 
-// Locked parts: players get title + position only, never the body (ADR-007).
+// Locked parts do not exist for non-GM users: not listed, not readable (not even the title). ADR-007/012.
 export default function storyRoutes({ db, hub, auth }) {
   const r = Router();
   const get = (id) => db.prepare('SELECT * FROM story_parts WHERE id=?').get(id) ?? (() => { throw notFound('Story part not found'); })();
-  const view = (p, gm) => (gm || p.unlocked ? p : { id: p.id, position: p.position, title: p.title, unlocked: 0, unlocked_at: null, body: null });
 
   r.get('/story', (req, res) => {
     const gm = auth.isGm(req);
     const rows = db.prepare('SELECT * FROM story_parts ORDER BY position, id').all();
-    res.json(rows.map((p) => view(p, gm)));
+    res.json(gm ? rows : rows.filter((p) => p.unlocked));
   });
   r.get('/story/:id', (req, res) => {
     const p = get(req.params.id);
-    res.json(view(p, auth.isGm(req)));
+    if (!p.unlocked && !auth.isGm(req)) throw notFound('Story part not found');
+    res.json(p);
   });
 
   r.use('/story', (req, res, next) => (req.method === 'GET' ? next() : auth.requireGm(req, res, next)));
