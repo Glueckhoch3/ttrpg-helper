@@ -40,7 +40,7 @@ const move = (i, d) => run(() => {
       <template v-if="gm">
         <Button size="small" text icon="pi pi-arrow-up" :disabled="i === 0" @click="move(i, -1)" />
         <Button size="small" text icon="pi pi-arrow-down" :disabled="i === parts.length - 1" @click="move(i, 1)" />
-        <Button size="small" :severity="p.unlocked ? 'secondary' : 'success'" :label="p.unlocked ? $t('story.lock') : $t('story.unlock')" @click="toggle(p)" />
+        <Button size="small" :severity="p.unlocked ? 'secondary' : undefined" :icon="p.unlocked ? 'pi pi-lock' : 'pi pi-lock-open'" :label="p.unlocked ? $t('story.lock') : $t('story.unlock')" @click="toggle(p)" />
         <Button size="small" text :label="$t('common.edit')" @click="startEdit(p)" />
         <Button size="small" text severity="danger" :label="$t('common.delete')" @click="del(p)" />
       </template>

@@ -5,26 +5,32 @@
 // - vars:    app-level CSS variables used by our own CSS (see App.vue)
 import { ref } from 'vue'
 
+// Palettes target WCAG AAA-ish text contrast (>=7:1 body, >=4.5:1 muted) and >=3:1 for borders/UI.
+// Accents are blue/orange/yellow (colour-blind safe); red is only ever used together with a text label.
 export const THEMES = {
   daylight: {
-    dark: false, primary: 'teal', shift: 1, surface: 'zinc',
-    vars: { bg: '#f6f7f8', panel: '#ffffff', text: '#1f2933', muted: '#6b7280', border: '#d9dde1', accent: '#0f766e', danger: '#b00020', warn: '#fff8e1', stage: '#222a30' },
+    dark: false, primary: 'blue', shift: 2, surface: 'slate', bw: '1px',
+    vars: { bg: '#dfe5ec', panel: '#ffffff', text: '#0a0f1a', muted: '#3a4556', border: '#5f6b7c', accent: '#0b4fa8', danger: '#a8001a', warn: '#ffe9a8', stage: '#1a2028' },
   },
   parchment: {
-    dark: false, primary: 'amber', shift: 2, surface: 'stone',
-    vars: { bg: '#efe4cc', panel: '#f8f0dd', text: '#3b2a1a', muted: '#7a6650', border: '#cdb98f', accent: '#8a4b0f', danger: '#9b1c1c', warn: '#f3dfa6', stage: '#3b2a1a' },
+    dark: false, primary: 'orange', shift: 3, surface: 'stone', bw: '1px',
+    vars: { bg: '#dcc89a', panel: '#fbf5e4', text: '#24160a', muted: '#54402a', border: '#7a5f38', accent: '#7a3a00', danger: '#9d1010', warn: '#f0d27a', stage: '#2a1c0e' },
   },
   midnight: {
-    dark: true, primary: 'indigo', surface: 'slate',
-    vars: { bg: '#0f1420', panel: '#1a2133', text: '#e4e8f1', muted: '#9aa5bd', border: '#2d3750', accent: '#8ea2ff', danger: '#ff8a8a', warn: '#3a3320', stage: '#05070d' },
+    dark: true, primary: 'indigo', surface: 'slate', bw: '1px',
+    vars: { bg: '#04070f', panel: '#16203a', text: '#f4f7ff', muted: '#b9c4de', border: '#7081ab', accent: '#a9bbff', danger: '#ff9a9a', warn: '#4a3d12', stage: '#000000' },
   },
   dungeon: {
-    dark: true, primary: 'orange', surface: 'neutral',
-    vars: { bg: '#141210', panel: '#211d19', text: '#eadfd0', muted: '#a89a88', border: '#3a322a', accent: '#f08a3c', danger: '#ff7b6b', warn: '#3d2e17', stage: '#070605' },
+    dark: true, primary: 'orange', surface: 'neutral', bw: '1px',
+    vars: { bg: '#080605', panel: '#211a14', text: '#fbf2e6', muted: '#d2c2aa', border: '#947a58', accent: '#ffa24d', danger: '#ff9b8a', warn: '#4a3411', stage: '#000000' },
   },
-  forest: {
-    dark: true, primary: 'emerald', surface: 'zinc',
-    vars: { bg: '#10170f', panel: '#1a241a', text: '#e2ecdc', muted: '#9bb092', border: '#2c3d2a', accent: '#5fd08c', danger: '#ff8f8f', warn: '#33351a', stage: '#060906' },
+  contrastLight: {
+    dark: false, primary: 'blue', shift: 3, surface: 'neutral', bw: '2px',
+    vars: { bg: '#ffffff', panel: '#ffffff', text: '#000000', muted: '#1a1a1a', border: '#000000', accent: '#0033cc', danger: '#b00000', warn: '#ffec99', stage: '#000000' },
+  },
+  contrastDark: {
+    dark: true, primary: 'yellow', surface: 'neutral', bw: '2px',
+    vars: { bg: '#000000', panel: '#000000', text: '#ffffff', muted: '#ececec', border: '#ffffff', accent: '#ffe14d', danger: '#ff8f8f', warn: '#3a3300', stage: '#000000' },
   },
 }
 export const THEME_IDS = ['auto', ...Object.keys(THEMES)]
@@ -35,12 +41,18 @@ const read = () => { try { return localStorage.getItem(KEY) } catch { return nul
 export const themeChoice = ref(THEME_IDS.includes(read()) ? read() : 'auto')
 
 const prefersDark = () => globalThis.matchMedia?.('(prefers-color-scheme: dark)').matches
-const resolve = (id) => (id === 'auto' ? (prefersDark() ? 'midnight' : 'daylight') : id)
+const prefersMore = () => globalThis.matchMedia?.('(prefers-contrast: more)').matches
+const resolve = (id) => {
+  if (id !== 'auto') return id
+  if (prefersMore()) return prefersDark() ? 'contrastDark' : 'contrastLight'
+  return prefersDark() ? 'midnight' : 'daylight'
+}
 
 export function applyTheme(id = themeChoice.value) {
   const t = THEMES[resolve(id)]
   const root = document.documentElement
   root.classList.toggle('app-dark', t.dark)
+  root.style.setProperty('--app-bw', t.bw)
   root.style.colorScheme = t.dark ? 'dark' : 'light'
   for (const [k, v] of Object.entries(t.vars)) root.style.setProperty(`--app-${k}`, v)
   SHADES.forEach((s, i) => {
@@ -49,6 +61,13 @@ export function applyTheme(id = themeChoice.value) {
     root.style.setProperty(`--p-surface-${s}`, `var(--p-${t.surface}-${s})`)
   })
   root.style.setProperty('--p-surface-0', '#ffffff')
+  // form fields / danger text must meet 3:1 (borders) and 4.5:1 (text) in every look
+  for (const f of ['inputtext', 'select', 'textarea']) {
+    root.style.setProperty(`--p-${f}-border-color`, t.vars.border)
+    root.style.setProperty(`--p-${f}-hover-border-color`, t.vars.accent)
+    root.style.setProperty(`--p-${f}-placeholder-color`, t.vars.muted)
+  }
+  root.style.setProperty('--p-button-text-danger-color', t.vars.danger)
 }
 
 export function setTheme(id) {
@@ -59,5 +78,6 @@ export function setTheme(id) {
 
 export function initTheme() {
   applyTheme()
-  globalThis.matchMedia?.('(prefers-color-scheme: dark)').addEventListener?.('change', () => themeChoice.value === 'auto' && applyTheme())
+  for (const q of ['(prefers-color-scheme: dark)', '(prefers-contrast: more)'])
+    globalThis.matchMedia?.(q).addEventListener?.('change', () => themeChoice.value === 'auto' && applyTheme())
 }

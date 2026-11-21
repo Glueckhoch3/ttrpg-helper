@@ -25,8 +25,10 @@ const PALETTE = [
   ['🧙', 'player'], ['🐉', 'dragon'], ['👹', 'monster'], ['🐺', 'beast'], ['💀', 'undead'],
   ['📦', 'object'], ['🗝️', 'key'], ['⚔️', 'weapon'], ['🏰', 'landmark'], ['🌲', 'tree'], ['⛰️', 'mountain'], ['🕳️', 'pit'], ['🔥', 'hazard'], ['●', 'marker'],
 ]
+const GRID_PASSES = [{ color: '#fff', opacity: 0.4, w: 2.2 }, { color: '#000', opacity: 0.75, w: 1 }]
 const GRIDS = computed(() => ['square', 'hex', 'none'].map((v) => ({ l: t(`map.${v}`), v })))
-const COLORS = ['#d32f2f', '#1976d2', '#388e3c', '#f9a825', '#7b1fa2', '#212121', '#ffffff']
+// Okabe-Ito colour-blind-safe palette + black/white
+const COLORS = ['#D55E00', '#0072B2', '#009E73', '#E69F00', '#CC79A7', '#56B4E9', '#F0E442', '#000000', '#ffffff']
 
 const selected = computed(() => tokens.value.find((x) => x.id === selectedId.value))
 // selected symbol is drawn last = on top
@@ -134,12 +136,17 @@ const attach = () => run(async () => {
       <div class="stage">
         <svg ref="svg" :viewBox="`0 0 ${map.img_w} ${map.img_h}`" @pointermove="move" @pointerup="up" @pointerdown.self="selectedId = null">
           <image :href="imageUrl" x="0" y="0" :width="map.img_w" :height="map.img_h" />
-          <g v-if="map.grid_type === 'square'" stroke="#000" stroke-opacity=".45" :stroke-width="Math.max(1, map.cell_px / 40)" fill="none" pointer-events="none">
-            <rect v-for="c in cells" :key="`${c.col}_${c.row}`" :x="c.x - map.cell_px / 2" :y="c.y - map.cell_px / 2" :width="map.cell_px" :height="map.cell_px" />
-          </g>
-          <g v-else-if="map.grid_type === 'hex'" stroke="#000" stroke-opacity=".45" :stroke-width="Math.max(1, map.cell_px / 40)" fill="none" pointer-events="none">
-            <polygon v-for="c in cells" :key="`${c.col}_${c.row}`" :points="hexPoints(c.x, c.y, map.cell_px)" />
-          </g>
+          <!-- grid drawn twice (light halo + dark line) so it stays visible on dark and light maps -->
+          <template v-if="map.grid_type !== 'none'">
+            <g v-for="pass in GRID_PASSES" :key="pass.color" :stroke="pass.color" :stroke-opacity="pass.opacity" :stroke-width="Math.max(1, map.cell_px / 40) * pass.w" fill="none" pointer-events="none">
+              <template v-if="map.grid_type === 'square'">
+                <rect v-for="c in cells" :key="`${c.col}_${c.row}`" :x="c.x - map.cell_px / 2" :y="c.y - map.cell_px / 2" :width="map.cell_px" :height="map.cell_px" />
+              </template>
+              <template v-else>
+                <polygon v-for="c in cells" :key="`${c.col}_${c.row}`" :points="hexPoints(c.x, c.y, map.cell_px)" />
+              </template>
+            </g>
+          </template>
           <g v-for="t in ordered" :key="t.id" data-token :style="{ cursor: locked ? 'grab' : 'default', touchAction: 'none', opacity: locked ? 1 : 0.45, pointerEvents: locked ? 'auto' : 'none' }" @pointerdown.stop="down($event, t)">
             <circle :cx="pos(t).x" :cy="pos(t).y" :r="radius(t)" :fill="t.color" fill-opacity=".35" :stroke="t.color" :stroke-width="t.id === selectedId ? map.cell_px / 10 : map.cell_px / 25" />
             <text :x="pos(t).x" :y="pos(t).y" text-anchor="middle" dominant-baseline="central" :font-size="radius(t) * 1.3">{{ t.symbol }}</text>
@@ -156,7 +163,7 @@ const attach = () => run(async () => {
         <div class="card">
           <strong>{{ $t('map.grid') }} {{ locked ? '🔒' : '🔓' }}</strong>
           <p class="muted">{{ locked ? $t('map.lockedHint') : $t('map.unlockedHint') }}</p>
-          <Button size="small" :severity="locked ? 'secondary' : 'success'" :icon="locked ? 'pi pi-lock-open' : 'pi pi-lock'" :label="locked ? $t('map.unlockGrid') : $t('map.lockGrid')" @click="setLock(!locked)" />
+          <Button size="small" :severity="locked ? 'secondary' : undefined" :icon="locked ? 'pi pi-lock-open' : 'pi pi-lock'" :label="locked ? $t('map.unlockGrid') : $t('map.lockGrid')" @click="setLock(!locked)" />
           <div v-if="!locked" class="row"><Select :modelValue="map.grid_type" :options="GRIDS" optionLabel="l" optionValue="v" @update:modelValue="setGrid('grid_type', $event); saveGrid()" /></div>
           <template v-if="!locked && map.grid_type !== 'none'">
             <label class="muted">{{ $t('map.cellSize') }}: {{ Math.round(map.cell_px) }}</label>
@@ -186,7 +193,7 @@ const attach = () => run(async () => {
           <div class="row">{{ $t('map.size') }}
             <Button v-for="n in [1, 2, 3]" :key="n" size="small" :severity="selected.size === n ? 'primary' : 'secondary'" :label="`${n}`" @click="updateToken(selected, { size: n })" />
           </div>
-          <div class="row"><button v-for="c in COLORS" :key="c" class="sw" :style="{ background: c, outline: selected.color === c ? '2px solid #000' : 'none' }" @click="updateToken(selected, { color: c })" /></div>
+          <div class="row"><button v-for="c in COLORS" :key="c" class="sw" :style="{ background: c, outline: selected.color === c ? '3px solid var(--app-accent)' : 'none', outlineOffset: '2px' }" @click="updateToken(selected, { color: c })" /></div>
           <InputText :modelValue="selected.note" :placeholder="$t('map.note')" maxlength="500" fluid @change="updateToken(selected, { note: $event.target.value })" />
           <Button size="small" severity="danger" :label="$t('common.remove')" @click="removeToken(selected)" />
         </div>
@@ -212,7 +219,7 @@ const attach = () => run(async () => {
 svg { display: block; width: 100%; height: auto; user-select: none; }
 aside .card { display: flex; flex-direction: column; gap: .4rem; }
 .palette { display: flex; flex-wrap: wrap; gap: .3rem; }
-.palette button { font-size: 1.4rem; width: 2.4rem; height: 2.4rem; cursor: pointer; border: 1px solid var(--app-border); border-radius: 6px; background: var(--app-panel); color: var(--app-text); }
-.sw { width: 1.6rem; height: 1.6rem; border: 1px solid var(--app-muted); border-radius: 50%; cursor: pointer; }
+.palette button { font-size: 1.4rem; width: 2.4rem; height: 2.4rem; cursor: pointer; border: 2px solid var(--app-border); border-radius: 6px; background: var(--app-panel); color: var(--app-text); }
+.sw { width: 1.6rem; height: 1.6rem; border: 2px solid var(--app-border); border-radius: 50%; cursor: pointer; }
 @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
 </style>

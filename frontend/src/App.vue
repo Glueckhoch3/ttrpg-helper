@@ -65,15 +65,17 @@ async function gmLogin() {
 body { margin: 0; font-family: system-ui, sans-serif; background: var(--app-bg); color: var(--app-text); }
 a { color: var(--app-accent); }
 input[type=range], input[type=file] { accent-color: var(--app-accent); }
-.nav { display: flex; gap: 1rem; align-items: center; padding: .6rem 1rem; background: var(--app-panel); border-bottom: 1px solid var(--app-border); flex-wrap: wrap; }
-.nav a { text-decoration: none; color: var(--app-accent); font-weight: 500; }
-.nav a.router-link-active { border-bottom: 2px solid var(--app-accent); }
+.nav { display: flex; gap: 1rem; align-items: center; padding: .6rem 1rem; background: var(--app-panel); border-bottom: 3px solid var(--app-accent); flex-wrap: wrap; }
+.nav a { text-decoration: none; color: var(--app-text); font-weight: 600; padding-bottom: 2px; }
+.nav a:hover { text-decoration: underline; }
+.nav a.router-link-active { border-bottom: 3px solid var(--app-accent); color: var(--app-accent); }
 .spacer { flex: 1; }
+:focus-visible { outline: 3px solid var(--app-accent); outline-offset: 2px; }
 .gm { padding: .6rem 1rem; display: flex; gap: .5rem; align-items: center; background: var(--app-warn); }
 main { padding: 1rem; max-width: 1400px; margin: 0 auto; }
 .join { max-width: 22rem; margin: 15vh auto; display: flex; flex-direction: column; gap: .8rem; text-align: center; }
 .err { color: var(--app-danger); }
-.card { background: var(--app-panel); border: 1px solid var(--app-border); border-radius: 8px; padding: .8rem 1rem; margin-bottom: .8rem; }
+.card { background: var(--app-panel); border: var(--app-bw) solid var(--app-border); border-radius: 8px; padding: .8rem 1rem; margin-bottom: .8rem; }
 .row { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
 .pre { white-space: pre-wrap; }
 .muted { color: var(--app-muted); font-size: .85rem; }

@@ -117,6 +117,7 @@
     "parchment": "Parchment",
     "midnight": "Midnight",
     "dungeon": "Dungeon",
-    "forest": "Forest"
+    "contrastLight": "High contrast (light)",
+    "contrastDark": "High contrast (dark)"
   }
 }
