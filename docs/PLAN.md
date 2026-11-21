@@ -25,12 +25,13 @@ sessions(id, number, title, played_on, summary) · notes(id, session_id, author,
 Join · Sessions (list + detail with notes & attachments) · Story (player: unlocked list; GM: editor + unlock toggles) · Maps (list/upload) · MapView (SVG: image, grid, calibration, symbol palette, drag, edit panel, export).
 
 ## Map details
+- Workflow: define grid first, then lock (ADR-011); symbols only while locked.
 - Grid `square` or `hex` (pointy-top, odd-r offset coords). `cell_px` = cell size in image pixels, `offset_x/y` shift; GM/players calibrate with sliders so grid fits the picture ("size" of picture ↔ net).
 - Token: symbol (emoji/preset set: creature, object, landmark, hazard…), label, color, `elevation` integer (+ above / − beneath, shown as small badge, 0 hidden), size 1–3 cells, free note. Editable at any time, drag to move (snaps to cell).
 - Export: render SVG → canvas → **PNG** (ADR-008), download and/or "attach to session" (stored as attachment so it appears in the session notes). PDF can be added later via print-to-PDF.
 
 ## Status
-Phases 0-5 implemented (2026-11-21), plus group password, i18n and symbol-stack cycling. Backend: 14 passing tests. Frontend lints/builds clean and was verified with a headless-browser run (join, notes, map, drag, stack cycling, hex grid, PNG export/attach/remove, GM login, live unlock).
+Phases 0-5 implemented (2026-11-21), plus group password, i18n and symbol-stack cycling. Backend: 15 passing tests. Frontend lints/builds clean and was verified with a headless-browser run (join, notes, map, drag, stack cycling, hex grid, PNG export/attach/remove, GM login, live unlock).
 
 ## Phases
 0 Setup (this doc, CLAUDE.md, ADRs, scaffolding, tooling) → 1 Backend core + tests → 2 Frontend shell, join, sessions/notes → 3 Story parts + GM → 4 Maps/grid/tokens → 5 Export + attach → 6 Polish, README, LAN run docs.

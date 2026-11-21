@@ -33,5 +33,8 @@ export function openDb(file = ':memory:') {
   const db = new DatabaseSync(file);
   db.exec('PRAGMA foreign_keys = ON;');
   db.exec(SCHEMA);
+  // migration: maps.grid_locked (ADR-011)
+  if (!db.prepare('PRAGMA table_info(maps)').all().some((c) => c.name === 'grid_locked'))
+    db.exec('ALTER TABLE maps ADD COLUMN grid_locked INTEGER NOT NULL DEFAULT 0');
   return db;
 }

@@ -7,3 +7,4 @@
 | ADR-008 | PNG export (PDF later) | accepted |
 | ADR-009 | Group password + member cookie (amends 007) | accepted |
 | ADR-010 | vue-i18n, English only for now | accepted |
+| ADR-011 | Grid lock before placing symbols | accepted |

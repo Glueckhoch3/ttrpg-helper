@@ -97,15 +97,35 @@ describe('story', () => {
 });
 
 describe('maps and tokens', () => {
-  const mk = () => request(app).post('/api/maps?title=Cave&w=800&h=600').set('Content-Type', 'image/png').send(PNG);
+  const mk = async () => {
+    const r = await request(app).post('/api/maps?title=Cave&w=800&h=600').set('Content-Type', 'image/png').send(PNG);
+    if (r.status === 201) await request(app).patch(`/api/maps/${r.body.id}`).send({ grid_locked: true });
+    return r;
+  };
+  it('requires a locked grid for symbols and freezes the grid while locked', async () => {
+    const m = (await request(app).post('/api/maps?title=x&w=800&h=600').set('Content-Type', 'image/png').send(PNG)).body;
+    expect(m.grid_locked).toBe(0);
+    await request(app).post(`/api/maps/${m.id}/tokens`).send({}).expect(409);
+    await request(app).patch(`/api/maps/${m.id}`).send({ cell_px: 70, grid_locked: true }).expect(200);
+    await request(app).patch(`/api/maps/${m.id}`).send({ cell_px: 80 }).expect(409);
+    await request(app).patch(`/api/maps/${m.id}`).send({ title: 'renamed' }).expect(200);
+    const t = (await request(app).post(`/api/maps/${m.id}/tokens`).send({ col: 1 }).expect(201)).body;
+    await request(app).patch(`/api/maps/${m.id}`).send({ grid_locked: 'yes' }).expect(400);
+    await request(app).patch(`/api/maps/${m.id}`).send({ grid_locked: false, cell_px: 90 }).expect(200);
+    await request(app).patch(`/api/tokens/${t.id}`).send({ col: 2 }).expect(409);
+    // symbols keep their cell coordinates when the grid is re-adjusted
+    expect((await request(app).get(`/api/maps/${m.id}`)).body.tokens[0]).toMatchObject({ col: 1 });
+  });
   it('uploads maps and validates', async () => {
     await request(app).post('/api/maps?title=x&w=1&h=1').set('Content-Type', 'image/png').send(Buffer.from('nope nope nope nope')).expect(400);
     await request(app).post('/api/maps?title=x').set('Content-Type', 'image/png').send(PNG).expect(400);
-    const m = (await mk().expect(201)).body;
+    const m = (await mk()).body;
     expect(m.grid_type).toBe('square');
   });
   it('calibrates grid', async () => {
     const m = (await mk()).body;
+    await request(app).patch(`/api/maps/${m.id}`).send({ grid_type: 'hex' }).expect(409);
+    await request(app).patch(`/api/maps/${m.id}`).send({ grid_locked: false }).expect(200);
     const r = await request(app).patch(`/api/maps/${m.id}`).send({ grid_type: 'hex', cell_px: 64, offset_x: 5 }).expect(200);
     expect(r.body).toMatchObject({ grid_type: 'hex', cell_px: 64, offset_x: 5 });
     await request(app).patch(`/api/maps/${m.id}`).send({ grid_type: 'tri' }).expect(400);

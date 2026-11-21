@@ -3,7 +3,7 @@ import express from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { bad, notFound, str, int, num, patch, sniff } from '../lib/util.js';
+import { HttpError, bad, notFound, str, int, num, patch, sniff } from '../lib/util.js';
 
 const GRIDS = ['square', 'hex', 'none'];
 
@@ -35,10 +35,15 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
   r.patch('/maps/:id', (req, res) => {
     const m = getMap(req.params.id);
     const b = req.body ?? {};
+    if (b.grid_locked !== undefined && typeof b.grid_locked !== 'boolean') throw bad('grid_locked must be a boolean');
+    // Locked grid: geometry is frozen; unlock first (may be in the same request).
+    const touchesGrid = ['grid_type', 'cell_px', 'offset_x', 'offset_y'].some((k) => b[k] !== undefined);
+    if (m.grid_locked && touchesGrid && b.grid_locked !== false) throw new HttpError(409, 'Grid is locked – unlock it first');
     if (b.grid_type !== undefined && !GRIDS.includes(b.grid_type)) throw bad(`grid_type must be one of ${GRIDS.join(', ')}`);
     patch(db, 'maps', m.id, {
       title: b.title === undefined ? undefined : str(b.title, 'title', { max: 200 }),
       grid_type: b.grid_type,
+      grid_locked: b.grid_locked === undefined ? undefined : Number(b.grid_locked),
       cell_px: b.cell_px === undefined ? undefined : num(b.cell_px, 'cell_px', { min: 4, max: 5000 }),
       offset_x: b.offset_x === undefined ? undefined : num(b.offset_x, 'offset_x'),
       offset_y: b.offset_y === undefined ? undefined : num(b.offset_y, 'offset_y'),
@@ -69,8 +74,11 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
     return o;
   };
 
+  const needLocked = (m) => { if (!m.grid_locked) throw new HttpError(409, 'Lock the grid before placing symbols'); };
+
   r.post('/maps/:id/tokens', (req, res) => {
     const m = getMap(req.params.id);
+    needLocked(m);
     const f = Object.fromEntries(Object.entries(fields(req.body ?? {})).filter(([, v]) => v !== undefined));
     const cols = ['map_id', ...Object.keys(f)];
     const info = db.prepare(`INSERT INTO tokens(${cols.join(',')}) VALUES(${cols.map(() => '?').join(',')})`).run(m.id, ...Object.values(f));
@@ -79,12 +87,14 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
   });
   r.patch('/tokens/:id', (req, res) => {
     const t = getToken(req.params.id);
+    needLocked(getMap(t.map_id));
     patch(db, 'tokens', t.id, fields(req.body ?? {}));
     hub.emit('tokens', t.map_id);
     res.json(getToken(t.id));
   });
   r.delete('/tokens/:id', (req, res) => {
     const t = getToken(req.params.id);
+    needLocked(getMap(t.map_id));
     db.prepare('DELETE FROM tokens WHERE id=?').run(t.id);
     hub.emit('tokens', t.map_id);
     res.status(204).end();
