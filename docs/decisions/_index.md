@@ -10,3 +10,4 @@
 | ADR-011 | Grid lock before placing symbols | accepted |
 | ADR-012 | Theme template + locked story fully hidden (amends 007) | accepted |
 | ADR-013 | Story tree, NPC pool, note links, map locks | accepted |
+| ADR-014 | Blueprints, import menu, marker links (amends 013) | accepted |

@@ -31,6 +31,14 @@ CREATE TABLE IF NOT EXISTS npcs(
 CREATE TABLE IF NOT EXISTS npc_stats(
   id INTEGER PRIMARY KEY, npc_id INTEGER NOT NULL REFERENCES npcs(id) ON DELETE CASCADE, position INTEGER NOT NULL DEFAULT 0,
   title TEXT NOT NULL, value TEXT NOT NULL DEFAULT '', visible INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS blueprints(
+  id INTEGER PRIMARY KEY, kind TEXT NOT NULL, name TEXT NOT NULL, subtitle TEXT NOT NULL DEFAULT '', body TEXT NOT NULL DEFAULT '',
+  stats TEXT NOT NULL DEFAULT '[]', source TEXT NOT NULL DEFAULT 'manual', created_at TEXT NOT NULL DEFAULT (datetime('now')));
+CREATE INDEX IF NOT EXISTS blueprints_kind_name ON blueprints(kind, name COLLATE NOCASE);
+CREATE TABLE IF NOT EXISTS token_items(
+  token_id INTEGER NOT NULL REFERENCES tokens(id) ON DELETE CASCADE,
+  blueprint_id INTEGER NOT NULL REFERENCES blueprints(id) ON DELETE CASCADE,
+  position INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(token_id, blueprint_id));
 CREATE TABLE IF NOT EXISTS story_npcs(
   story_id INTEGER NOT NULL REFERENCES story_parts(id) ON DELETE CASCADE,
   npc_id INTEGER NOT NULL REFERENCES npcs(id) ON DELETE CASCADE, PRIMARY KEY(story_id, npc_id));
@@ -56,6 +64,8 @@ export function openDb(file = ':memory:') {
   addColumn(db, 'story_parts', 'map_id', 'INTEGER REFERENCES maps(id) ON DELETE SET NULL');
   addColumn(db, 'npcs', 'hp', 'INTEGER NOT NULL DEFAULT 0'); // GM-only health
   addColumn(db, 'npcs', 'gm_notes', "TEXT NOT NULL DEFAULT ''"); // GM-only; `description` is public
+  addColumn(db, 'tokens', 'npc_id', 'INTEGER REFERENCES npcs(id) ON DELETE SET NULL'); // ADR-014
+  addColumn(db, 'tokens', 'creature_id', 'INTEGER REFERENCES blueprints(id) ON DELETE SET NULL');
   addColumn(db, 'notes', 'story_id', 'INTEGER REFERENCES story_parts(id) ON DELETE SET NULL');
   return db;
 }

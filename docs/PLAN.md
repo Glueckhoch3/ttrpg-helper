@@ -14,7 +14,7 @@ Vue 3 + Vite + PrimeVue frontend, Express 5 (ESM) + AJV + Jest backend. It was a
 - Auth: players join with a name + shared group password (ADR-009; HttpOnly cookie). GM unlocks with a PIN (env `GM_PIN`, auto-generated + printed at start when unset) → bearer token. Server enforces: locked story parts are never sent to players.
 
 ## Data model (SQLite)
-sessions(id, number, title, played_on, summary) · notes(id, session_id, author, body, story_id, created_at, updated_at) · story_parts(id, parent_id, position, title, location, body, map_id, unlocked, unlocked_at) · npcs(id, name, description, gm_notes, hp) · npc_stats(id, npc_id, title, value, visible) · story_npcs(story_id, npc_id) · maps(id, unlocked, title, image_file, img_w, img_h, grid_type[square|hex|none], cell_px, offset_x, offset_y, session_id) · tokens(id, map_id, symbol, label, color, col, row, elevation, size, note) · attachments(id, session_id, kind, file, title, created_at)
+sessions(id, number, title, played_on, summary) · notes(id, session_id, author, body, story_id, created_at, updated_at) · story_parts(id, parent_id, position, title, location, body, map_id, unlocked, unlocked_at) · npcs(id, name, description, gm_notes, hp) · npc_stats(id, npc_id, title, value, visible) · story_npcs(story_id, npc_id) · maps(id, unlocked, title, image_file, img_w, img_h, grid_type[square|hex|none], cell_px, offset_x, offset_y, session_id) · tokens(id, map_id, symbol, label, color, col, row, elevation, size, note) · attachments(id, session_id, kind, file, title, created_at) · blueprints(id, kind[item|creature], name, subtitle, body, stats JSON, source) · token_items(token_id, blueprint_id, position); tokens also have npc_id, creature_id (ADR-014)
 
 ## API (all JSON under /api unless noted)
 - `POST /auth/join {password}` (sets cookie) · `POST /auth/leave` · `GET /auth/me` · `POST /auth/gm {pin}` → `{token}` · `GET /health` · `GET /events` (SSE). All other routes need the member cookie or GM token.
@@ -22,10 +22,11 @@ sessions(id, number, title, played_on, summary) · notes(id, session_id, author,
 - Story (ADR-013; tree via `parent_id`, max 2 layers; fields title, location, body, `npc_ids`, `map_id`; GM write; players only see parts that are unlocked with all ancestors unlocked): `GET/POST /story`, `PATCH/DELETE /story/:id`, `POST /story/:id/unlock|lock`, `POST /story/reorder {ids, parent_id}`
 - NPC pool (GM write): `GET/POST /npcs`, `PATCH/DELETE /npcs/:id` (hp, gm_notes, description), `POST /npcs/:id/stats` (max 8), `PATCH/DELETE /npc-stats/:id`; `GET /npcs/:id` also for players, public fields only, only for NPCs in visible story parts
 - Notes: `PATCH /notes/:id {story_id}` links a note to a visible story part
-- Maps: `GET /maps`, `POST /maps` (raw image upload, `?title=`), `GET/PATCH/DELETE /maps/:id`, `POST /maps/:id/unlock|lock` (GM; new maps start locked and are hidden from players incl. image file); tokens `GET/POST /maps/:id/tokens`, `PATCH/DELETE /tokens/:id`
+- Blueprints (ADR-014; GM only, except `GET /blueprints/:id`, which players may read only while it is linked to a marker on an unlocked map): `GET /blueprints?kind=`, `POST /blueprints`, `GET/PATCH/DELETE /blueprints/:id`. Import (GM): `GET /import/formats`, `POST /import/preview {format, kind, data}`, `POST /import {format, kind, data, indexes?}` → `{imported, duplicates}`
+- Maps: `GET /maps`, `POST /maps` (raw image upload, `?title=`), `GET/PATCH/DELETE /maps/:id`, `POST /maps/:id/unlock|lock` (GM; new maps start locked and are hidden from players incl. image file); tokens `GET/POST /maps/:id/tokens`, `PATCH/DELETE /tokens/:id` (GM may also set `npc_id`, `creature_id`, `item_ids` (max 5); responses add `npc`, `creature`, `items` as `{id,name}`)
 
 ## Frontend views
-Join · Sessions (list + detail with notes & attachments) · Story (player: unlocked list; GM: editor + unlock toggles) · Maps (list/upload) · MapView (SVG: image, grid, calibration, symbol palette, drag, edit panel, export).
+Join · Sessions (list + detail with notes & attachments) · Story (player: unlocked list; GM: editor + unlock toggles) · Blueprints (GM: library, import menu) · Maps (list/upload) · MapView (SVG: image, grid, calibration, symbol palette, drag, edit panel, details sidebar with collapsible bars for the linked NPC/creature/items, export).
 
 ## Map details
 - Workflow: define grid first, then lock (ADR-011); symbols only while locked.

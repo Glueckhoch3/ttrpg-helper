@@ -1,0 +1,2 @@
+{"item":[{"name":"Longsword","type":"M","rarity":"none","weight":3,"value":1500,"dmg1":"1d8","dmgType":"S","entries":["A {@item longsword|phb} is versatile."]},
+ {"name":"Ring of Protection","type":"RG","rarity":"rare","reqAttune":true,"entries":["+1 to AC and saving throws.",{"type":"list","items":["one","two"]}]}]}

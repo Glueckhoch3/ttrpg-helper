@@ -7,6 +7,7 @@
     "story": "Story",
     "maps": "Maps",
     "npcs": "NPCs",
+    "blueprints": "Blueprints",
     "gm": "GM",
     "gmLogin": "GM login",
     "leaveGm": "Leave GM",
@@ -30,6 +31,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "remove": "Remove",
+    "loading": "Loading…",
     "confirmDelete": "Are you sure you want to delete this?"
   },
   "sessions": {
@@ -102,6 +104,46 @@
     "add": "Add NPC",
     "confirmDelete": "Delete \"{name}\"? It is removed from all story parts."
   },
+  "blueprints": {
+    "title": "Blueprints",
+    "hint": "Reusable item and creature data (GM only). Link them to map symbols: players then see them in the symbol's details bar. Entries nobody has linked stay hidden.",
+    "items": "Item Blueprints",
+    "creatures": "Creature Blueprints",
+    "kind": {
+      "item": "Item",
+      "creature": "Creature"
+    },
+    "none": "Nothing here yet. Import a file or create an entry.",
+    "search": "Search by name",
+    "new": "New blueprint",
+    "name": "Name",
+    "subtitle": "Type line (e.g. Medium humanoid, neutral)",
+    "body": "Description",
+    "stats": "Stat fields",
+    "statTitle": "Title",
+    "statValue": "Value",
+    "addStat": "Add stat",
+    "create": "Create",
+    "confirmDelete": "Delete \"{name}\"? It is removed from all map symbols.",
+    "empty": "No details.",
+    "import": "Import…"
+  },
+  "import": {
+    "title": "Import blueprints",
+    "step1": "1. Choose a format",
+    "step2": "2. Choose what to import and select the file",
+    "step3": "3. Choose entries",
+    "kind": "Content",
+    "file": "JSON file",
+    "notJson": "This file is not valid JSON.",
+    "found": "{n} entries found, {dup} already exist (will be skipped), {skipped} unreadable.",
+    "selectAll": "Select all new",
+    "selectNone": "Select none",
+    "run": "Import {n} selected",
+    "done": "Imported {imported}, skipped {duplicates} duplicates.",
+    "limit": "At most {n} entries per import.",
+    "duplicate": "exists"
+  },
   "maps": {
     "title": "Maps",
     "locked": "Locked (hidden from players)",
@@ -137,6 +179,12 @@
     "attach": "Attach to session",
     "session": "Session",
     "attached": "Attached to session notes.",
+    "details": "Details",
+    "links": "Linked data (GM)",
+    "linkNpc": "NPC",
+    "linkCreature": "Creature Blueprint",
+    "linkItems": "Item Blueprints (max. 5)",
+    "linkNone": "— none —",
     "stack": "{n} symbols on this field – click again to cycle",
     "symbols": {
       "player": "Player",

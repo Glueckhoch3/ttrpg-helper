@@ -3,6 +3,7 @@ import express from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { withLinks, parseLinks, saveItems, hasLinkInput } from '../lib/tokenLinks.js';
 import { HttpError, bad, notFound, str, int, num, patch, sniff } from '../lib/util.js';
 
 const GRIDS = ['square', 'hex', 'none'];
@@ -16,7 +17,18 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
     if (!m.unlocked && !auth.isGm(req)) throw notFound('Map not found');
     return m;
   };
-  const getToken = (id) => db.prepare('SELECT * FROM tokens WHERE id=?').get(id) ?? (() => { throw notFound('Token not found'); })();
+  const getToken = (id) => {
+    const t = db.prepare('SELECT * FROM tokens WHERE id=?').get(id);
+    if (!t) throw notFound('Token not found');
+    return withLinks(db, [t])[0];
+  };
+  // Links to NPCs / blueprints are GM only (ADR-014); returns the validated link fields.
+  const linksFrom = (req) => {
+    const b = req.body ?? {};
+    if (!hasLinkInput(b)) return {};
+    if (!auth.isGm(req)) throw new HttpError(403, 'GM access required to link data to a symbol');
+    return parseLinks(db, b);
+  };
 
   r.get('/maps', (req, res) => {
     const rows = db.prepare('SELECT * FROM maps ORDER BY id DESC').all();
@@ -24,7 +36,7 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
   });
   r.get('/maps/:id', (req, res) => {
     const m = getMapFor(req, req.params.id);
-    res.json({ ...m, tokens: db.prepare('SELECT * FROM tokens WHERE map_id=? ORDER BY id').all(m.id) });
+    res.json({ ...m, tokens: withLinks(db, db.prepare('SELECT * FROM tokens WHERE map_id=? ORDER BY id').all(m.id)) });
   });
 
   // Upload: raw image body; ?title=&w=&h= (pixel size read by the browser)
@@ -98,16 +110,21 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
   r.post('/maps/:id/tokens', (req, res) => {
     const m = getMapFor(req, req.params.id);
     needLocked(m);
-    const f = Object.fromEntries(Object.entries(fields(req.body ?? {})).filter(([, v]) => v !== undefined));
+    const { item_ids: itemIds, ...links } = linksFrom(req);
+    const f = Object.fromEntries(Object.entries({ ...fields(req.body ?? {}), ...links }).filter(([, v]) => v !== undefined));
     const cols = ['map_id', ...Object.keys(f)];
     const info = db.prepare(`INSERT INTO tokens(${cols.join(',')}) VALUES(${cols.map(() => '?').join(',')})`).run(m.id, ...Object.values(f));
+    if (itemIds) saveItems(db, info.lastInsertRowid, itemIds);
     hub.emit('tokens', m.id);
     res.status(201).json(getToken(info.lastInsertRowid));
   });
   r.patch('/tokens/:id', (req, res) => {
     const t = getToken(req.params.id);
     needLocked(getMapFor(req, t.map_id));
-    patch(db, 'tokens', t.id, fields(req.body ?? {}));
+    const { item_ids: itemIds, ...links } = linksFrom(req);
+    const f = { ...fields(req.body ?? {}), ...links };
+    if (Object.values(f).some((v) => v !== undefined) || !itemIds) patch(db, 'tokens', t.id, f);
+    if (itemIds) saveItems(db, t.id, itemIds);
     hub.emit('tokens', t.map_id);
     res.json(getToken(t.id));
   });

@@ -1,0 +1,5 @@
+{"count":2,"results":[
+ {"name":"Goblin","size":"Small","type":"humanoid","subtype":"goblinoid","alignment":"neutral evil","armor_class":15,"armor_desc":"leather armor, shield","hit_points":7,"hit_dice":"2d6","speed":{"walk":30},"strength":8,"dexterity":14,"constitution":10,"intelligence":10,"wisdom":8,"charisma":8,"challenge_rating":"1/4","senses":"darkvision 60 ft.","languages":"Common, Goblin",
+  "special_abilities":[{"name":"Nimble Escape","desc":"Disengage or Hide as a bonus action."}],"actions":[{"name":"Scimitar","desc":"+4 to hit, 1d6+2 slashing."}]},
+ {"size":"Tiny","type":"beast"}
+]}
