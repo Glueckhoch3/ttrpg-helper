@@ -10,11 +10,20 @@ const GRIDS = ['square', 'hex', 'none'];
 export default function mapsRoutes({ db, hub, auth, filesDir }) {
   const r = Router();
   const getMap = (id) => db.prepare('SELECT * FROM maps WHERE id=?').get(id) ?? (() => { throw notFound('Map not found'); })();
+  // Locked maps do not exist for non-GM users (ADR-013).
+  const getMapFor = (req, id) => {
+    const m = getMap(id);
+    if (!m.unlocked && !auth.isGm(req)) throw notFound('Map not found');
+    return m;
+  };
   const getToken = (id) => db.prepare('SELECT * FROM tokens WHERE id=?').get(id) ?? (() => { throw notFound('Token not found'); })();
 
-  r.get('/maps', (req, res) => res.json(db.prepare('SELECT * FROM maps ORDER BY id DESC').all()));
+  r.get('/maps', (req, res) => {
+    const rows = db.prepare('SELECT * FROM maps ORDER BY id DESC').all();
+    res.json(auth.isGm(req) ? rows : rows.filter((m) => m.unlocked));
+  });
   r.get('/maps/:id', (req, res) => {
-    const m = getMap(req.params.id);
+    const m = getMapFor(req, req.params.id);
     res.json({ ...m, tokens: db.prepare('SELECT * FROM tokens WHERE map_id=? ORDER BY id').all(m.id) });
   });
 
@@ -27,13 +36,22 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
     const h = int(q('h'), 'h', { min: 1, max: 20000 });
     const file = `${crypto.randomUUID()}.${type.ext}`;
     fs.writeFileSync(path.join(filesDir, file), req.body);
-    const info = db.prepare('INSERT INTO maps(title,image_file,img_w,img_h) VALUES(?,?,?,?)')
-      .run(str(req.query.title, 'title', { max: 200 }), file, w, h);
+    const info = db.prepare('INSERT INTO maps(title,image_file,img_w,img_h,unlocked) VALUES(?,?,?,?,?)')
+      .run(str(req.query.title, 'title', { max: 200 }), file, w, h, auth.isGm(req) ? 0 : 1); // GM maps start hidden, player maps are shared at once
     hub.emit('maps');
     res.status(201).json(getMap(info.lastInsertRowid));
   });
-  r.patch('/maps/:id', (req, res) => {
+  r.post('/maps/:id/unlock', auth.requireGm, (req, res) => setUnlocked(req, res, 1));
+  r.post('/maps/:id/lock', auth.requireGm, (req, res) => setUnlocked(req, res, 0));
+  function setUnlocked(req, res, v) {
     const m = getMap(req.params.id);
+    db.prepare('UPDATE maps SET unlocked=? WHERE id=?').run(v, m.id);
+    hub.emit('maps', m.id);
+    hub.emit('story');
+    res.json(getMap(m.id));
+  }
+  r.patch('/maps/:id', (req, res) => {
+    const m = getMapFor(req, req.params.id);
     const b = req.body ?? {};
     if (b.grid_locked !== undefined && typeof b.grid_locked !== 'boolean') throw bad('grid_locked must be a boolean');
     // Locked grid: geometry is frozen; unlock first (may be in the same request).
@@ -57,6 +75,7 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
     db.prepare('DELETE FROM maps WHERE id=?').run(m.id);
     fs.rmSync(path.join(filesDir, m.image_file), { force: true });
     hub.emit('maps', m.id);
+    hub.emit('story');
     res.status(204).end();
   });
 
@@ -77,7 +96,7 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
   const needLocked = (m) => { if (!m.grid_locked) throw new HttpError(409, 'Lock the grid before placing symbols'); };
 
   r.post('/maps/:id/tokens', (req, res) => {
-    const m = getMap(req.params.id);
+    const m = getMapFor(req, req.params.id);
     needLocked(m);
     const f = Object.fromEntries(Object.entries(fields(req.body ?? {})).filter(([, v]) => v !== undefined));
     const cols = ['map_id', ...Object.keys(f)];
@@ -87,14 +106,14 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
   });
   r.patch('/tokens/:id', (req, res) => {
     const t = getToken(req.params.id);
-    needLocked(getMap(t.map_id));
+    needLocked(getMapFor(req, t.map_id));
     patch(db, 'tokens', t.id, fields(req.body ?? {}));
     hub.emit('tokens', t.map_id);
     res.json(getToken(t.id));
   });
   r.delete('/tokens/:id', (req, res) => {
     const t = getToken(req.params.id);
-    needLocked(getMap(t.map_id));
+    needLocked(getMapFor(req, t.map_id));
     db.prepare('DELETE FROM tokens WHERE id=?').run(t.id);
     hub.emit('tokens', t.map_id);
     res.status(204).end();

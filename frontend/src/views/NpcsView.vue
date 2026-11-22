@@ -1,0 +1,77 @@
+<script setup>
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import Button from 'primevue/button'
+import Textarea from 'primevue/textarea'
+import InputText from 'primevue/inputtext'
+import { api } from '@/lib/api'
+import { useLive } from '@/lib/useLive'
+
+const { t } = useI18n()
+const npcs = ref([])
+const error = ref('')
+const draft = ref({ name: '', description: '' })
+const editing = ref(null)
+const edit = ref({ name: '', description: '', gm_notes: '' })
+const statDraft = ref({})
+const MAX_STATS = 8
+useLive(['npcs'], async () => { npcs.value = await api.get('/npcs') })
+const run = async (fn) => { error.value = ''; try { await fn() } catch (e) { error.value = e.message } }
+const add = () => run(async () => { await api.post('/npcs', draft.value); draft.value = { name: '', description: '' } })
+const startEdit = (n) => { editing.value = n.id; edit.value = { name: n.name, description: n.description, gm_notes: n.gm_notes } }
+const hp = (n, v) => run(() => api.patch(`/npcs/${n.id}`, { hp: v }))
+const setStat = (s, f) => run(() => api.patch(`/npc-stats/${s.id}`, f))
+const delStat = (s) => run(() => api.del(`/npc-stats/${s.id}`))
+const addStat = (n) => run(async () => { await api.post(`/npcs/${n.id}/stats`, { title: statDraft.value[n.id].title, value: statDraft.value[n.id].value ?? '', visible: !!statDraft.value[n.id].visible }); statDraft.value[n.id] = {} })
+const sd = (n) => (statDraft.value[n.id] ??= {})
+const save = (n) => run(async () => { await api.patch(`/npcs/${n.id}`, edit.value); editing.value = null })
+const del = (n) => confirm(t('npcs.confirmDelete', { name: n.name })) && run(() => api.del(`/npcs/${n.id}`))
+</script>
+
+<template>
+  <h2>{{ $t('npcs.title') }}</h2>
+  <p class="muted">{{ $t('npcs.hint') }}</p>
+  <p v-if="!npcs.length" class="muted">{{ $t('npcs.none') }}</p>
+  <div v-for="n in npcs" :key="n.id" class="card">
+    <template v-if="editing === n.id">
+      <InputText v-model="edit.name" fluid />
+      <Textarea v-model="edit.description" rows="4" fluid :placeholder="$t('npcs.description')" />
+      <Textarea v-model="edit.gm_notes" rows="3" fluid :placeholder="$t('npcs.gmNotes')" />
+      <div class="row"><Button size="small" :label="$t('common.save')" :disabled="!edit.name.trim()" @click="save(n)" /><Button size="small" severity="secondary" :label="$t('common.cancel')" @click="editing = null" /></div>
+    </template>
+    <template v-else>
+      <div class="row"><strong>👤 {{ n.name }}</strong><span class="spacer" />
+        <Button size="small" text :label="$t('common.edit')" @click="startEdit(n)" />
+        <Button size="small" text severity="danger" :label="$t('common.delete')" @click="del(n)" /></div>
+      <div class="pre">{{ n.description }}</div>
+      <div v-if="n.gm_notes" class="pre muted">🔒 {{ n.gm_notes }}</div>
+      <div class="row">
+        <strong>{{ $t('npcs.hp') }}</strong>
+        <Button size="small" label="−" :aria-label="$t('npcs.hpDown')" @click="hp(n, n.hp - 1)" />
+        <input type="number" :value="n.hp" style="width:4.5rem" :aria-label="$t('npcs.hp')" @change="hp(n, Math.trunc(+$event.target.value) || 0)" />
+        <Button size="small" label="+" :aria-label="$t('npcs.hpUp')" @click="hp(n, n.hp + 1)" />
+        <span class="muted">{{ $t('npcs.gmOnly') }}</span>
+      </div>
+      <div v-for="s in n.stats" :key="s.id" class="row">
+        <strong style="min-width:8rem">{{ s.title }}</strong>
+        <InputText :model-value="s.value" maxlength="64" size="small" @change="setStat(s, { value: $event.target.value })" />
+        <label class="muted"><input type="checkbox" :checked="!!s.visible" @change="setStat(s, { visible: $event.target.checked })" /> {{ $t('npcs.statVisible') }}</label>
+        <Button size="small" text severity="danger" icon="pi pi-trash" :aria-label="$t('common.delete')" @click="delStat(s)" />
+      </div>
+      <div v-if="n.stats.length < MAX_STATS" class="row">
+        <InputText v-model="sd(n).title" maxlength="32" size="small" :placeholder="$t('npcs.statTitle')" />
+        <InputText v-model="sd(n).value" maxlength="64" size="small" :placeholder="$t('npcs.statValue')" />
+        <label class="muted"><input v-model="sd(n).visible" type="checkbox" /> {{ $t('npcs.statVisible') }}</label>
+        <Button size="small" icon="pi pi-plus" :label="$t('npcs.addStat')" :disabled="!sd(n).title?.trim()" @click="addStat(n)" />
+      </div>
+      <span v-else class="muted">{{ $t('npcs.maxStats') }}</span>
+    </template>
+  </div>
+  <div class="card">
+    <strong>{{ $t('npcs.new') }}</strong>
+    <InputText v-model="draft.name" :placeholder="$t('npcs.name')" fluid />
+    <Textarea v-model="draft.description" rows="3" fluid :placeholder="$t('npcs.description')" />
+    <Button :label="$t('npcs.add')" :disabled="!draft.name.trim()" @click="add" />
+  </div>
+  <p class="err">{{ error }}</p>
+</template>

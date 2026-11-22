@@ -4,11 +4,20 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { bad, notFound, str, int, patch, sniff } from '../lib/util.js';
+import { allParts, visibleIds } from '../lib/story.js';
 
 export default function sessionsRoutes({ db, hub, auth, filesDir }) {
   const r = Router();
   const getSession = (id) => db.prepare('SELECT * FROM sessions WHERE id=?').get(id) ?? (() => { throw notFound('Session not found'); })();
   const getNote = (id) => db.prepare('SELECT * FROM notes WHERE id=?').get(id) ?? (() => { throw notFound('Note not found'); })();
+
+  // Note -> story link (ADR-013): story_id/story_title are only exposed while the requester may see that part.
+  const withLinks = (req, notes) => {
+    const parts = allParts(db);
+    const ok = auth.isGm(req) ? new Set(parts.map((p) => p.id)) : visibleIds(parts);
+    const title = new Map(parts.map((p) => [p.id, p.title]));
+    return notes.map((n) => (n.story_id && ok.has(n.story_id) ? { ...n, story_title: title.get(n.story_id) } : { ...n, story_id: null, story_title: null }));
+  };
 
   r.get('/sessions', (req, res) => {
     res.json(db.prepare('SELECT * FROM sessions ORDER BY COALESCE(number,0) DESC, id DESC').all());
@@ -25,7 +34,7 @@ export default function sessionsRoutes({ db, hub, auth, filesDir }) {
     const s = getSession(req.params.id);
     res.json({
       ...s,
-      notes: db.prepare('SELECT * FROM notes WHERE session_id=? ORDER BY id').all(s.id),
+      notes: withLinks(req, db.prepare('SELECT * FROM notes WHERE session_id=? ORDER BY id').all(s.id)),
       attachments: db.prepare('SELECT * FROM attachments WHERE session_id=? ORDER BY id').all(s.id),
     });
   });
@@ -59,9 +68,23 @@ export default function sessionsRoutes({ db, hub, auth, filesDir }) {
   });
   r.patch('/notes/:id', (req, res) => {
     const n = getNote(req.params.id);
-    patch(db, 'notes', n.id, { body: str(req.body?.body, 'body'), updated_at: new Date().toISOString() });
+    const b = req.body ?? {};
+    if (b.body === undefined && b.story_id === undefined) throw bad('No fields to update');
+    const f = {};
+    if (b.body !== undefined) { f.body = str(b.body, 'body'); f.updated_at = new Date().toISOString(); }
+    if (b.story_id !== undefined) {
+      if (b.story_id === null) f.story_id = null;
+      else {
+        const id = int(b.story_id, 'story_id', { min: 1 });
+        const parts = allParts(db);
+        const ok = auth.isGm(req) ? parts.some((p) => p.id === id) : visibleIds(parts).has(id);
+        if (!ok) throw bad('Unknown or locked story part');
+        f.story_id = id;
+      }
+    }
+    patch(db, 'notes', n.id, f);
     hub.emit('notes', n.session_id);
-    res.json(getNote(n.id));
+    res.json(withLinks(req, [getNote(n.id)])[0]);
   });
   r.delete('/notes/:id', (req, res) => {
     const n = getNote(req.params.id);

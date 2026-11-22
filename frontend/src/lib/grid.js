@@ -10,6 +10,13 @@ export function cellCenter(map, col, row) {
   return { x: map.offset_x + (col + 0.5) * s, y: map.offset_y + (row + 0.5) * s }
 }
 
+// Centre of a size x size block of cells whose top-left cell is (col,row): size 2 = 4 cells, size 3 = 9 cells.
+export function blockCenter(map, col, row, size = 1) {
+  let x = 0, y = 0
+  for (let i = 0; i < size; i++) for (let j = 0; j < size; j++) { const c = cellCenter(map, col + i, row + j); x += c.x; y += c.y }
+  return { x: x / (size * size), y: y / (size * size) }
+}
+
 export function pointToCell(map, x, y) {
   const s = map.cell_px
   if (map.grid_type !== 'hex') return { col: Math.floor((x - map.offset_x) / s), row: Math.floor((y - map.offset_y) / s) }
