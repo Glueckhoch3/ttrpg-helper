@@ -37,7 +37,7 @@ async function upload() {
 
 <template>
   <h2>{{ $t('maps.title') }}</h2>
-  <div v-if="auth.token" class="card row">
+  <div class="card row">
     <InputText v-model="title" :placeholder="$t('maps.mapTitle')" />
     <input type="file" accept="image/png,image/jpeg,image/webp" @change="file = $event.target.files[0]" />
     <Button :label="$t('maps.upload')" :disabled="!file" @click="upload" />

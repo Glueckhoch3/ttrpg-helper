@@ -50,7 +50,7 @@ const move = (d) => run(() => {
         <Button size="small" text severity="danger" :label="$t('common.delete')" @click="del" />
       </template>
     </div>
-    <StoryForm v-if="mode" v-model="draft" :npcs="npcs" :maps="maps" :submit-label="$t('common.save')" @submit="submit" @cancel="mode = null" />
+    <StoryForm v-if="mode === 'edit'" v-model="draft" :npcs="npcs" :maps="maps" :submit-label="$t('common.save')" @submit="submit" @cancel="mode = null" />
     <template v-else>
       <div v-if="part.location" class="muted">📍 {{ part.location }}</div>
       <div v-if="part.npcs.length" class="muted">👤 {{ part.npcs.map((n) => n.name).join(', ') }}</div>

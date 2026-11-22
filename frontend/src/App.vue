@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
@@ -14,6 +14,9 @@ const nameInput = ref(auth.name)
 const groupPw = ref('')
 const showGm = ref(false)
 const pin = ref('')
+const pinBox = ref(null)
+// focus the PIN field as soon as the GM login opens
+watch(showGm, async (v) => { if (v) { await nextTick(); pinBox.value?.querySelector('input')?.focus() } })
 const error = ref('')
 
 onMounted(checkSession)
@@ -53,7 +56,7 @@ async function gmLogin() {
       <Button size="small" text :label="$t('nav.changeName')" @click="setName('')" />
       <Button size="small" text :label="$t('nav.logout')" @click="leaveGroup" />
     </header>
-    <div v-if="showGm && !auth.token" class="gm">
+    <div v-if="showGm && !auth.token" ref="pinBox" class="gm">
       <Password v-model="pin" :feedback="false" :placeholder="$t('gm.pin')" @keyup.enter="gmLogin" />
       <Button :label="$t('gm.unlock')" @click="gmLogin" />
       <span class="err">{{ error }}</span>
@@ -73,6 +76,7 @@ input[type=range], input[type=file] { accent-color: var(--app-accent); }
 .spacer { flex: 1; }
 :focus-visible { outline: 3px solid var(--app-accent); outline-offset: 2px; }
 .gm { padding: .6rem 1rem; display: flex; gap: .5rem; align-items: center; background: var(--app-warn); }
+@media (min-width: 900px) { .gm { width: fit-content; margin-left: auto; border-radius: 0 0 8px 8px; } }
 main { padding: 1rem; max-width: 1400px; margin: 0 auto; }
 .join { max-width: 22rem; margin: 15vh auto; display: flex; flex-direction: column; gap: .8rem; text-align: center; }
 .err { color: var(--app-danger); }

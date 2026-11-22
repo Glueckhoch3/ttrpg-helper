@@ -28,7 +28,7 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
   });
 
   // Upload: raw image body; ?title=&w=&h= (pixel size read by the browser)
-  r.post('/maps', auth.requireGm, express.raw({ type: () => true, limit: '25mb' }), (req, res) => {
+  r.post('/maps', express.raw({ type: () => true, limit: '25mb' }), (req, res) => {
     const type = sniff(req.body);
     if (!type || type.mime === 'application/pdf') throw bad('Map must be png, jpg or webp');
     const q = (k) => { const v = Number(req.query[k]); return Number.isInteger(v) ? v : NaN; };
@@ -36,8 +36,8 @@ export default function mapsRoutes({ db, hub, auth, filesDir }) {
     const h = int(q('h'), 'h', { min: 1, max: 20000 });
     const file = `${crypto.randomUUID()}.${type.ext}`;
     fs.writeFileSync(path.join(filesDir, file), req.body);
-    const info = db.prepare('INSERT INTO maps(title,image_file,img_w,img_h) VALUES(?,?,?,?)')
-      .run(str(req.query.title, 'title', { max: 200 }), file, w, h);
+    const info = db.prepare('INSERT INTO maps(title,image_file,img_w,img_h,unlocked) VALUES(?,?,?,?,?)')
+      .run(str(req.query.title, 'title', { max: 200 }), file, w, h, auth.isGm(req) ? 0 : 1); // GM maps start hidden, player maps are shared at once
     hub.emit('maps');
     res.status(201).json(getMap(info.lastInsertRowid));
   });

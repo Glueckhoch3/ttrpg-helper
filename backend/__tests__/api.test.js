@@ -125,7 +125,8 @@ describe('maps and tokens', () => {
   it('uploads maps and validates', async () => {
     await request(app).post('/api/maps?title=x&w=1&h=1').set(G(gm)).set('Content-Type', 'image/png').send(Buffer.from('nope nope nope nope')).expect(400);
     await request(app).post('/api/maps?title=x').set(G(gm)).set('Content-Type', 'image/png').send(PNG).expect(400);
-    await request(app).post('/api/maps?title=x&w=1&h=1').set('Content-Type', 'image/png').send(PNG).expect(403);
+    const own = (await request(app).post('/api/maps?title=x&w=1&h=1').set('Content-Type', 'image/png').send(PNG).expect(201)).body;
+    expect(own.unlocked).toBe(1); // a player's map is visible to the group; the GM may lock it
     const m = (await mk()).body;
     expect(m.grid_type).toBe('square');
   });
@@ -218,6 +219,11 @@ describe('map locks and story/note links (issue #2)', () => {
     await request(app).get(`/api/files/${m.image_file}`).expect(200);
     await request(app).post(`/api/maps/${m.id}/lock`).set(G(gm)).expect(200);
     await request(app).get(`/api/maps/${m.id}`).expect(404);
+  });
+  it('maps uploaded by the GM start locked, by players unlocked', async () => {
+    const pm = (await request(app).post('/api/maps?title=P&w=10&h=10').set('Content-Type', 'image/png').send(PNG).expect(201)).body;
+    expect(pm.unlocked).toBe(1);
+    await request(app).get(`/api/maps/${pm.id}`).expect(200);
   });
   it('a map linked in the story needs its own unlock', async () => {
     const m = await upload();

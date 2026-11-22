@@ -22,7 +22,7 @@ sessions(id, number, title, played_on, summary) · notes(id, session_id, author,
 - Story (ADR-013; tree via `parent_id`, max 2 layers; fields title, location, body, `npc_ids`, `map_id`; GM write; players only see parts that are unlocked with all ancestors unlocked): `GET/POST /story`, `PATCH/DELETE /story/:id`, `POST /story/:id/unlock|lock`, `POST /story/reorder {ids, parent_id}`
 - NPC pool (GM only): `GET/POST /npcs`, `PATCH/DELETE /npcs/:id`
 - Notes: `PATCH /notes/:id {story_id}` links a note to a visible story part
-- Maps: `GET /maps`, `POST /maps` (GM, raw image upload, `?title=`), `GET/PATCH/DELETE /maps/:id`, `POST /maps/:id/unlock|lock` (GM; new maps start locked and are hidden from players incl. image file); tokens `GET/POST /maps/:id/tokens`, `PATCH/DELETE /tokens/:id`
+- Maps: `GET /maps`, `POST /maps` (raw image upload, `?title=`), `GET/PATCH/DELETE /maps/:id`, `POST /maps/:id/unlock|lock` (GM; new maps start locked and are hidden from players incl. image file); tokens `GET/POST /maps/:id/tokens`, `PATCH/DELETE /tokens/:id`
 
 ## Frontend views
 Join · Sessions (list + detail with notes & attachments) · Story (player: unlocked list; GM: editor + unlock toggles) · Maps (list/upload) · MapView (SVG: image, grid, calibration, symbol palette, drag, edit panel, export).

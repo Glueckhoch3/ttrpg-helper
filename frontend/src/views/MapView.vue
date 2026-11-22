@@ -1,15 +1,17 @@
 <script setup>
 import { ref, computed, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import { api, auth } from '@/lib/api'
 import { useLive } from '@/lib/useLive'
-import { cellCenter, pointToCell, hexPoints, visibleCells, formatElevation } from '@/lib/grid'
+import { cellCenter, blockCenter, pointToCell, hexPoints, visibleCells, formatElevation } from '@/lib/grid'
 import { mapToPngBlob } from '@/lib/exportMap'
 
 const { t } = useI18n()
+const router = useRouter()
 const props = defineProps({ id: String })
 const map = ref(null)
 const tokens = ref([])
@@ -42,7 +44,11 @@ async function load() {
   tokens.value = m.tokens
   map.value = Object.assign(map.value || {}, m)
 }
-useLive(['maps', 'tokens'], () => { if (drag.id === null) load().catch((e) => { error.value = e.message }) })
+useLive(['maps', 'tokens'], () => { if (drag.id === null) load().catch((e) => {
+  // the GM locked this map while we were on it: leave to the map list
+  if (e.status === 404 && !auth.token) router.replace('/maps')
+  else error.value = e.message
+}) })
 api.get('/sessions').then((s) => { sessions.value = s; exportSession.value = s[0]?.id ?? null })
 
 const run = async (fn) => { error.value = ''; try { await fn() } catch (e) { error.value = e.message } }
@@ -60,8 +66,10 @@ const saveGrid = () => run(() => api.patch(`/maps/${props.id}`, {
 }))
 
 // --- tokens ---
-const pos = (t) => (drag.id === t.id ? { x: drag.x, y: drag.y } : cellCenter(map.value, t.col, t.row))
+const pos = (t) => (drag.id === t.id ? { x: drag.x, y: drag.y } : blockCenter(map.value, t.col, t.row, t.size))
 const radius = (t) => (t.size * map.value.cell_px) * 0.42
+// offset between a symbol's block centre and its anchor (top-left) cell centre, so a drop snaps the whole block
+const anchorShift = (t) => { const b = blockCenter(map.value, t.col, t.row, t.size); const c = cellCenter(map.value, t.col, t.row); return { x: b.x - c.x, y: b.y - c.y } }
 const addToken = (symbol) => run(async () => {
   const c = pointToCell(map.value, map.value.img_w / 2, map.value.img_h / 2)
   const t = await api.post(`/maps/${props.id}/tokens`, { symbol, col: c.col, row: c.row, label: symbol === '🧙' ? auth.name : '' })
@@ -86,7 +94,7 @@ function down(e, tk) {
   const target = sel ?? tk
   press = { target, stack, wasSelected: !!sel }
   selectedId.value = target.id
-  Object.assign(drag, cellCenter(map.value, target.col, target.row), { id: target.id })
+  Object.assign(drag, blockCenter(map.value, target.col, target.row, target.size), { id: target.id })
   e.currentTarget.setPointerCapture(e.pointerId)
 }
 function move(e) {
@@ -97,7 +105,8 @@ function move(e) {
 async function up() {
   if (drag.id === null) return
   const tk = tokens.value.find((x) => x.id === drag.id)
-  const c = pointToCell(map.value, drag.x, drag.y)
+  const sh = anchorShift(tk)
+  const c = pointToCell(map.value, drag.x - sh.x, drag.y - sh.y)
   drag.id = null
   if (!tk) return
   if (c.col !== tk.col || c.row !== tk.row) await updateToken(tk, c)
@@ -138,7 +147,7 @@ const attach = () => run(async () => {
     </div>
     <div class="layout">
       <div class="stage">
-        <svg ref="svg" :viewBox="`0 0 ${map.img_w} ${map.img_h}`" @pointermove="move" @pointerup="up" @pointerdown.self="selectedId = null">
+        <svg ref="svg" :style="{ touchAction: selectedId !== null ? 'none' : 'auto' }" :viewBox="`0 0 ${map.img_w} ${map.img_h}`" @pointermove="move" @pointerup="up" @pointercancel="up" @pointerdown="selectedId = null">
           <image :href="imageUrl" x="0" y="0" :width="map.img_w" :height="map.img_h" />
           <!-- grid drawn twice (light halo + dark line) so it stays visible on dark and light maps -->
           <template v-if="map.grid_type !== 'none'">

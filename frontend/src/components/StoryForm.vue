@@ -20,7 +20,7 @@ defineEmits(['submit', 'cancel'])
     <Textarea v-model="draft.body" rows="6" fluid :placeholder="$t('story.bodyPlaceholder')" />
     <div class="row">
       <Button size="small" :label="submitLabel" :disabled="!draft.title.trim()" @click="$emit('submit')" />
-      <Button v-if="$attrs.onCancel" size="small" severity="secondary" :label="$t('common.cancel')" @click="$emit('cancel')" />
+      <Button size="small" severity="secondary" :label="$t('common.cancel')" @click="$emit('cancel')" />
     </div>
   </div>
 </template>
