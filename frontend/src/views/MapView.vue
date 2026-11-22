@@ -5,6 +5,8 @@ import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
+import MultiSelect from 'primevue/multiselect'
+import TokenDetails from '@/components/TokenDetails.vue'
 import { api, auth } from '@/lib/api'
 import { useLive } from '@/lib/useLive'
 import { cellCenter, blockCenter, pointToCell, hexPoints, visibleCells, formatElevation } from '@/lib/grid'
@@ -49,6 +51,22 @@ useLive(['maps', 'tokens'], () => { if (drag.id === null) load().catch((e) => {
   if (e.status === 404 && !auth.token) router.replace('/maps')
   else error.value = e.message
 }) })
+// GM only: pick lists for linking NPCs / blueprints to a symbol (Issue #4)
+const npcs = ref([])
+const library = ref([])
+useLive(['npcs', 'blueprints'], async () => {
+  if (!auth.token) return
+  ;[npcs.value, library.value] = await Promise.all([api.get('/npcs'), api.get('/blueprints')])
+})
+const NONE = { id: null, name: '' }
+const npcOptions = computed(() => [{ ...NONE, name: t('map.linkNone') }, ...npcs.value])
+const creatureOptions = computed(() => [{ ...NONE, name: t('map.linkNone') }, ...library.value.filter((b) => b.kind === 'creature')])
+const itemOptions = computed(() => library.value.filter((b) => b.kind === 'item'))
+const MAX_ITEMS = 5
+const hasDetails = computed(() => !!selected.value && (selected.value.npc || selected.value.creature || selected.value.items.length > 0))
+// the server answers with the full token (incl. names), so the details bars update at once
+const setLinks = (tk, fields) => run(async () => { Object.assign(tk, await api.patch(`/tokens/${tk.id}`, fields)) })
+
 api.get('/sessions').then((s) => { sessions.value = s; exportSession.value = s[0]?.id ?? null })
 
 const run = async (fn) => { error.value = ''; try { await fn() } catch (e) { error.value = e.message } }
@@ -193,6 +211,11 @@ const attach = () => run(async () => {
           <div class="palette"><button v-for="[s, n] in PALETTE" :key="s" :title="$t(`map.symbols.${n}`)" @click="addToken(s)">{{ s }}</button></div>
         </div>
 
+        <div v-if="locked && hasDetails" class="card">
+          <strong>{{ $t('map.details') }}</strong>
+          <TokenDetails :token="selected" />
+        </div>
+
         <div v-if="locked && selected" class="card">
           <strong>{{ $t('map.editSymbol') }}</strong>
           <InputText :modelValue="selected.label" :placeholder="$t('map.label')" maxlength="60" fluid @change="updateToken(selected, { label: $event.target.value })" />
@@ -208,6 +231,15 @@ const attach = () => run(async () => {
           </div>
           <div class="row"><button v-for="c in COLORS" :key="c" class="sw" :style="{ background: c, outline: selected.color === c ? '3px solid var(--app-accent)' : 'none', outlineOffset: '2px' }" @click="updateToken(selected, { color: c })" /></div>
           <InputText :modelValue="selected.note" :placeholder="$t('map.note')" maxlength="500" fluid @change="updateToken(selected, { note: $event.target.value })" />
+          <template v-if="auth.token">
+            <strong>{{ $t('map.links') }}</strong>
+            <label class="muted">{{ $t('map.linkNpc') }}</label>
+            <Select :model-value="selected.npc_id" :options="npcOptions" option-label="name" option-value="id" :placeholder="$t('map.linkNone')" fluid @update:model-value="setLinks(selected, { npc_id: $event })" />
+            <label class="muted">{{ $t('map.linkCreature') }}</label>
+            <Select :model-value="selected.creature_id" :options="creatureOptions" option-label="name" option-value="id" :placeholder="$t('map.linkNone')" filter fluid @update:model-value="setLinks(selected, { creature_id: $event })" />
+            <label class="muted">{{ $t('map.linkItems') }}</label>
+            <MultiSelect :model-value="selected.items.map((i) => i.id)" :options="itemOptions" option-label="name" option-value="id" filter :selection-limit="MAX_ITEMS" display="chip" :placeholder="$t('map.linkNone')" fluid @update:model-value="setLinks(selected, { item_ids: $event })" />
+          </template>
           <Button size="small" severity="danger" :label="$t('common.remove')" @click="removeToken(selected)" />
         </div>
 
