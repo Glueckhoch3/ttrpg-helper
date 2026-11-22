@@ -14,13 +14,15 @@ Vue 3 + Vite + PrimeVue frontend, Express 5 (ESM) + AJV + Jest backend. It was a
 - Auth: players join with a name + shared group password (ADR-009; HttpOnly cookie). GM unlocks with a PIN (env `GM_PIN`, auto-generated + printed at start when unset) → bearer token. Server enforces: locked story parts are never sent to players.
 
 ## Data model (SQLite)
-sessions(id, number, title, played_on, summary) · notes(id, session_id, author, body, created_at, updated_at) · story_parts(id, position, title, body, unlocked, unlocked_at) · maps(id, title, image_file, img_w, img_h, grid_type[square|hex|none], cell_px, offset_x, offset_y, session_id) · tokens(id, map_id, symbol, label, color, col, row, elevation, size, note) · attachments(id, session_id, kind, file, title, created_at)
+sessions(id, number, title, played_on, summary) · notes(id, session_id, author, body, story_id, created_at, updated_at) · story_parts(id, parent_id, position, title, location, body, map_id, unlocked, unlocked_at) · npcs(id, name, description) · story_npcs(story_id, npc_id) · maps(id, unlocked, title, image_file, img_w, img_h, grid_type[square|hex|none], cell_px, offset_x, offset_y, session_id) · tokens(id, map_id, symbol, label, color, col, row, elevation, size, note) · attachments(id, session_id, kind, file, title, created_at)
 
 ## API (all JSON under /api unless noted)
 - `POST /auth/join {password}` (sets cookie) · `POST /auth/leave` · `GET /auth/me` · `POST /auth/gm {pin}` → `{token}` · `GET /health` · `GET /events` (SSE). All other routes need the member cookie or GM token.
 - Sessions: `GET/POST /sessions`, `GET/PATCH/DELETE /sessions/:id`; notes: `GET/POST /sessions/:id/notes`, `PATCH/DELETE /notes/:id`; `GET/POST /sessions/:id/attachments` (raw PNG/PDF), `GET /files/:name`
-- Story (GM write; players only ever see unlocked parts, locked ones are 404/omitted): `GET/POST /story`, `PATCH/DELETE /story/:id`, `POST /story/:id/unlock|lock`, `POST /story/reorder`
-- Maps: `GET/POST /maps` (raw image upload, `?title=`), `GET/PATCH/DELETE /maps/:id`; tokens `GET/POST /maps/:id/tokens`, `PATCH/DELETE /tokens/:id`
+- Story (ADR-013; tree via `parent_id`, max 2 layers; fields title, location, body, `npc_ids`, `map_id`; GM write; players only see parts that are unlocked with all ancestors unlocked): `GET/POST /story`, `PATCH/DELETE /story/:id`, `POST /story/:id/unlock|lock`, `POST /story/reorder {ids, parent_id}`
+- NPC pool (GM only): `GET/POST /npcs`, `PATCH/DELETE /npcs/:id`
+- Notes: `PATCH /notes/:id {story_id}` links a note to a visible story part
+- Maps: `GET /maps`, `POST /maps` (GM, raw image upload, `?title=`), `GET/PATCH/DELETE /maps/:id`, `POST /maps/:id/unlock|lock` (GM; new maps start locked and are hidden from players incl. image file); tokens `GET/POST /maps/:id/tokens`, `PATCH/DELETE /tokens/:id`
 
 ## Frontend views
 Join · Sessions (list + detail with notes & attachments) · Story (player: unlocked list; GM: editor + unlock toggles) · Maps (list/upload) · MapView (SVG: image, grid, calibration, symbol palette, drag, edit panel, export).

@@ -44,6 +44,7 @@ async function gmLogin() {
       <router-link to="/sessions">{{ $t('nav.sessions') }}</router-link>
       <router-link to="/story">{{ $t('nav.story') }}</router-link>
       <router-link to="/maps">{{ $t('nav.maps') }}</router-link>
+      <router-link v-if="auth.token" to="/npcs">{{ $t('nav.npcs') }}</router-link>
       <span class="spacer" />
       <Select :model-value="themeChoice" :options="themeOptions" option-label="label" option-value="id" size="small" :aria-label="$t('theme.label')" :title="$t('theme.label')" @update:model-value="setTheme" />
       <span>{{ auth.name }}<template v-if="auth.token"> · {{ $t('nav.gm') }}</template></span>

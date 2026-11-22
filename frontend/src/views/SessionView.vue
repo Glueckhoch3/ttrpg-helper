@@ -1,8 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
+import Select from 'primevue/select'
 import { api, auth } from '@/lib/api'
 import { useLive } from '@/lib/useLive'
 
@@ -13,8 +14,17 @@ const body = ref('')
 const editing = ref(null)
 const editBody = ref('')
 const error = ref('')
+const parts = ref([])
+const linking = ref(null) // note id whose link selector is open
+const byId = (id) => parts.value.find((p) => p.id === id)
+// "Town › Tavern": parents first so the player sees where a scenario belongs
+const partLabel = (p) => (p.parent_id && byId(p.parent_id) ? `${partLabel(byId(p.parent_id))} › ${p.title}` : p.title)
+const options = computed(() => parts.value.map((p) => ({ id: p.id, label: partLabel(p) })))
 
-useLive(['notes', 'sessions'], async () => { s.value = await api.get(`/sessions/${props.id}`) })
+useLive(['notes', 'sessions', 'story'], async () => {
+  [s.value, parts.value] = await Promise.all([api.get(`/sessions/${props.id}`), api.get('/story')])
+})
+const setLink = (n, storyId) => run(async () => { await api.patch(`/notes/${n.id}`, { story_id: storyId ?? null }); if (storyId == null) linking.value = null })
 
 const run = async (fn) => { error.value = ''; try { await fn() } catch (e) { error.value = e.message } }
 const add = () => run(async () => { await api.post(`/sessions/${props.id}/notes`, { author: auth.name, body: body.value }); body.value = '' })
@@ -50,7 +60,12 @@ const delSession = () => confirm(t('sessions.confirmSession')) && run(async () =
       </template>
       <template v-else>
         <div class="pre">{{ n.body }}</div>
-        <div class="row"><Button size="small" text :label="$t('common.edit')" @click="startEdit(n)" /><Button size="small" text severity="danger" :label="$t('common.delete')" @click="del(n)" /></div>
+        <div class="row">
+          <Button size="small" text :label="$t('common.edit')" @click="startEdit(n)" /><Button size="small" text severity="danger" :label="$t('common.delete')" @click="del(n)" />
+          <Button size="small" text icon="pi pi-link" :label="$t('sessions.link')" :aria-expanded="linking === n.id" @click="linking = linking === n.id ? null : n.id" />
+          <router-link v-if="n.story_id" :to="{ path: '/story', query: { part: n.story_id } }">📖 {{ n.story_title }}</router-link>
+          <Select v-if="linking === n.id" :model-value="n.story_id" :options="options" option-label="label" option-value="id" show-clear filter :placeholder="$t('sessions.linkPlaceholder')" :empty-message="$t('sessions.linkNone')" size="small" @update:model-value="(v) => setLink(n, v)" />
+        </div>
       </template>
     </div>
     <div class="card">

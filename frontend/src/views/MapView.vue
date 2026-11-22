@@ -132,6 +132,10 @@ const attach = () => run(async () => {
   <template v-if="map">
     <router-link to="/maps">{{ $t('maps.back') }}</router-link>
     <h2>{{ map.title }}</h2>
+    <div v-if="auth.token" class="row" style="margin-bottom:.5rem">
+      <span class="muted">{{ map.unlocked ? $t('maps.unlocked') : $t('maps.locked') }}</span>
+      <Button size="small" :severity="map.unlocked ? 'secondary' : undefined" :icon="map.unlocked ? 'pi pi-lock' : 'pi pi-lock-open'" :label="map.unlocked ? $t('maps.lock') : $t('maps.unlock')" @click="run(() => api.post(`/maps/${props.id}/${map.unlocked ? 'lock' : 'unlock'}`))" />
+    </div>
     <div class="layout">
       <div class="stage">
         <svg ref="svg" :viewBox="`0 0 ${map.img_w} ${map.img_h}`" @pointermove="move" @pointerup="up" @pointerdown.self="selectedId = null">

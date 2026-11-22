@@ -100,13 +100,17 @@ describe('story', () => {
 
 describe('maps and tokens', () => {
   const mk = async () => {
-    const r = await request(app).post('/api/maps?title=Cave&w=800&h=600').set('Content-Type', 'image/png').send(PNG);
-    if (r.status === 201) await request(app).patch(`/api/maps/${r.body.id}`).send({ grid_locked: true });
+    const r = await request(app).post('/api/maps?title=Cave&w=800&h=600').set(G(gm)).set('Content-Type', 'image/png').send(PNG);
+    if (r.status === 201) {
+      await request(app).post(`/api/maps/${r.body.id}/unlock`).set(G(gm));
+      await request(app).patch(`/api/maps/${r.body.id}`).send({ grid_locked: true });
+    }
     return r;
   };
   it('requires a locked grid for symbols and freezes the grid while locked', async () => {
-    const m = (await request(app).post('/api/maps?title=x&w=800&h=600').set('Content-Type', 'image/png').send(PNG)).body;
+    const m = (await request(app).post('/api/maps?title=x&w=800&h=600').set(G(gm)).set('Content-Type', 'image/png').send(PNG)).body;
     expect(m.grid_locked).toBe(0);
+    await request(app).post(`/api/maps/${m.id}/unlock`).set(G(gm));
     await request(app).post(`/api/maps/${m.id}/tokens`).send({}).expect(409);
     await request(app).patch(`/api/maps/${m.id}`).send({ cell_px: 70, grid_locked: true }).expect(200);
     await request(app).patch(`/api/maps/${m.id}`).send({ cell_px: 80 }).expect(409);
@@ -119,8 +123,9 @@ describe('maps and tokens', () => {
     expect((await request(app).get(`/api/maps/${m.id}`)).body.tokens[0]).toMatchObject({ col: 1 });
   });
   it('uploads maps and validates', async () => {
-    await request(app).post('/api/maps?title=x&w=1&h=1').set('Content-Type', 'image/png').send(Buffer.from('nope nope nope nope')).expect(400);
-    await request(app).post('/api/maps?title=x').set('Content-Type', 'image/png').send(PNG).expect(400);
+    await request(app).post('/api/maps?title=x&w=1&h=1').set(G(gm)).set('Content-Type', 'image/png').send(Buffer.from('nope nope nope nope')).expect(400);
+    await request(app).post('/api/maps?title=x').set(G(gm)).set('Content-Type', 'image/png').send(PNG).expect(400);
+    await request(app).post('/api/maps?title=x&w=1&h=1').set('Content-Type', 'image/png').send(PNG).expect(403);
     const m = (await mk()).body;
     expect(m.grid_type).toBe('square');
   });
@@ -149,5 +154,94 @@ describe('maps and tokens', () => {
     await request(app).delete(`/api/maps/${m.id}`).expect(403);
     await request(app).delete(`/api/maps/${m.id}`).set(G(gm)).expect(204);
     await request(app).get(`/api/maps/${m.id}`).expect(404);
+  });
+});
+
+describe('story tree (issue #2)', () => {
+  const post = (url, body) => request(app).post(url).set(G(gm)).send(body);
+  it('nests scenarios under snippets, limited to two layers', async () => {
+    const town = (await post('/api/story', { title: 'Town', location: 'Riverside' }).expect(201)).body;
+    const tavern = (await post('/api/story', { title: 'Tavern', parent_id: town.id }).expect(201)).body;
+    expect(tavern.parent_id).toBe(town.id);
+    await post('/api/story', { title: 'Cellar', parent_id: tavern.id }).expect(400);
+    await post('/api/story', { title: 'x', parent_id: 999 }).expect(404);
+  });
+  it('hides scenarios while their snippet is locked', async () => {
+    const town = (await post('/api/story', { title: 'Town' })).body;
+    const tavern = (await post('/api/story', { title: 'Tavern', body: 'secret', parent_id: town.id })).body;
+    await post(`/api/story/${tavern.id}/unlock`);
+    expect((await request(app).get('/api/story')).body).toEqual([]);
+    await request(app).get(`/api/story/${tavern.id}`).expect(404);
+    await post(`/api/story/${town.id}/unlock`);
+    expect((await request(app).get('/api/story')).body.map((p) => p.title)).toEqual(['Town', 'Tavern']);
+  });
+  it('reorders siblings per parent and cascades deletes', async () => {
+    const t = (await post('/api/story', { title: 'T' })).body;
+    const a = (await post('/api/story', { title: 'A', parent_id: t.id })).body;
+    const b = (await post('/api/story', { title: 'B', parent_id: t.id })).body;
+    await post('/api/story/reorder', { ids: [b.id, a.id], parent_id: t.id }).expect(200);
+    const titles = (await request(app).get('/api/story').set(G(gm))).body.filter((p) => p.parent_id === t.id).map((p) => p.title);
+    expect(titles).toEqual(['B', 'A']);
+    await post('/api/story/reorder', { ids: [a.id] , parent_id: t.id }).expect(400);
+    await request(app).delete(`/api/story/${t.id}`).set(G(gm)).expect(204);
+    expect((await request(app).get('/api/story').set(G(gm))).body).toEqual([]);
+  });
+  it('links NPCs from the GM-only pool; players see names only', async () => {
+    await request(app).get('/api/npcs').expect(403);
+    const n = (await post('/api/npcs', { name: 'Mayor Bram', description: 'is the villain' }).expect(201)).body;
+    const p = (await post('/api/story', { title: 'Town', npc_ids: [n.id] }).expect(201)).body;
+    expect(p.npcs).toEqual([{ id: n.id, name: 'Mayor Bram' }]);
+    await post('/api/story', { title: 'Bad', npc_ids: [999] }).expect(400);
+    await post(`/api/story/${p.id}/unlock`);
+    const seen = (await request(app).get('/api/story')).body[0];
+    expect(seen.npcs[0].name).toBe('Mayor Bram');
+    expect(JSON.stringify(seen)).not.toMatch(/villain/);
+    await request(app).patch(`/api/story/${p.id}`).set(G(gm)).send({ npc_ids: [] }).expect(200);
+    expect((await request(app).get('/api/story')).body[0].npcs).toEqual([]);
+    await request(app).delete(`/api/npcs/${n.id}`).set(G(gm)).expect(204);
+  });
+});
+
+describe('map locks and story/note links (issue #2)', () => {
+  const upload = async () => (await request(app).post('/api/maps?title=Cave&w=800&h=600').set(G(gm)).set('Content-Type', 'image/png').send(PNG).expect(201)).body;
+  it('new maps are hidden from players until the GM unlocks them', async () => {
+    const m = await upload();
+    expect(m.unlocked).toBe(0);
+    expect((await request(app).get('/api/maps')).body).toEqual([]);
+    expect((await request(app).get('/api/maps').set(G(gm))).body).toHaveLength(1);
+    await request(app).get(`/api/maps/${m.id}`).expect(404);
+    await request(app).get(`/api/files/${m.image_file}`).expect(404);
+    await request(app).get(`/api/files/${m.image_file}`).set(G(gm)).expect(200);
+    await request(app).post(`/api/maps/${m.id}/unlock`).expect(403);
+    await request(app).post(`/api/maps/${m.id}/unlock`).set(G(gm)).expect(200);
+    await request(app).get(`/api/maps/${m.id}`).expect(200);
+    await request(app).get(`/api/files/${m.image_file}`).expect(200);
+    await request(app).post(`/api/maps/${m.id}/lock`).set(G(gm)).expect(200);
+    await request(app).get(`/api/maps/${m.id}`).expect(404);
+  });
+  it('a map linked in the story needs its own unlock', async () => {
+    const m = await upload();
+    const p = (await request(app).post('/api/story').set(G(gm)).send({ title: 'Cave', map_id: m.id }).expect(201)).body;
+    expect(p.map).toMatchObject({ id: m.id, unlocked: false });
+    await request(app).post(`/api/story/${p.id}/unlock`).set(G(gm));
+    expect((await request(app).get('/api/story')).body[0]).toMatchObject({ map_id: null, map: null });
+    await request(app).post(`/api/maps/${m.id}/unlock`).set(G(gm));
+    expect((await request(app).get('/api/story')).body[0].map).toMatchObject({ id: m.id, title: 'Cave' });
+    await request(app).post('/api/story').set(G(gm)).send({ title: 'x', map_id: 999 }).expect(400);
+  });
+  it('links notes to unlocked story parts only', async () => {
+    const s = (await request(app).post('/api/sessions').send({ title: 'S' })).body;
+    const n = (await request(app).post(`/api/sessions/${s.id}/notes`).send({ author: 'Ann', body: 'hi' })).body;
+    const p = (await request(app).post('/api/story').set(G(gm)).send({ title: 'Tavern' })).body;
+    await request(app).patch(`/api/notes/${n.id}`).send({ story_id: p.id }).expect(400);
+    await request(app).post(`/api/story/${p.id}/unlock`).set(G(gm));
+    const r = await request(app).patch(`/api/notes/${n.id}`).send({ story_id: p.id }).expect(200);
+    expect(r.body).toMatchObject({ story_id: p.id, story_title: 'Tavern', body: 'hi' });
+    expect((await request(app).get(`/api/sessions/${s.id}`)).body.notes[0].story_title).toBe('Tavern');
+    await request(app).post(`/api/story/${p.id}/lock`).set(G(gm));
+    expect((await request(app).get(`/api/sessions/${s.id}`)).body.notes[0]).toMatchObject({ story_id: null, story_title: null });
+    expect((await request(app).get(`/api/sessions/${s.id}`).set(G(gm))).body.notes[0].story_title).toBe('Tavern');
+    await request(app).patch(`/api/notes/${n.id}`).send({ story_id: null }).expect(200);
+    await request(app).patch(`/api/notes/${n.id}`).send({}).expect(400);
   });
 });
