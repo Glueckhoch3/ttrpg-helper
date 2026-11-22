@@ -11,6 +11,7 @@ Purpose: LAN web app for a D&D group (session notes, GM-unlocked story parts, gr
 - Prod/LAN: `npm run build --prefix frontend` then `npm --prefix backend start`; backend serves `frontend/dist`, prints LAN URL + GM PIN.
 - Tests: `npm --prefix backend test` (in-memory DB via `createApp(openDb(':memory:'))`). Add a test for every endpoint.
 - New endpoint: route module in `backend/modules/<name>/`, tests, update `docs/PLAN.md` API list.
+- New import format: file in `backend/lib/importers/`, register in `index.js` (the menu shows max. three formats), add a fixture in `backend/__tests__/fixtures/` + a test, document it in `docs/import-formats.md`.
 - Lint frontend: `npm --prefix frontend run lint`.
 
 ## Rules
