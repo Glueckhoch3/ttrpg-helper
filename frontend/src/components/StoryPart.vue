@@ -4,14 +4,16 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import StoryForm from './StoryForm.vue'
 import { api } from '@/lib/api'
+import { openNpc } from '@/lib/npcDialog'
 
 // One story part (snippet or scenario); renders its children recursively. Depth is capped by the backend (MAX_DEPTH).
 const props = defineProps({
   part: Object, depth: { type: Number, default: 1 }, index: Number, siblings: Array,
-  children: Object, gm: Boolean, npcs: Array, maps: Array, maxDepth: Number, number: String,
+  children: Object, gm: Boolean, npcs: Array, maps: Array, maxDepth: Number, number: String, openIds: { type: Set, default: () => new Set() },
 })
 const emit = defineEmits(['error'])
 const { t } = useI18n()
+const open = ref(props.openIds.has(props.part.id)) // collapsed by default: only this layer's titles show
 const mode = ref(null) // 'edit' | 'add'
 const draft = ref({})
 const kids = computed(() => props.children.get(props.part.id) ?? [])
@@ -19,8 +21,8 @@ const label = computed(() => (props.depth === 1 ? t('story.snippet') : t('story.
 
 const run = async (fn) => { try { await fn() } catch (e) { emit('error', e.message) } }
 const blank = () => ({ title: '', location: '', body: '', npc_ids: [], map_id: null })
-const startEdit = () => { draft.value = { title: props.part.title, location: props.part.location, body: props.part.body, npc_ids: props.part.npcs.map((n) => n.id), map_id: props.part.map_id }; mode.value = 'edit' }
-const startAdd = () => { draft.value = blank(); mode.value = 'add' }
+const startEdit = () => { draft.value = { title: props.part.title, location: props.part.location, body: props.part.body, npc_ids: props.part.npcs.map((n) => n.id), map_id: props.part.map_id }; mode.value = 'edit'; open.value = true }
+const startAdd = () => { draft.value = blank(); mode.value = 'add'; open.value = true }
 const submit = () => run(async () => {
   if (mode.value === 'edit') await api.patch(`/story/${props.part.id}`, draft.value)
   else await api.post('/story', { ...draft.value, parent_id: props.part.id })
@@ -39,8 +41,11 @@ const move = (d) => run(() => {
 <template>
   <div :id="`story-${part.id}`" class="card part" :class="{ nested: depth > 1, locked: !part.unlocked }">
     <div class="row">
-      <strong>{{ part.unlocked ? '📖' : '🔒' }} {{ number }} {{ part.title }}</strong>
+      <Button text size="small" :icon="open ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" :aria-expanded="open" :aria-label="open ? $t('story.collapse') : $t('story.expand')" @click="open = !open" />
+      <strong class="clickable" @click="open = !open">{{ part.unlocked ? '📖' : '🔒' }} {{ number }} {{ part.title }}</strong>
       <span class="muted">{{ label }}</span>
+      <span v-if="kids.length" class="muted">· {{ $t('story.scenarioCount', { n: kids.length }, kids.length) }}</span>
+      <span v-if="part.location && !open" class="muted">· 📍 {{ part.location }}</span>
       <span class="spacer" />
       <template v-if="gm">
         <Button size="small" text icon="pi pi-arrow-up" :aria-label="$t('story.moveUp')" :disabled="index === 0" @click="move(-1)" />
@@ -50,10 +55,13 @@ const move = (d) => run(() => {
         <Button size="small" text severity="danger" :label="$t('common.delete')" @click="del" />
       </template>
     </div>
+    <template v-if="open">
     <StoryForm v-if="mode === 'edit'" v-model="draft" :npcs="npcs" :maps="maps" :submit-label="$t('common.save')" @submit="submit" @cancel="mode = null" />
     <template v-else>
       <div v-if="part.location" class="muted">📍 {{ part.location }}</div>
-      <div v-if="part.npcs.length" class="muted">👤 {{ part.npcs.map((n) => n.name).join(', ') }}</div>
+      <div v-if="part.npcs.length" class="row muted">👤
+        <Button v-for="n in part.npcs" :key="n.id" size="small" text :label="n.name" icon="pi pi-id-card" @click="openNpc(n.id)" />
+      </div>
       <div v-if="part.map" class="row">
         🗺️
         <router-link v-if="part.map.unlocked" :to="`/maps/${part.map.id}`">{{ part.map.title }}</router-link>
@@ -64,11 +72,13 @@ const move = (d) => run(() => {
     </template>
     <div v-if="gm && depth < maxDepth && mode !== 'add'" class="row"><Button size="small" text icon="pi pi-plus" :label="$t('story.addScenario')" @click="startAdd" /></div>
     <StoryForm v-if="mode === 'add'" v-model="draft" :npcs="npcs" :maps="maps" :submit-label="$t('story.add')" @submit="submit" @cancel="mode = null" />
-    <StoryPart v-for="(c, i) in kids" :key="c.id" :part="c" :depth="depth + 1" :index="i" :siblings="kids" :children="children" :gm="gm" :npcs="npcs" :maps="maps" :max-depth="maxDepth" :number="`${number}${i + 1}.`" @error="emit('error', $event)" />
+    <StoryPart v-for="(c, i) in kids" :key="c.id" :part="c" :depth="depth + 1" :index="i" :siblings="kids" :children="children" :gm="gm" :npcs="npcs" :maps="maps" :max-depth="maxDepth" :number="`${number}${i + 1}.`" :open-ids="openIds" @error="emit('error', $event)" />
+    </template>
   </div>
 </template>
 
 <style scoped>
 .part.nested { margin-left: 1.25rem; border-left: 3px solid var(--app-accent); }
 .part.locked { opacity: .8; }
+.clickable { cursor: pointer; }
 </style>

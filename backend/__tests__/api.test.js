@@ -189,7 +189,7 @@ describe('story tree (issue #2)', () => {
   });
   it('links NPCs from the GM-only pool; players see names only', async () => {
     await request(app).get('/api/npcs').expect(403);
-    const n = (await post('/api/npcs', { name: 'Mayor Bram', description: 'is the villain' }).expect(201)).body;
+    const n = (await post('/api/npcs', { name: 'Mayor Bram', description: 'is the mayor', gm_notes: 'is the villain', hp: 20 }).expect(201)).body;
     const p = (await post('/api/story', { title: 'Town', npc_ids: [n.id] }).expect(201)).body;
     expect(p.npcs).toEqual([{ id: n.id, name: 'Mayor Bram' }]);
     await post('/api/story', { title: 'Bad', npc_ids: [999] }).expect(400);
@@ -249,5 +249,35 @@ describe('map locks and story/note links (issue #2)', () => {
     expect((await request(app).get(`/api/sessions/${s.id}`).set(G(gm))).body.notes[0].story_title).toBe('Tavern');
     await request(app).patch(`/api/notes/${n.id}`).send({ story_id: null }).expect(200);
     await request(app).patch(`/api/notes/${n.id}`).send({}).expect(400);
+  });
+});
+
+describe('NPC details (issue #2)', () => {
+  const G2 = () => G(gm);
+  it('shows players only public info of NPCs in visible story parts', async () => {
+    const n = (await request(app).post('/api/npcs').set(G2()).send({ name: 'Bram', description: 'Tall mayor', gm_notes: 'villain', hp: 20 }).expect(201)).body;
+    await request(app).post(`/api/npcs/${n.id}/stats`).set(G2()).send({ title: 'Armor', value: '15', visible: true }).expect(201);
+    await request(app).post(`/api/npcs/${n.id}/stats`).set(G2()).send({ title: 'Secret', value: 'cultist' }).expect(201);
+    const p = (await request(app).post('/api/story').set(G2()).send({ title: 'Town', npc_ids: [n.id] })).body;
+    await request(app).get(`/api/npcs/${n.id}`).expect(404); // part still locked
+    await request(app).post(`/api/story/${p.id}/unlock`).set(G2());
+    const pub = (await request(app).get(`/api/npcs/${n.id}`).expect(200)).body;
+    expect(pub).toEqual({ id: n.id, name: 'Bram', description: 'Tall mayor', stats: [{ title: 'Armor', value: '15' }] });
+    expect(JSON.stringify(pub)).not.toMatch(/villain|hp|cultist/);
+    expect((await request(app).get(`/api/npcs/${n.id}`).set(G2())).body).toMatchObject({ hp: 20, gm_notes: 'villain' });
+  });
+  it('edits HP and stats (GM only), max 8 stats, title max 32 chars', async () => {
+    const n = (await request(app).post('/api/npcs').set(G2()).send({ name: 'X' })).body;
+    await request(app).patch(`/api/npcs/${n.id}`).send({ hp: 5 }).expect(403);
+    expect((await request(app).patch(`/api/npcs/${n.id}`).set(G2()).send({ hp: 9 }).expect(200)).body.hp).toBe(9);
+    await request(app).patch(`/api/npcs/${n.id}`).set(G2()).send({ hp: 1.5 }).expect(400);
+    await request(app).post(`/api/npcs/${n.id}/stats`).set(G2()).send({ title: 'x'.repeat(33) }).expect(400);
+    let st;
+    for (let i = 0; i < 8; i++) st = (await request(app).post(`/api/npcs/${n.id}/stats`).set(G2()).send({ title: `S${i}`, value: '1' }).expect(201)).body;
+    await request(app).post(`/api/npcs/${n.id}/stats`).set(G2()).send({ title: 'ninth' }).expect(409);
+    expect((await request(app).patch(`/api/npc-stats/${st.id}`).set(G2()).send({ value: '12' }).expect(200)).body.value).toBe('12');
+    await request(app).delete(`/api/npc-stats/${st.id}`).set(G2()).expect(204);
+    await request(app).post(`/api/npcs/${n.id}/stats`).set(G2()).send({ title: 'again' }).expect(201);
+    expect((await request(app).get('/api/npcs').set(G2())).body[0].stats).toHaveLength(8);
   });
 });

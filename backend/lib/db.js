@@ -28,6 +28,9 @@ CREATE TABLE IF NOT EXISTS attachments(
   kind TEXT NOT NULL, file TEXT NOT NULL, title TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL DEFAULT (datetime('now')));
 CREATE TABLE IF NOT EXISTS npcs(
   id INTEGER PRIMARY KEY, name TEXT NOT NULL, description TEXT NOT NULL DEFAULT '');
+CREATE TABLE IF NOT EXISTS npc_stats(
+  id INTEGER PRIMARY KEY, npc_id INTEGER NOT NULL REFERENCES npcs(id) ON DELETE CASCADE, position INTEGER NOT NULL DEFAULT 0,
+  title TEXT NOT NULL, value TEXT NOT NULL DEFAULT '', visible INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS story_npcs(
   story_id INTEGER NOT NULL REFERENCES story_parts(id) ON DELETE CASCADE,
   npc_id INTEGER NOT NULL REFERENCES npcs(id) ON DELETE CASCADE, PRIMARY KEY(story_id, npc_id));
@@ -51,6 +54,8 @@ export function openDb(file = ':memory:') {
   addColumn(db, 'story_parts', 'parent_id', 'INTEGER REFERENCES story_parts(id) ON DELETE CASCADE');
   addColumn(db, 'story_parts', 'location', "TEXT NOT NULL DEFAULT ''");
   addColumn(db, 'story_parts', 'map_id', 'INTEGER REFERENCES maps(id) ON DELETE SET NULL');
+  addColumn(db, 'npcs', 'hp', 'INTEGER NOT NULL DEFAULT 0'); // GM-only health
+  addColumn(db, 'npcs', 'gm_notes', "TEXT NOT NULL DEFAULT ''"); // GM-only; `description` is public
   addColumn(db, 'notes', 'story_id', 'INTEGER REFERENCES story_parts(id) ON DELETE SET NULL');
   return db;
 }

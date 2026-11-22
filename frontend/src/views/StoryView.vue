@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import Button from 'primevue/button'
 import StoryForm from '@/components/StoryForm.vue'
 import StoryPart from '@/components/StoryPart.vue'
+import NpcDialog from '@/components/NpcDialog.vue'
 import { api, auth } from '@/lib/api'
 import { useLive } from '@/lib/useLive'
 
@@ -21,6 +22,12 @@ const tree = computed(() => {
   const m = new Map()
   for (const p of parts.value) { const k = p.parent_id ?? null; if (!m.has(k)) m.set(k, []); m.get(k).push(p) }
   return m
+})
+// deep link ?part=ID: open that part and all its ancestors
+const openIds = computed(() => {
+  const ids = new Set()
+  for (let cur = parts.value.find((p) => p.id === Number(route.query.part)); cur; cur = parts.value.find((p) => p.id === cur.parent_id)) ids.add(cur.id)
+  return ids
 })
 const roots = computed(() => tree.value.get(null) ?? [])
 
@@ -40,7 +47,7 @@ const add = async () => {
 <template>
   <h2>{{ $t('story.title') }}</h2>
   <p v-if="!parts.length" class="muted">{{ $t('story.empty') }}<template v-if="!gm">{{ $t('story.emptyPlayer') }}</template></p>
-  <StoryPart v-for="(p, i) in roots" :key="p.id" :part="p" :index="i" :siblings="roots" :children="tree" :gm="gm" :npcs="npcs" :maps="maps" :max-depth="MAX_DEPTH" :number="`${i + 1}.`" @error="error = $event" />
+  <StoryPart v-for="(p, i) in roots" :key="p.id" :part="p" :index="i" :siblings="roots" :children="tree" :gm="gm" :npcs="npcs" :maps="maps" :max-depth="MAX_DEPTH" :number="`${i + 1}.`" :open-ids="openIds" @error="error = $event" />
   <div v-if="gm" class="card">
     <Button v-if="!adding" icon="pi pi-plus" :label="$t('story.new')" @click="startAdd" />
     <template v-else>
@@ -49,4 +56,5 @@ const add = async () => {
     </template>
   </div>
   <p class="err">{{ error }}</p>
+  <NpcDialog />
 </template>
