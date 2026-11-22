@@ -10,6 +10,8 @@ import sessionsRoutes from './routes/sessions.js';
 import storyRoutes from './routes/story.js';
 import mapsRoutes from './routes/maps.js';
 import npcRoutes from './routes/npcs.js';
+import blueprintRoutes from './routes/blueprints.js';
+import importRoutes from './routes/import.js';
 
 /** createApp({ db, gmPin, filesDir, staticDir }) – used by server.js and tests. */
 export function createApp({ db, gmPin, groupPassword, filesDir, staticDir }) {
@@ -21,7 +23,8 @@ export function createApp({ db, gmPin, groupPassword, filesDir, staticDir }) {
 
   app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'same-site' }, hsts: false }));
   app.use(cors());
-  app.use(express.json({ limit: '1mb' }));
+  const json = express.json({ limit: '1mb' });
+  app.use((req, res, next) => (req.path.startsWith('/api/import') ? next() : json(req, res, next))); // import routes parse their own larger body after the GM check
 
   const api = express.Router();
   api.get('/health', (req, res) => res.json({ status: 'ok' }));
@@ -43,6 +46,8 @@ export function createApp({ db, gmPin, groupPassword, filesDir, staticDir }) {
   api.use(sessionsRoutes(ctx));
   api.use(storyRoutes(ctx));
   api.use(npcRoutes(ctx));
+  api.use(blueprintRoutes(ctx));
+  api.use(importRoutes(ctx));
   api.use(mapsRoutes(ctx));
   api.get('/files/:name', (req, res) => {
     const name = req.params.name;

@@ -18,7 +18,8 @@ export default function npcRoutes({ db, hub, auth }) {
     const n = find(req.params.id);
     if (auth.isGm(req)) return res.json(full(n));
     const vis = visibleIds(allParts(db));
-    const linked = db.prepare('SELECT story_id FROM story_npcs WHERE npc_id=?').all(n.id).some((x) => vis.has(x.story_id));
+    const linked = db.prepare('SELECT story_id FROM story_npcs WHERE npc_id=?').all(n.id).some((x) => vis.has(x.story_id))
+      || !!db.prepare('SELECT 1 FROM tokens t JOIN maps m ON m.id=t.map_id WHERE t.npc_id=? AND m.unlocked=1').get(n.id); // or on a visible map marker (ADR-014)
     if (!linked) throw notFound('NPC not found');
     res.json({ id: n.id, name: n.name, description: n.description, stats: stats(n.id).filter((s) => s.visible).map(({ title, value }) => ({ title, value })) });
   });
@@ -49,6 +50,7 @@ export default function npcRoutes({ db, hub, auth }) {
     const n = find(req.params.id);
     db.prepare('DELETE FROM npcs WHERE id=?').run(n.id);
     emit();
+    hub.emit('tokens');
     res.status(204).end();
   });
 

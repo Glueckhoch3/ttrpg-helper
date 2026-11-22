@@ -281,3 +281,130 @@ describe('NPC details (issue #2)', () => {
     expect((await request(app).get('/api/npcs').set(G2())).body[0].stats).toHaveLength(8);
   });
 });
+
+describe('blueprints and import (issue #4)', () => {
+  const P = (body) => request(app).post('/api/blueprints').set(G(gm)).send(body);
+  const GOBLIN = { kind: 'creature', name: 'Goblin', subtitle: 'Small humanoid', body: 'Sneaky.', stats: [{ title: 'HP', value: '7' }] };
+
+  it('GM manages blueprints, players cannot list or edit', async () => {
+    const b = (await P(GOBLIN).expect(201)).body;
+    expect(b.stats).toEqual(GOBLIN.stats);
+    await request(app).post('/api/blueprints').send(GOBLIN).expect(403);
+    await request(app).get('/api/blueprints').expect(403);
+    await request(app).patch(`/api/blueprints/${b.id}`).send({ name: 'x' }).expect(403);
+    await request(app).delete(`/api/blueprints/${b.id}`).expect(403);
+    await P({ ...GOBLIN, kind: 'spell' }).expect(400);
+    await P({ kind: 'item', name: '' }).expect(400);
+    const list = (await request(app).get('/api/blueprints?kind=creature').set(G(gm))).body;
+    expect(list).toEqual([{ id: b.id, kind: 'creature', name: 'Goblin', subtitle: 'Small humanoid', source: 'manual' }]);
+    expect((await request(app).get('/api/blueprints?kind=item').set(G(gm))).body).toEqual([]);
+    await request(app).get('/api/blueprints?kind=bogus').set(G(gm)).expect(400);
+    const p = (await request(app).patch(`/api/blueprints/${b.id}`).set(G(gm)).send({ name: 'Goblin Boss', kind: 'item' }).expect(200)).body;
+    expect(p).toMatchObject({ name: 'Goblin Boss', kind: 'creature', body: 'Sneaky.' });
+    await request(app).delete(`/api/blueprints/${b.id}`).set(G(gm)).expect(204);
+    await request(app).get(`/api/blueprints/${b.id}`).set(G(gm)).expect(404);
+  });
+
+  describe('marker links', () => {
+    let map, tok, item, creature, npc;
+    const mkItem = async (name) => (await P({ kind: 'item', name }).expect(201)).body;
+    beforeEach(async () => {
+      map = (await request(app).post('/api/maps?title=M&w=100&h=100').set(G(gm)).set('Content-Type', 'image/png').send(PNG).expect(201)).body;
+      await request(app).patch(`/api/maps/${map.id}`).set(G(gm)).send({ grid_locked: true }).expect(200);
+      tok = (await request(app).post(`/api/maps/${map.id}/tokens`).set(G(gm)).send({ symbol: 'X' }).expect(201)).body;
+      item = await mkItem('Sword');
+      creature = (await P(GOBLIN)).body;
+      npc = (await request(app).post('/api/npcs').set(G(gm)).send({ name: 'Bob', description: 'public' })).body;
+    });
+    const link = (body) => request(app).patch(`/api/tokens/${tok.id}`).set(G(gm)).send(body);
+
+    it('links up to 5 items, one creature and one NPC; names come back', async () => {
+      const r = (await link({ npc_id: npc.id, creature_id: creature.id, item_ids: [item.id] }).expect(200)).body;
+      expect(r).toMatchObject({ npc: { id: npc.id, name: 'Bob' }, creature: { id: creature.id, name: 'Goblin' }, items: [{ id: item.id, name: 'Sword' }] });
+      const m = (await request(app).get(`/api/maps/${map.id}`).set(G(gm))).body;
+      expect(m.tokens[0].items).toHaveLength(1);
+      const more = [item, ...(await Promise.all([1, 2, 3, 4].map((n) => mkItem(`I${n}`))))].map((i) => i.id);
+      expect((await link({ item_ids: more }).expect(200)).body.items).toHaveLength(5);
+      await link({ item_ids: [...more, (await mkItem('sixth')).id] }).expect(400);
+      await link({ item_ids: [item.id, item.id] }).expect(400);
+      expect((await link({ item_ids: [] }).expect(200)).body.items).toEqual([]);
+      expect((await link({ creature_id: null, npc_id: null }).expect(200)).body).toMatchObject({ npc: null, creature: null });
+    });
+    it('checks the kinds and existence', async () => {
+      await link({ creature_id: item.id }).expect(400);
+      await link({ item_ids: [creature.id] }).expect(400);
+      await link({ npc_id: 999 }).expect(400);
+      await link({ item_ids: 'x' }).expect(400);
+    });
+    it('can link on create', async () => {
+      const t = (await request(app).post(`/api/maps/${map.id}/tokens`).set(G(gm)).send({ creature_id: creature.id, item_ids: [item.id] }).expect(201)).body;
+      expect(t.creature.name).toBe('Goblin');
+      expect(t.items).toHaveLength(1);
+    });
+    it('players cannot set links', async () => {
+      await request(app).post(`/api/maps/${map.id}/unlock`).set(G(gm)).expect(200);
+      await request(app).patch(`/api/tokens/${tok.id}`).send({ npc_id: npc.id }).expect(403);
+      await request(app).patch(`/api/tokens/${tok.id}`).send({ item_ids: [] }).expect(403);
+      await request(app).patch(`/api/tokens/${tok.id}`).send({ label: 'ok' }).expect(200);
+    });
+    it('players see linked data only while the map is unlocked', async () => {
+      await link({ npc_id: npc.id, creature_id: creature.id, item_ids: [item.id] }).expect(200);
+      for (const u of [`/api/blueprints/${item.id}`, `/api/blueprints/${creature.id}`, `/api/npcs/${npc.id}`]) await request(app).get(u).expect(404);
+      await request(app).post(`/api/maps/${map.id}/unlock`).set(G(gm)).expect(200);
+      expect((await request(app).get(`/api/blueprints/${creature.id}`).expect(200)).body.stats).toEqual(GOBLIN.stats);
+      await request(app).get(`/api/blueprints/${item.id}`).expect(200);
+      expect((await request(app).get(`/api/npcs/${npc.id}`).expect(200)).body.name).toBe('Bob');
+      const unlinked = await mkItem('Secret');
+      await request(app).get(`/api/blueprints/${unlinked.id}`).expect(404);
+      await request(app).post(`/api/maps/${map.id}/lock`).set(G(gm)).expect(200);
+      await request(app).get(`/api/blueprints/${creature.id}`).expect(404);
+    });
+    it('deleting blueprints, NPCs or tokens cleans up the links', async () => {
+      await link({ npc_id: npc.id, creature_id: creature.id, item_ids: [item.id] }).expect(200);
+      await request(app).delete(`/api/blueprints/${item.id}`).set(G(gm)).expect(204);
+      await request(app).delete(`/api/blueprints/${creature.id}`).set(G(gm)).expect(204);
+      await request(app).delete(`/api/npcs/${npc.id}`).set(G(gm)).expect(204);
+      const t = (await request(app).get(`/api/maps/${map.id}`).set(G(gm))).body.tokens[0];
+      expect(t).toMatchObject({ npc: null, creature: null, items: [] });
+      await request(app).delete(`/api/tokens/${tok.id}`).set(G(gm)).expect(204);
+    });
+  });
+
+  describe('import', () => {
+    const body = (extra = {}) => ({ format: 'ttrpg', kind: 'creature', data: { creatures: [{ name: 'A' }, { name: 'B' }, { name: 'a' }] }, ...extra });
+    it('is GM only and lists up to three formats', async () => {
+      await request(app).get('/api/import/formats').expect(403);
+      await request(app).post('/api/import/preview').send(body()).expect(403);
+      await request(app).post('/api/import').send(body()).expect(403);
+      const f = (await request(app).get('/api/import/formats').set(G(gm)).expect(200)).body;
+      expect(f.map((x) => x.id)).toEqual(['open5e', '5etools', 'ttrpg']);
+    });
+    it('previews without saving, then imports the chosen entries and skips duplicates', async () => {
+      const pv = (await request(app).post('/api/import/preview').set(G(gm)).send(body()).expect(200)).body;
+      expect(pv.entries.map((e) => e.name)).toEqual(['A', 'B', 'a']);
+      expect((await request(app).get('/api/blueprints').set(G(gm))).body).toEqual([]);
+      const r = (await request(app).post('/api/import').set(G(gm)).send(body({ indexes: [0, 1, 2, 2, 99] })).expect(201)).body;
+      expect(r).toEqual({ imported: 2, duplicates: 1 });
+      const list = (await request(app).get('/api/blueprints').set(G(gm))).body;
+      expect(list.map((x) => x.source)).toEqual(['ttrpg', 'ttrpg']);
+      const again = (await request(app).post('/api/import/preview').set(G(gm)).send(body()).expect(200)).body;
+      expect(again.entries.map((e) => e.duplicate)).toEqual([true, true, true]);
+      expect((await request(app).post('/api/import').set(G(gm)).send(body()).expect(201)).body).toEqual({ imported: 0, duplicates: 3 });
+    });
+    it('imports everything without indexes and handles a large (>1 MB) file', async () => {
+      const creatures = Array.from({ length: 300 }, (_, i) => ({ name: `C${i}`, body: 'x'.repeat(5000) }));
+      const r = await request(app).post('/api/import').set(G(gm)).send({ format: 'ttrpg', kind: 'creature', data: { creatures } }).expect(201);
+      expect(r.body.imported).toBe(300);
+    });
+    it('rejects bad input', async () => {
+      await request(app).post('/api/import').set(G(gm)).send(body({ format: 'x' })).expect(400);
+      await request(app).post('/api/import').set(G(gm)).send(body({ kind: 'x' })).expect(400);
+      await request(app).post('/api/import').set(G(gm)).send(body({ data: { items: [] } })).expect(400);
+      await request(app).post('/api/import').set(G(gm)).send(body({ indexes: 'all' })).expect(400);
+      await request(app).post('/api/import').set(G(gm)).send(body({ data: null })).expect(400);
+    });
+    it('keeps the 1 MB limit elsewhere', async () => {
+      await request(app).post('/api/npcs').set(G(gm)).send({ name: 'x', description: 'y'.repeat(1.2e6) }).expect(413);
+    });
+  });
+});
